@@ -1,0 +1,16 @@
+{
+   "sourceName": "Hikari",
+   "iconUrl": "/logo.png",
+   "author": {
+       "name": "ShadeOfChaos",
+       "icon": "/ofchaos.jpg"
+   },
+   "version": "1.0.0",
+   "language": "English (SUB)",
+   "streamType": "HLS",
+   "quality": "1080p",
+   "baseUrl": "https://watch.hikaritv.xyz/",
+   "searchBaseUrl": "https://watch.hikaritv.xyz/search?keyword=%s",
+   "scriptUrl": "/HikariSUBS.js",
+   "asyncJS": true
+}
