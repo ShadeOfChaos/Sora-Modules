@@ -3,10 +3,10 @@ function searchResults(html) {
     const trimmedHtml = trimHtml(html, 'class="film_list-wrap', 'class="pre-pagination');
 
     const regex = /<div class="flw-item"[\s\S]*?src="(.+)"[\s\S]*?href="([^"]+)[\s\S]*?dynamic-name">[\s]*([^<]+)/g;
-    const results = Array.from(trimmedHtml.matchAll(regex), match => { 
-        return { image: match[1], href: match[2], title: match[3].trim() } 
+    const results = Array.from(trimmedHtml.matchAll(regex), match => {
+        return { image: match[1], href: match[2], title: match[3].trim() }
     }) || [];
-    
+
     return results;
 }
 
@@ -20,27 +20,27 @@ function extractDetails(html) {
         aliases: '',
         airdate: ''
     }
-    
+
     const descriptionRegex = /<h3>Description:<\/h3>[\s\n]*<p>([^<]+)/;
     const descriptionMatch = trimmedHtml.match(descriptionRegex);
-    
-    if(descriptionMatch != null) {
+
+    if (descriptionMatch != null) {
         details.description = descriptionMatch[1];
     }
-    
+
     const sidebarRegex = /(Japanese|English|Synonyms|Aired):<\/span>[\s\n]*<span class="name">([^<]+)/g;
-    const sidebarMatch = Array.from(trimmedHtml.matchAll(sidebarRegex), m => { 
+    const sidebarMatch = Array.from(trimmedHtml.matchAll(sidebarRegex), m => {
         let obj = {};
-        obj[m[1]] = m[2];	
+        obj[m[1]] = m[2];
         return obj;
     }) || [];
-    
-    if(sidebarMatch.length <= 0) {
+
+    if (sidebarMatch.length <= 0) {
         return details;
     }
-    
+
     const result = Object.assign({}, ...sidebarMatch);
-    
+
     details.airdate = result?.Aired || '';
     details.aliases = buildAliasString(result);
 
@@ -49,21 +49,21 @@ function extractDetails(html) {
     // Encapsulating this away
     function buildAliasString(resultObj) {
         let string = '';
-    
-        if(resultObj?.Japanese) {
+
+        if (resultObj?.Japanese) {
             string += resultObj.Japanese;
         }
-    
-        if(resultObj?.English) {
-            if(string != '') string += ', ';
+
+        if (resultObj?.English) {
+            if (string != '') string += ', ';
             string += resultObj.English;
         }
-    
-        if(resultObj?.Synonyms) {
-            if(string != '') string += ', ';
+
+        if (resultObj?.Synonyms) {
+            if (string != '') string += ', ';
             string += resultObj.Synonyms;
         }
-    
+
         return string;
     }
 }
@@ -79,13 +79,13 @@ function extractEpisodes(html) {
     const regex = /SUB: ([0-9]+)[\s\S]*<a href="\/([^"]+)/;
     const match = trimmedHtml.match(regex);
 
-    if(match == null) {
+    if (match == null) {
         return episodes;
     }
 
     episodesBaseUrl = baseUrl + match[2].slice(0, -1);
 
-    for(let i = 1, len = match[1]; i<=len; i++) {
+    for (let i = 1, len = match[1]; i <= len; i++) {
         episodes.push(episodesBaseUrl + i);
     }
 
@@ -113,8 +113,8 @@ async function extractStreamUrl(url) {
 
         const iframeString = embedData[0];
         const match = iframeString.match(regex);
-        
-        if(match == null) {
+
+        if (match == null) {
             return JSON.stringify({ stream: null, subtitles: null });
         }
 
