@@ -1,134 +1,104 @@
-async function searchResults(keyword) {
-    try {
-        const baseUrl = "https://watch.hikaritv.xyz/";
-        const encodedKeyword = encodeURIComponent(keyword);
-        const response = await fetch(`https://watch.hikaritv.xyz/search?keyword=${encodedKeyword}&language=ani_sub`);
-        const html = await response;
+function searchResults(html) {
+    const baseUrl = "https://watch.hikaritv.xyz/";
+    // Cut down on regex-workload
+    const trimmedHtml = trimHtml(html, 'class="film_list-wrap', 'class="pre-pagination');
 
-        // Cut down on regex-workload
-        const trimmedHtml = trimHtml(html, 'class="film_list-wrap', 'class="pre-pagination');
+    const regex = /<div class="flw-item"[\s\S]*?src="(.+)"[\s\S]*?href="([^"]+)[\s\S]*?dynamic-name">[\s]*([^<]+)/g;
+    const results = Array.from(trimmedHtml.matchAll(regex), match => {
+        return { image: match[1], href: baseUrl + match[2], title: match[3].trim() }
+    }) || [];
 
-        const regex = /<div class="flw-item"[\s\S]*?src="(.+)"[\s\S]*?href="([^"]+)[\s\S]*?dynamic-name">[\s]*([^<]+)/g;
-        const results = Array.from(trimmedHtml.matchAll(regex), match => {
-            return { image: match[1], href: baseUrl + match[2], title: match[3].trim() }
-        }) || [];
-
-        return JSON.stringify(results);
-    } catch (error) {
-        console.log('Fetch error:', error);
-        return JSON.stringify([{ title: 'Error', image: '', href: '' }]);
-    }
+    return JSON.stringify(results);
 }
 
-async function extractDetails(url) {
-    console.log('ExtractDetails url:', url);
-    try {
-        const response = await fetch(url);
-        const html = await response;
-        // Cut down on regex-workload
-        const trimmedHtml = trimHtml(html, 'class="anisc-info-wrap', '<script');
+function extractDetails(html) {
+    // Cut down on regex-workload
+    const trimmedHtml = trimHtml(html, 'class="anisc-info-wrap', '<script');
 
 
-        const details = {
-            description: '',
-            aliases: '',
-            airdate: ''
-        }
+    const details = {
+        description: '',
+        aliases: '',
+        airdate: ''
+    }
 
-        const descriptionRegex = /<h3>Description:<\/h3>[\s\n]*<p>([^<]+)/;
-        const descriptionMatch = trimmedHtml.match(descriptionRegex);
+    const descriptionRegex = /<h3>Description:<\/h3>[\s\n]*<p>([^<]+)/;
+    const descriptionMatch = trimmedHtml.match(descriptionRegex);
 
-        if (descriptionMatch != null) {
-            details.description = descriptionMatch[1];
-        }
+    if (descriptionMatch != null) {
+        details.description = descriptionMatch[1];
+    }
 
-        const sidebarRegex = /(Japanese|English|Synonyms|Aired):<\/span>[\s\n]*<span class="name">([^<]+)/g;
-        const sidebarMatch = Array.from(trimmedHtml.matchAll(sidebarRegex), m => {
-            let obj = {};
-            obj[m[1]] = m[2];
-            return obj;
-        }) || [];
+    const sidebarRegex = /(Japanese|English|Synonyms|Aired):<\/span>[\s\n]*<span class="name">([^<]+)/g;
+    const sidebarMatch = Array.from(trimmedHtml.matchAll(sidebarRegex), m => {
+        let obj = {};
+        obj[m[1]] = m[2];
+        return obj;
+    }) || [];
 
-        if (sidebarMatch.length <= 0) {
-            return JSON.stringify([details]);
-        }
-
-        const result = Object.assign({}, ...sidebarMatch);
-
-        details.airdate = result?.Aired || '';
-        details.aliases = buildAliasString(result);
-
+    if (sidebarMatch.length <= 0) {
         return JSON.stringify([details]);
+    }
 
-        // Encapsulating this away
-        function buildAliasString(resultObj) {
-            let string = '';
+    const result = Object.assign({}, ...sidebarMatch);
 
-            if (resultObj?.Japanese) {
-                string += resultObj.Japanese;
-            }
+    details.airdate = result?.Aired || '';
+    details.aliases = buildAliasString(result);
 
-            if (resultObj?.English) {
-                if (string != '') string += ', ';
-                string += resultObj.English;
-            }
+    return JSON.stringify([details]);
 
-            if (resultObj?.Synonyms) {
-                if (string != '') string += ', ';
-                string += resultObj.Synonyms;
-            }
+    // Encapsulating this away
+    function buildAliasString(resultObj) {
+        let string = '';
 
-            return string;
+        if (resultObj?.Japanese) {
+            string += resultObj.Japanese;
         }
-    } catch (error) {
-        console.log('Details error:', error);
-        return JSON.stringify([{
-            description: 'Error loading description',
-            aliases: 'Duration: Unknown',
-            airdate: 'Aired: Unknown'
-        }]);
+
+        if (resultObj?.English) {
+            if (string != '') string += ', ';
+            string += resultObj.English;
+        }
+
+        if (resultObj?.Synonyms) {
+            if (string != '') string += ', ';
+            string += resultObj.Synonyms;
+        }
+
+        return string;
     }
 }
 
-async function extractEpisodes(url) {
-    console.log('extractEpisodes url:', url);
-    try {
-        const episodes = [];
-        const baseUrl = "https://watch.hikaritv.xyz/";
-        let episodesBaseUrl = '';
+function extractEpisodes(html) {
+    const episodes = [];
+    const baseUrl = "https://watch.hikaritv.xyz/";
+    let episodesBaseUrl = '';
 
-        const response = await fetch(url);
-        const html = await response;
-        // Cut down on regex-workload
-        const trimmedHtml = trimHtml(html, 'class="anisc-detail', 'btn-play');
+    // Cut down on regex-workload
+    const trimmedHtml = trimHtml(html, 'class="anisc-detail', 'btn-play');
 
-        const regex = /SUB: ([0-9]+)[\s\S]*<a href="\/([^"]+)/;
-        const match = trimmedHtml.match(regex);
+    const regex = /SUB: ([0-9]+)[\s\S]*<a href="\/([^"]+)/;
+    const match = trimmedHtml.match(regex);
 
-        if (match == null) {
-            return JSON.stringify(episodes);
-        }
-
-        episodesBaseUrl = baseUrl + match[2].slice(0, -1);
-
-        for (let i = 1, len = match[1]; i <= len; i++) {
-            let episodeUrl = episodesBaseUrl + i;
-
-            episodes.push({
-                href: episodeUrl,
-                number: i
-            });
-        }
-
+    if (match == null) {
         return JSON.stringify(episodes);
-    } catch (error) {
-        console.error('Fetch error:', error);
-        return JSON.stringify([]);
     }
+
+    episodesBaseUrl = baseUrl + match[2].slice(0, -1);
+
+    for (let i = 1, len = match[1]; i <= len; i++) {
+        let episodeUrl = episodesBaseUrl + i;
+
+        episodes.push({
+            href: episodeUrl,
+            number: i
+        });
+    }
+
+    return JSON.stringify(episodes);
 }
 
 async function extractStreamUrl(url) {
-    console.log('extractStreamUrl url:', url);
     try {
         const iframeRegex = /src="([^"]*)/;
 
@@ -157,7 +127,7 @@ async function extractStreamUrl(url) {
         const streamPageUrl = iframeMatch[1];
 
         const StreamPageResponse = await fetch(streamPageUrl);
-        const streamPage = await StreamPageResponse.text();
+        const streamPage = await StreamPageResponse;
         const unpackedScript = deobfuscate(streamPage);
         
         const streamRegex = /file:"(https[^"]*)/;
