@@ -100,8 +100,15 @@ async function extractEpisodes(url) {
         // Cut down on regex-workload
         const trimmedHtml = trimHtml(html, 'class="anisc-detail', 'btn-play');
 
-        const regex = /SUB: ([0-9]+)[\s\S]*<a href="\/([^"]+)/;
-        const match = trimmedHtml.match(regex);
+        
+        const subRegex = /SUB: ([0-9]+)[\s\S]*<a href="\/([^"]+)/;
+        const multiRegex = /MULTI: ([0-9]+)[\s\S]*<a href="\/([^"]+)/;
+        const match = trimmedHtml.match(subRegex);
+        const multiMatch = trimmedHtml.match(multiRegex);
+
+        if(parseInt(multiMatch[1]) > parseInt(match[1])) {
+            match = multiMatch;
+        }
 
         if (match == null) {
             return JSON.stringify(episodes);
