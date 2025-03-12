@@ -91,7 +91,6 @@ async function extractDetails(url) {
 }
 
 async function extractEpisodes(url) {
-    console.log('extractEpisodes url:', url);
     try {
         const episodes = [];
         const baseUrl = "https://watch.hikaritv.xyz/";
@@ -128,7 +127,6 @@ async function extractEpisodes(url) {
 }
 
 async function extractStreamUrl(url) {
-    console.log('extractStreamUrl url:', url);
     try {
         const iframeRegex = /src="([^"]*)/;
 
@@ -159,11 +157,11 @@ async function extractStreamUrl(url) {
         const StreamPageResponse = await fetch(streamPageUrl);
         const streamPage = await StreamPageResponse;
         const unpackedScript = deobfuscate(streamPage);
-        
+
         const streamRegex = /file:"(https[^"]*)/;
         const streamMatch = unpackedScript.match(streamRegex);
 
-        if(streamMatch == null) {
+        if (streamMatch == null) {
             return null;
         }
 

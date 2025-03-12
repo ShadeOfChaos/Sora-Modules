@@ -129,11 +129,11 @@ async function extractStreamUrl(url) {
         const StreamPageResponse = await fetch(streamPageUrl);
         const streamPage = await StreamPageResponse;
         const unpackedScript = deobfuscate(streamPage);
-        
+
         const streamRegex = /file:"(https[^"]*)/;
         const streamMatch = unpackedScript.match(streamRegex);
 
-        if(streamMatch == null) {
+        if (streamMatch == null) {
             return null;
         }
 
