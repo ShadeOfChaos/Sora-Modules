@@ -127,7 +127,7 @@ async function extractStreamUrl(url) {
         const streamPageUrl = iframeMatch[1];
 
         const StreamPageResponse = await fetch(streamPageUrl);
-        const streamPage = await StreamPageResponse.text();
+        const streamPage = await StreamPageResponse;
         const unpackedScript = deobfuscate(streamPage);
         
         const streamRegex = /file:"(https[^"]*)/;
