@@ -106,12 +106,13 @@ async function extractEpisodes(url) {
         const match = trimmedHtml.match(subRegex);
         const multiMatch = trimmedHtml.match(multiRegex);
 
-        if(parseInt(multiMatch[1]) > parseInt(match[1])) {
-            match = multiMatch;
-        }
-
         if (match == null) {
             return JSON.stringify(episodes);
+        }
+        if(multiMatch !=- null) {
+            if(parseInt(multiMatch[1]) > parseInt(match[1])) {
+                match = multiMatch;
+            }
         }
 
         episodesBaseUrl = baseUrl + match[2].slice(0, -1);
