@@ -7,7 +7,7 @@ function searchResults(html) {
         return { image: match[1], href: match[2], title: match[3].trim() }
     }) || [];
 
-    return results;
+    return JSON.stringify(results);
 }
 
 function extractDetails(html) {
@@ -36,7 +36,7 @@ function extractDetails(html) {
     }) || [];
 
     if (sidebarMatch.length <= 0) {
-        return details;
+        return JSON.stringify([details]);
     }
 
     const result = Object.assign({}, ...sidebarMatch);
@@ -44,7 +44,7 @@ function extractDetails(html) {
     details.airdate = result?.Aired || '';
     details.aliases = buildAliasString(result);
 
-    return details;
+    return JSON.stringify([details]);
 
     // Encapsulating this away
     function buildAliasString(resultObj) {
@@ -80,16 +80,21 @@ function extractEpisodes(html) {
     const match = trimmedHtml.match(regex);
 
     if (match == null) {
-        return episodes;
+        return JSON.stringify(episodes);
     }
 
     episodesBaseUrl = baseUrl + match[2].slice(0, -1);
 
     for (let i = 1, len = match[1]; i <= len; i++) {
-        episodes.push(episodesBaseUrl + i);
+        let episodeUrl = episodesBaseUrl + i;
+
+        episodes.push({
+            href: episodeUrl,
+            number: i
+        });
     }
 
-    return episodes;
+    return JSON.stringify(episodes);
 }
 
 async function extractStreamUrl(url) {
@@ -115,19 +120,15 @@ async function extractStreamUrl(url) {
         const match = iframeString.match(regex);
 
         if (match == null) {
-            return JSON.stringify({ stream: null, subtitles: null });
+            return null;
         }
 
         const streamUrl = match[1];
+        return streamUrl;
 
-        const result = {
-            stream: streamUrl,
-            subtitles: null
-        };
-        return JSON.stringify(result);
     } catch (error) {
         console.error('Fetch error:', error);
-        return JSON.stringify({ stream: null, subtitles: null });
+        return null;
     }
 }
 
