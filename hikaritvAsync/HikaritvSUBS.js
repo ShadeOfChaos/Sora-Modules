@@ -3,7 +3,7 @@ async function searchResults(keyword) {
         const baseUrl = "https://watch.hikaritv.xyz/";
         const encodedKeyword = encodeURIComponent(keyword);
         const response = await fetch(`https://watch.hikaritv.xyz/search?keyword=${encodedKeyword}&language=ani_sub`);
-        const html = await response.text();
+        const html = await response;
 
         // Cut down on regex-workload
         const trimmedHtml = trimHtml(html, 'class="film_list-wrap', 'class="pre-pagination');
@@ -24,7 +24,7 @@ async function extractDetails(url) {
     console.warn('ExtractDetails url:', url);
     try {
         const response = await fetch(url);
-        const html = await response.text();
+        const html = await response;
         // Cut down on regex-workload
         const trimmedHtml = trimHtml(html, 'class="anisc-info-wrap', '<script');
 
@@ -98,7 +98,7 @@ async function extractEpisodes(url) {
         let episodesBaseUrl = '';
 
         const response = await fetch(url);
-        const html = await response.text();
+        const html = await response;
         // Cut down on regex-workload
         const trimmedHtml = trimHtml(html, 'class="anisc-detail', 'btn-play');
 
@@ -134,13 +134,13 @@ async function extractStreamUrl(url) {
         const embedServerUrl = `https://watch.hikaritv.xyz/ajax/embedserver/${uid}/${episode}`;
 
         const embedServerResponse = await fetch(embedServerUrl);
-        const embedServerData = await embedServerResponse.json();
+        const embedServerData = await JSON.parse(embedServerResponse);
 
         const embedId = embedServerData.embedFirst;
         const embedUrl = `https://watch.hikaritv.xyz/ajax/embed/${uid}/${episode}/${embedId}`;
 
         const embedResponse = await fetch(embedUrl);
-        const embedData = await embedResponse.json();
+        const embedData = await JSON.parse(embedResponse);
 
         const iframeString = embedData[0];
         const match = iframeString.match(regex);

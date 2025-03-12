@@ -103,13 +103,13 @@ async function extractStreamUrl(url) {
         const embedServerUrl = `https://watch.hikaritv.xyz/ajax/embedserver/${uid}/${episode}`;
 
         const embedServerResponse = await fetch(embedServerUrl);
-        const embedServerData = await embedServerResponse.json();
+        const embedServerData = await JSON.parse(embedServerResponse);
 
         const embedId = embedServerData.embedFirst;
         const embedUrl = `https://watch.hikaritv.xyz/ajax/embed/${uid}/${episode}/${embedId}`;
 
         const embedResponse = await fetch(embedUrl);
-        const embedData = await embedResponse.json();
+        const embedData = await JSON.parse(embedResponse);
 
         const iframeString = embedData[0];
         const match = iframeString.match(regex);
