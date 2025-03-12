@@ -11,7 +11,7 @@
    "quality": "1080p",
    "baseUrl": "https://watch.hikaritv.xyz/",
    "searchBaseUrl": "https://watch.hikaritv.xyz/search?keyword=%s",
-   "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/hikaritv/HikariTvSUBS30.js",
+   "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/hikaritv/HikariTvSUBS40.js",
 
    "asyncJS": true,
    "streamAsyncJS": true
