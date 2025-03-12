@@ -21,7 +21,7 @@ async function searchResults(keyword) {
 }
 
 async function extractDetails(url) {
-    console.warn('ExtractDetails url:', url);
+    console.log('ExtractDetails url:', url);
     try {
         const response = await fetch(url);
         const html = await response;
@@ -91,7 +91,7 @@ async function extractDetails(url) {
 }
 
 async function extractEpisodes(url) {
-    console.warn('extractEpisodes url:', url);
+    console.log('extractEpisodes url:', url);
     try {
         const episodes = [];
         const baseUrl = "https://watch.hikaritv.xyz/";
@@ -128,7 +128,7 @@ async function extractEpisodes(url) {
 }
 
 async function extractStreamUrl(url) {
-    console.warn('extractStreamUrl url:', url);
+    console.log('extractStreamUrl url:', url);
     try {
         const regex = /src="([^"]*)/;
 

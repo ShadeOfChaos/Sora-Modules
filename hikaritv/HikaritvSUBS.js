@@ -1,10 +1,11 @@
 function searchResults(html) {
+    const baseUrl = "https://watch.hikaritv.xyz/";
     // Cut down on regex-workload
     const trimmedHtml = trimHtml(html, 'class="film_list-wrap', 'class="pre-pagination');
 
     const regex = /<div class="flw-item"[\s\S]*?src="(.+)"[\s\S]*?href="([^"]+)[\s\S]*?dynamic-name">[\s]*([^<]+)/g;
     const results = Array.from(trimmedHtml.matchAll(regex), match => {
-        return { image: match[1], href: match[2], title: match[3].trim() }
+        return { image: match[1], href: baseUrl + match[2], title: match[3].trim() }
     }) || [];
 
     return JSON.stringify(results);
