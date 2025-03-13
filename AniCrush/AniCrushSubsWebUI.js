@@ -92,7 +92,8 @@ async function searchResults(keyword) {
             method: 'GET',
             headers: getCommonHeaders()
         });
-        const data = await response.json();
+        
+        const data = JSON.parse(response);
 
         if(data?.status == false || data?.result?.movies?.length <= 0) {
             throw('No results found');
@@ -122,7 +123,7 @@ async function extractDetails(url) {
             method: 'GET',
             headers: getCommonHeaders()
         });
-        const data = await response.json();
+        const data = JSON.parse(response);
 
         if(data?.status == false || data?.result == null) {
             throw('No results found');
@@ -189,7 +190,7 @@ async function extractEpisodes(url) {
             method: 'GET',
             headers: getCommonHeaders()
         });
-        const data = await response.json();
+        const data = JSON.parse(response);
 
         if(data?.status == false || data?.result == null) {
             throw('No results found');
