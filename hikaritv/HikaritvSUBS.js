@@ -1,4 +1,6 @@
 async function searchResults(keyword) {
+    alert("Warning: This module does not fully function for the entirety of it source, do not ask for help in the discord if you get stuck while using it");
+
     try {
         const baseUrl = "https://watch.hikaritv.xyz/";
         const encodedKeyword = encodeURIComponent(keyword);
