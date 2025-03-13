@@ -9,7 +9,7 @@ function getImage(path, type = "poster") {
         reversedPath += pathToReverse[i];
     }
 
-    const extension = reversedPath.split('.').pop();
+    const extension = pathToReverse.split('.').pop();
     const imageUrl = `${ SOURCE_STATIC_URL }/${type === "poster" ? "300x400" : "900x600"}/100/${ reversedPath }.${ extension }`;
 
     return imageUrl;
