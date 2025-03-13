@@ -11,7 +11,7 @@
     "quality": "1080p",
     "baseUrl": "https://api.anicrush.to/",
     "searchBaseUrl": "https://api.anicrush.to/shared/v2/movie/list?keyword=%s",
-    "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AniCrush/AniCrushSubs.js",
+    "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AniCrush/AniCrushSubsWebUI.js",
     "asyncJS": true,
     "streamAsyncJS": true
  }
