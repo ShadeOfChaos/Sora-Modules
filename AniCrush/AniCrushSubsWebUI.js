@@ -2,14 +2,6 @@ const SOURCE_URL = "https://anicrush.to";
 const SOURCE_API_URL = "https://api.anicrush.to";
 const SOURCE_STATIC_URL = "https://static.gniyonna.com/media/poster";
 
-// TODO - Remove tests below this line
-const results = await searchResults('Solo Leveling');
-const details = await extractDetails(JSON.parse(results)[0].href);
-const episodes = await extractEpisodes(JSON.parse(results)[0].href);
-const streamUrl = await extractStreamUrl(JSON.parse(episodes)[0].href);
-
-// TODO - Remove test above this line
-
 function getImage(path, type = "poster") {
     const pathToReverse = path.split('/')[2];
 
