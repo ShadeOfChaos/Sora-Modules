@@ -1,4 +1,3 @@
-const SOURCE_URL = "https://anicrush.to";
 const SOURCE_API_URL = "https://api.anicrush.to";
 const SOURCE_STATIC_URL = "https://static.gniyonna.com/media/poster";
 
