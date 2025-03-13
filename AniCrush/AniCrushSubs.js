@@ -17,7 +17,7 @@ function getImage(path, type = "poster") {
         reversedPath += pathToReverse[i];
     }
 
-    const extension = pathToReverse.split('.').pop();
+    const extension = path.split('.').pop();
     const imageUrl = `${ SOURCE_STATIC_URL }/${type === "poster" ? "300x400" : "900x600"}/100/${ reversedPath }.${ extension }`;
 
     return imageUrl;
@@ -190,6 +190,8 @@ async function extractDetails(url) {
 
 async function extractEpisodes(url) {
     try {
+        const serverId = 4;
+        const streamType = 'sub';
         var episodes = [];
         const id = url.split('/').at(-1);
 
@@ -202,11 +204,11 @@ async function extractEpisodes(url) {
         if(data?.status == false || data?.result == null) {
             throw('No results found');
         }
-
+        
         for(let episodeList in data.result) {
             for(let episode of data.result[episodeList]) {
                 episodes.push({
-                    href: episode.id,
+                    href: `${ SOURCE_API_URL }/shared/v2/episode/sources?_movieId=${ id }&ep=${ episode.number }&sv=${ serverId }&sc=${ streamType }`,
                     number: episode.number
                 });
             }
@@ -221,6 +223,26 @@ async function extractEpisodes(url) {
 
 async function extractStreamUrl(url) {
     try {
+        var iframeUrl = '';
+
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: getCommonHeaders()
+        });
+
+        const data = await response.json();
+
+        if(data?.status == false || data?.result == null) {
+            throw('No stream found');
+        }
+        if(data.result?.type == 'iframe') {
+            iframeUrl = data.result?.link;
+        }
+        if(iframeUrl == '' || iframeUrl == null) {
+            throw("No stream found");
+        }
+
+        return iframeUrl; // TODO - Get HLS from iframeUrl
 
         return streamUrl;
 
