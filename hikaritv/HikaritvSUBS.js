@@ -134,6 +134,7 @@ async function extractEpisodes(url) {
 }
 
 async function extractStreamUrl(url) {
+    const validServers = ['streamwish'];
     try {
         const iframeRegex = /src="([^"]*)/;
 
@@ -147,8 +148,38 @@ async function extractStreamUrl(url) {
         const embedServerData = await JSON.parse(embedServerResponse);
 
         const embedId = embedServerData.embedFirst;
-        // const embedUrl = `https://watch.hikaritv.xyz/ajax/embed/${uid}/${episode}/${embedId}`;
-        const embedUrl = `https://watch.hikaritv.xyz/ajax/embed/52299/1/348492`;
+
+        // Get all 'valid' and 'functioning' options
+        // Streamwish - valid
+        // Por Sub & Por Dub - Portuguese (new and rare as of 2025-03-13)
+        // PlayerX - Invalid, too much work to figure out how to get the stream URL , though if someone figures it out, I'd love to know (Ask for debug data to get started)
+        // Filemoon - Invalid, too much work to figure out how to get the stream URL , though if someone figures it out, I'd love to know (Ask for debug data to get started)
+        const trimmedHtml = cutHtml(embedServerData.html, 'servers-dub', 'clearfix');
+
+        const regex = /" id=[\\]?"embed-([0-9]*).+>[\n\s]+([^<]+)/g;
+        const matches = trimmedHtml.matchAll(regex);
+        const validMatches = [];
+
+        for(let match of matches) {
+            let server = match[2].trim().toLowerCase();
+
+            if(validServers.includes(server)) {
+                if(match[1] == embedServerData?.embedFirst) {
+                    embedId = match[1];
+                    break;
+                }
+                validMatches.push(match[1]);
+            }
+        }
+
+        if(embedId == null) {
+            if(validMatches.size < 0) {
+                throw('No valid server found');
+            }
+            embedId = validMatches[0]; // First entries are sub, later entries are multi
+        }
+
+        const embedUrl = `https://watch.hikaritv.xyz/ajax/embed/${uid}/${episode}/${embedId}`;
 
         const embedResponse = await fetch(embedUrl);
         const embedData = await JSON.parse(embedResponse);
@@ -183,10 +214,27 @@ async function extractStreamUrl(url) {
     }
 }
 
+// Trims around the content, leaving only the area between the start and end string
 function trimHtml(html, startString, endString) {
     const startIndex = html.indexOf(startString);
     const endIndex = html.indexOf(endString, startIndex);
     return html.substring(startIndex, endIndex);
+}
+
+// Cuts out the content between start and end string
+function cutHtml(html, startString, endString) {
+    const startIndex = html.indexOf(startString);
+    const endIndex = html.indexOf(endString, startIndex);
+
+    // Nothing to cut out
+    if(startIndex <= 0) return html;
+
+    const startContent = html.substring(0, startIndex);
+    const endContent = html.substring(endIndex);
+
+    let tmpContent = startContent + endContent;
+
+    return tmpContent;
 }
 
 function deobfuscate(html) {
