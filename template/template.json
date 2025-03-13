@@ -1,0 +1,17 @@
+{
+    "sourceName": "",
+    "iconUrl": "",
+    "author": {
+        "name": "",
+        "icon": ""
+    },
+    "version": "1.0.0",
+    "language": "English (SUB)",
+    "streamType": "HLS",
+    "quality": "720p",
+    "baseUrl": "",
+    "searchBaseUrl": "",
+    "scriptUrl": "",
+    "asyncJS": true,
+    "streamAsyncJS": true
+ }
