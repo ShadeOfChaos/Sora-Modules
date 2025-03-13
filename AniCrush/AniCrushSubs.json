@@ -10,8 +10,8 @@
     "streamType": "HLS",
     "quality": "1080p",
     "baseUrl": "https://api.anicrush.to/",
-    "searchBaseUrl": "https://watch.hikaritv.xyz/search?keyword=%s",
-    "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/anicrush/AniCrushSubs.js",
+    "searchBaseUrl": "https://api.anicrush.to/shared/v2/movie/list?keyword=%s",
+    "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AniCrush/AniCrushSubs.js",
     "asyncJS": true,
     "streamAsyncJS": true
  }
