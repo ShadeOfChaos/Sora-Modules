@@ -26,7 +26,7 @@ function getImage(path, type = "poster") {
  */
 async function searchResults(keyword) {
     const BASE_URL = 'https://anicrush.to';
-    const UTILITY_URL = "https://ac-api.ofchaos.com";
+    const UTILITY_URL = 'https://ac-api.ofchaos.com';
 
     try {
         const page = 1;
