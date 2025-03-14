@@ -20,88 +20,11 @@ function getImage(path, type = "poster") {
 }
 
 /**
- * Returns a randomly selected User Agent object from the list of provided User Agents.
- *
- * @returns {object} - A User Agent object containing the name, version, platform, device, and userAgent string.
- */
-function getRandomUserAgent() {
-    const userAgents = [{
-        "name": "Chrome",
-        "version": "120",
-        "platform": "Windows",
-        "device": "Desktop",
-        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-      },
-      {
-        "name": "Firefox",
-        "version": "120",
-        "platform": "Windows",
-        "device": "Desktop",
-        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Firefox/120.0",
-      },
-      {
-        "name": "Safari",
-        "version": "17",
-        "platform": "MacOS",
-        "device": "Desktop",
-        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15",
-      },
-      {
-        "name": "Edge",
-        "version": "120",
-        "platform": "Windows",
-        "device": "Desktop",
-        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Edg/120.0.0.0",
-      },
-      {
-        "name": "Chrome",
-        "version": "120",
-        "platform": "Android",
-        "device": "Mobile",
-        "userAgent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
-      },
-      {
-        "name": "Safari",
-        "version": "17",
-        "platform": "iOS",
-        "device": "Mobile",
-        "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_1_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1",
-      }];
-
-      return userAgents[Math.floor(Math.random() * userAgents.length)];
-}
-
-/**
- * Returns an object containing common headers for making requests to the AniCrush API.
- * This includes a randomly selected User Agent string, as well as other headers required
- * for the API to work correctly.
- *
- * @returns {object} - An object containing the common headers.
- */
-function getCommonHeaders() {
-    return {
-        "User-Agent": getRandomUserAgent(),
-        "Accept": "application/json, text/plain, */*",
-        "Accept-Language": "en-US,en;q=0.9",
-        "Accept-Encoding": "gzip, deflate, br",
-        "Connection": "keep-alive",
-        "DNT": "1",
-        "Sec-Fetch-Dest": "empty",
-        "Sec-Fetch-Mode": "cors",
-        "Sec-Fetch-Site": "same-origin",
-        "x-site": "anicrush",
-        "X-Requested-With": "XMLHttpRequest"
-    }
-}
-
-
-/**
  * Searches the website for anime with the given keyword and returns the results
  * @param {string} keyword The keyword to search for
  * @returns {Promise<string>} A promise that resolves with a JSON string containing the search results in the format: `[{"title": "Title", "image": "Image URL", "href": "URL"}, ...]`
  */
 async function searchResults(keyword) {
-    const SOURCE_API_URL = "https://api.anicrush.to";
     const UTILITY_URL = "https://ac-api.ofchaos.com";
 
     try {
@@ -134,7 +57,7 @@ async function searchResults(keyword) {
  */
 async function extractDetails(movieId) {
     const UTILITY_URL = "https://ac-api.ofchaos.com";
-    
+
     try {
         const response = await fetch(`${ UTILITY_URL }/api/anime/info/${ movieId }`);
         const data = JSON.parse(response);
@@ -233,7 +156,6 @@ async function extractEpisodes(movieId) {
  */
 async function extractStreamUrl(url) {
     const SOURCE_BASE_URL = "https://anicrush.to";
-    const SOURCE_API_URL = "https://api.anicrush.to";
     const UTILITY_URL = "https://ac-api.ofchaos.com";
 
     try {
@@ -270,10 +192,7 @@ async function extractStreamUrl(url) {
             throw('Invalid _movieId provided');
         }
 
-        const serversResponse = await fetch(`${ SOURCE_API_URL }/shared/v2/episode/servers?_movieId=${ id }&ep=${ episode }`, {
-            method: 'GET',
-            headers: getCommonHeaders()
-        });
+        const serversResponse = await fetch(`${ UTILITY_URL }/api/anime/servers/${ id }?episode=${ episode }`);
         const serversData = await JSON.parse(serversResponse);
 
         if(serversData.status == false || serversData.result == null) {
@@ -298,10 +217,7 @@ async function extractStreamUrl(url) {
             serverObject = serverObjects[0].server;
         }
 
-        const sourceResponse = await fetch(`${ SOURCE_API_URL }/shared/v2/episode/sources?_movieId=${ id }&ep=${ episode }&sv=${ server }&sc=${ format }`, {
-            method: 'GET',
-            headers: getCommonHeaders()
-        });
+        const sourceResponse = await fetch(`${ UTILITY_URL }/api/anime/sources?movieId=${ id }&episode=${ episode }&server=${ server }&format=${ format }`);
         const sourceData = await JSON.parse(sourceResponse);
 
         if(
