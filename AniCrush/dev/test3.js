@@ -108,7 +108,7 @@ async function searchResults(keyword) {
         const limit = 24;
         const response = await fetch(`${ SOURCE_API_URL }/shared/v2/movie/list?keyword=${encodeURIComponent(keyword)}&page=${ page }&limit=${ limit }`, {
             method: 'GET',
-            // headers: getCommonHeaders()
+            headers: getCommonHeaders()
         });
         const data = JSON.parse(response);
 
