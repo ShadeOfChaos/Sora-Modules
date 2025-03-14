@@ -102,14 +102,12 @@ function getCommonHeaders() {
  */
 async function searchResults(keyword) {
     const SOURCE_API_URL = "https://api.anicrush.to";
+    const UTILITY_URL = "https://ac-api.ofchaos.com";
 
     try {
         const page = 1;
         const limit = 24;
-        const response = await fetch(`${ SOURCE_API_URL }/shared/v2/movie/list?keyword=${encodeURIComponent(keyword)}&page=${ page }&limit=${ limit }`, {
-            method: 'GET',
-            headers: getCommonHeaders()
-        });
+        const response = await fetch(`${ UTILITY_URL }/api/anime/search?keyword=${encodeURIComponent(keyword)}&page=${ page }&limit=${ limit }`);
         const data = JSON.parse(response);
 
         if(data?.status == false || data?.result?.movies?.length <= 0) {
@@ -117,9 +115,9 @@ async function searchResults(keyword) {
         }
 
         const results = data.result.movies.map(movie => {
-            const href = `${ SOURCE_API_URL }/shared/v2/movie/getById/${ movie.id }`
+            const data = movie.id;
 
-            return { title: movie.name, image: getImage(movie.poster_path), href: href }
+            return { title: movie.name, image: getImage(movie.poster_path), href: data }
         });
 
         return JSON.stringify(results);
@@ -130,19 +128,18 @@ async function searchResults(keyword) {
 }
 
 /**
- * Extracts the details (description, aliases, airdate) from the given url
- * @param {string} url The url to extract the details from
+ * Extracts the details (description, aliases, airdate) from the given movieId
+ * @param {string} movieId The id required to fetch the details
  * @returns {Promise<string>} A promise that resolves with a JSON string containing the details in the format: `[{"description": "Description", "aliases": "Aliases", "airdate": "Airdate"}]`
  */
-async function extractDetails(url) {
+async function extractDetails(movieId) {
+    const UTILITY_URL = "https://ac-api.ofchaos.com";
+    
     try {
-        const response = await fetch(url, {
-            method: 'GET',
-            headers: getCommonHeaders()
-        });
+        const response = await fetch(`${ UTILITY_URL }/api/anime/info/${ movieId }`);
         const data = JSON.parse(response);
 
-        if(data?.status == false || data?.result == null) {
+        if(data?.status == false || data?.result != null) {
             throw('No results found');
         }
 
@@ -192,24 +189,21 @@ async function extractDetails(url) {
 }
 
 /**
- * Extracts the episodes from the given url.
- * @param {string} url - The url to extract the episodes from.
+ * Extracts the episodes from the given movieId.
+ * @param {string} url - The id required to fetch the episodes
  * @returns {Promise<string>} A promise that resolves with a JSON string containing the episodes in the format: `[{ "href": "Episode URL", "number": Episode Number }, ...]`.
  * If an error occurs during the fetch operation, an empty array is returned in JSON format.
  */
-async function extractEpisodes(url) {
+async function extractEpisodes(movieId) {
     const SOURCE_API_URL = "https://api.anicrush.to";
+    const UTILITY_URL = "https://ac-api.ofchaos.com";
 
     try {
         const serverId = 4;
         const streamType = 'sub';
         var episodes = [];
-        const id = url.split('/').at(-1);
 
-        const response = await fetch(`${ SOURCE_API_URL }/shared/v2/episode/list?_movieId=${ id }`, {
-            method: 'GET',
-            headers: getCommonHeaders()
-        });
+        const response = await fetch(`${ UTILITY_URL }/api/anime/episodes?movieId=${ movieId }`);
         const data = JSON.parse(response);
 
         if(data?.status == false || data?.result == null) {
@@ -219,7 +213,7 @@ async function extractEpisodes(url) {
         for(let episodeList in data.result) {
             for(let episode of data.result[episodeList]) {
                 episodes.push({
-                    href: `${ SOURCE_API_URL }/shared/v2/episode/sources?_movieId=${ id }&ep=${ episode.number }&sv=${ serverId }&sc=${ streamType }`,
+                    href: `${ SOURCE_API_URL }/shared/v2/episode/sources?_movieId=${ movieId }&ep=${ episode.number }&sv=${ serverId }&sc=${ streamType }`,
                     number: episode.number
                 });
             }
