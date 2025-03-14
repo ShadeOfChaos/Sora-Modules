@@ -304,7 +304,7 @@ async function extractStreamUrl(url) {
             method: 'GET',
             headers: getCommonHeaders()
         });
-        const sourceData = await JSON.parse(sourceResponse.json);
+        const sourceData = await JSON.parse(sourceResponse);
 
         if(
             sourceData.status == false || 
