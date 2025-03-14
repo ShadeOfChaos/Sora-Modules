@@ -1,14 +1,13 @@
-// TODO - Remove tests below this line
-const results = await searchResults('Solo Leveling');
+//***** LOCAL TESTING
+// const results = await searchResults('Solo Leveling');
 // console.log(results);
-const details = await extractDetails(JSON.parse(results)[0].href);
+// const details = await extractDetails(JSON.parse(results)[0].href);
 // console.log('DETAILS:', details);
-const episodes = await extractEpisodes(JSON.parse(results)[0].href);
+// const episodes = await extractEpisodes(JSON.parse(results)[0].href);
 // console.log('OUTSIDE EPISODES:', episodes);
-const streamUrl = await extractStreamUrl(JSON.parse(episodes)[0].href);
+// const streamUrl = await extractStreamUrl(JSON.parse(episodes)[0].href);
 // console.log('STREAMURL:', streamUrl);
-
-// TODO - Remove test above this line
+//***** LOCAL TESTING
 
 /**
  * Given an image path, returns the URL to the resized image on AniCrush's CDN.
