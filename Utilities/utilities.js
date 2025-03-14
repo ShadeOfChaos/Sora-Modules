@@ -18,33 +18,9 @@ const CONFIG = {
 
 
 
-
-const search = async (query = "", page = 1, limit = 30) => {
-    const response = await fetch(`https://anicrush.to/shared/v2/movie/list?keyword=${encodeURIComponent(query)}&page=${page}&limit=${limit}`);
-    const data = await response.text();
-
-    return data;
-}
-
-
-
 (async() => {
 /** START OF USER CODE **/
     // NOTE: Code in this code block runs when the file is run through node
-
-    const embedUrl = encodeURIComponent('https://megacloud.club/embed-2/e-1/AA9F72kyyopf?z=');
-    const host = encodeURIComponent('https://anicrush.to');
-
-    let response2 = await fetch(`https://ac-api.ofchaos.com/convertembedtohls?embedUrl=${ embedUrl }&host=${ host }`, {
-        method: "GET",
-        headers: {
-            "x-source": "ofchaos-anime"
-        },
-    });
-    let data2 = await response2.text();
-
-
-    console.log(data2);
 
 
 /** END OF USER CODE **/
@@ -82,7 +58,7 @@ function writeFile(title, content) {
  */
 function readFile(filename) {
     return new Promise((resolve, reject) => {
-        fs.readFile('HikariTV/debug/' + filename, 'utf8', (err, data) => {
+        fs.readFile('debug/' + filename, 'utf8', (err, data) => {
             if (err) {
                 console.error('Readfile error:', err);
                 return reject(err);
