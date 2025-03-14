@@ -47,7 +47,6 @@ async function extractDetails(url) {
  * @returns {Promise<string>} A promise that resolves with a JSON string containing the episodes in the format: `[{ "href": "Episode URL", "number": Episode Number }, ...]`.
  * If an error occurs during the fetch operation, an empty array is returned in JSON format.
  */
-
 async function extractEpisodes(url) {
     try {
         // TEMPLATE TODO
@@ -62,6 +61,11 @@ async function extractEpisodes(url) {
     }
 }
 
+/**
+ * Extracts the stream URL from the given url.
+ * @param {string} url - The url to extract the stream URL from.
+ * @returns {Promise<string|null>} A promise that resolves with the stream URL if successful, or null if an error occurs during the fetch operation.
+ */
 async function extractStreamUrl(url) {
     try {
         // TEMPLATE TODO
