@@ -11,7 +11,7 @@
     "quality": "1080p",
     "baseUrl": "https://anicrush.to/",
     "searchBaseUrl": "https://ac-api.ofchaos.com/api/anime/search?keyword=%s",
-    "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AniCrush/dev/AniCrushSubs.js",
+    "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AniCrush/dev/AniCrushSubsWebUI.js",
     "asyncJS": true,
     "streamAsyncJS": true,
     "softsub": true
