@@ -25,6 +25,7 @@ function getImage(path, type = "poster") {
  * @returns {Promise<string>} A promise that resolves with a JSON string containing the search results in the format: `[{"title": "Title", "image": "Image URL", "href": "URL"}, ...]`
  */
 async function searchResults(keyword) {
+    const BASE_URL = 'https://anicrush.to';
     const UTILITY_URL = "https://ac-api.ofchaos.com";
 
     try {
@@ -38,9 +39,9 @@ async function searchResults(keyword) {
         }
 
         const results = data.result.movies.map(movie => {
-            const data = movie.id;
+            const href = `${ BASE_URL }/watch/${ movie.slug }.${ movie.id }`;
 
-            return { title: movie.name, image: getImage(movie.poster_path), href: data }
+            return { title: movie.name, image: getImage(movie.poster_path), href: href }
         });
 
         return JSON.stringify(results);
@@ -51,18 +52,19 @@ async function searchResults(keyword) {
 }
 
 /**
- * Extracts the details (description, aliases, airdate) from the given movieId
- * @param {string} movieId The id required to fetch the details
+ * Extracts the details (description, aliases, airdate) from the given url
+ * @param {string} url The id required to fetch the details
  * @returns {Promise<string>} A promise that resolves with a JSON string containing the details in the format: `[{"description": "Description", "aliases": "Aliases", "airdate": "Airdate"}]`
  */
-async function extractDetails(movieId) {
+async function extractDetails(url) {
     const UTILITY_URL = "https://ac-api.ofchaos.com";
+    const movieId = url.split('.').pop();
 
     try {
         const response = await fetch(`${ UTILITY_URL }/api/anime/info/${ movieId }`);
         const data = JSON.parse(response);
 
-        if(data?.status == false || data?.result != null) {
+        if(data?.status == false || data?.result == null) {
             throw('No results found');
         }
 
@@ -112,14 +114,15 @@ async function extractDetails(movieId) {
 }
 
 /**
- * Extracts the episodes from the given movieId.
+ * Extracts the episodes from the given url.
  * @param {string} url - The id required to fetch the episodes
  * @returns {Promise<string>} A promise that resolves with a JSON string containing the episodes in the format: `[{ "href": "Episode URL", "number": Episode Number }, ...]`.
  * If an error occurs during the fetch operation, an empty array is returned in JSON format.
  */
-async function extractEpisodes(movieId) {
+async function extractEpisodes(url) {
     const SOURCE_API_URL = "https://api.anicrush.to";
     const UTILITY_URL = "https://ac-api.ofchaos.com";
+    const movieId = url.split('.').pop();
 
     try {
         const serverId = 4;
