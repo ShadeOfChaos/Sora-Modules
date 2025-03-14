@@ -1,8 +1,3 @@
-const SOURCE_BASE_URL = "https://anicrush.to";
-const SOURCE_API_URL = "https://api.anicrush.to";
-const SOURCE_STATIC_URL = "https://static.gniyonna.com/media/poster";
-const UTILITY_URL = "https://ac-api.ofchaos.com";
-
 // TODO - Remove tests below this line
 const results = await searchResults('Solo Leveling');
 const details = await extractDetails(JSON.parse(results)[0].href);
@@ -18,6 +13,7 @@ const streamUrl = await extractStreamUrl(JSON.parse(episodes)[0].href);
  * @returns {string} - The URL to the resized image.
  */
 function getImage(path, type = "poster") {
+    const SOURCE_STATIC_URL = "https://static.gniyonna.com/media/poster";
     const pathToReverse = path.split('/')[2];
 
     let reversedPath = '';
@@ -113,6 +109,8 @@ function getCommonHeaders() {
  * @returns {Promise<string>} A promise that resolves with a JSON string containing the search results in the format: `[{"title": "Title", "image": "Image URL", "href": "URL"}, ...]`
  */
 async function searchResults(keyword) {
+    const SOURCE_API_URL = "https://api.anicrush.to";
+
     try {
         const page = 1;
         const limit = 24;
@@ -208,6 +206,8 @@ async function extractDetails(url) {
  * If an error occurs during the fetch operation, an empty array is returned in JSON format.
  */
 async function extractEpisodes(url) {
+    const SOURCE_API_URL = "https://api.anicrush.to";
+
     try {
         const serverId = 4;
         const streamType = 'sub';
@@ -246,6 +246,10 @@ async function extractEpisodes(url) {
  * @returns {Promise<string|null>} A promise that resolves with the stream URL if successful, or null if an error occurs during the fetch operation.
  */
 async function extractStreamUrl(url) {
+    const SOURCE_BASE_URL = "https://anicrush.to";
+    const SOURCE_API_URL = "https://api.anicrush.to";
+    const UTILITY_URL = "https://ac-api.ofchaos.com";
+
     try {
         if(url.indexOf('?') <= 0) {
             throw('Invalid url provided');
