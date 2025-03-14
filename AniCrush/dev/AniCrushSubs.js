@@ -137,7 +137,7 @@ async function extractEpisodes(url) {
 
     try {
         const serverId = 4;
-        const streamType = 'sub';
+        const format = 'sub';
         var episodes = [];
 
         const response = await fetch(`${ UTILITY_URL }/api/anime/episodes?movieId=${ movieId }`);
@@ -150,7 +150,7 @@ async function extractEpisodes(url) {
         for(let episodeList in data.result) {
             for(let episode of data.result[episodeList]) {
                 episodes.push({
-                    href: `${ SOURCE_API_URL }/shared/v2/episode/sources?_movieId=${ movieId }&ep=${ episode.number }&sv=${ serverId }&sc=${ streamType }`,
+                    href: `${ SOURCE_API_URL }/shared/v2/episode/sources?_movieId=${ movieId }&ep=${ episode.number }&sv=${ serverId }&sc=${ format }`,
                     number: episode.number
                 });
             }
