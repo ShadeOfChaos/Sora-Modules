@@ -6,6 +6,7 @@ const results = await searchResults('Solo Leveling');
 const details = await extractDetails(JSON.parse(results)[0].href);
 const episodes = await extractEpisodes(JSON.parse(results)[0].href);
 const streamUrl = await extractStreamUrl(JSON.parse(episodes)[0].href);
+console.log('streamUrl:', streamUrl);
 
 // TODO - Remove test above this line
 
@@ -208,6 +209,9 @@ async function extractEpisodes(url) {
         for(let episodeList in data.result) {
             for(let episode of data.result[episodeList]) {
                 episodes.push({
+
+                    // TODO - Per episode get servers and sources
+
                     href: `${ SOURCE_API_URL }/shared/v2/episode/sources?_movieId=${ id }&ep=${ episode.number }&sv=${ serverId }&sc=${ streamType }`,
                     number: episode.number
                 });
@@ -223,32 +227,105 @@ async function extractEpisodes(url) {
 
 async function extractStreamUrl(url) {
     try {
-        var iframeUrl = '';
+        if(url.indexOf('?') <= 0) {
+            throw('Invalid url provided');
+        }
 
-        const response = await fetch(url, {
-            method: 'GET',
-            headers: getCommonHeaders()
-        });
+        const paramString = url.split('?')[1];
+        const params = paramString.split('&');
+        let id = '';
+        let episode = 1;
+        let server = 4;
+        let format = 'sub';
 
-        const data = await response.json();
+        for(let paramStr of params) {
+            let param = paramStr.split('=');
+            switch(param[0]) {
+                case '_movieId':
+                    id = param[1];
+                    break;
+                case 'ep':
+                    episode = param[1];
+                    break;
+                case 'sv':
+                    server = param[1];
+                    break;
+                case 'sc':
+                    format = param[1];
+                    break;
+            }
+        }
 
-        if(data?.status == false || data?.result == null) {
+        if(id == '') {
+            throw('Invalid _movieId provided');
+        }
+
+        const hlsUrl = `https://ac-api.ofchaos.com/api/anime/hls/${ id }?episode=${ episode }&server=${ server }&format=${ format }`;
+        console.log('hlsUrl:', hlsUrl);
+        const hlsResponse = await fetch(hlsUrl);
+        const hlsData = await hlsResponse.json();
+
+        console.log('hlsData', hlsData);
+
+        if(hlsData?.status == false || hlsData?.result == null || hlsData?.error != null) {
             throw('No stream found');
         }
-        if(data.result?.type == 'iframe') {
-            iframeUrl = data.result?.link;
-        }
-        if(iframeUrl == '' || iframeUrl == null) {
-            throw("No stream found");
+
+        if(hlsData.result?.sources?.length <= 0) {
+            throw('No source found');
         }
 
-        return iframeUrl; // TODO - Get HLS from iframeUrl
+        let hlsSource = null;
 
-        return streamUrl;
+        for(let source of hlsData.result.sources) {
+            if(source.type === 'hls') {
+                hlsSource = source;
+                break;
+            }
+        }
+
+        if(hlsSource == null) {
+            throw('No valid HLS stream found');
+        }
+
+        if(hlsData.result?.tracks?.length <= 0) {
+            throw('No valid substitles found');
+        }
+
+        let reserveSubtitles = null;
+        let subtitles = null;
+
+        for(let track of hlsData.result.tracks) {
+            if(track.kind === 'captions') {
+                if(track?.label !== 'English') {
+                    continue;
+                }
+                if(track?.default === true) {
+                    subtitles = track;
+                    break;
+                }
+                reserveSubtitles = track;
+            }
+        }
+
+        if(subtitles == null) {
+            if(reserveSubtitles == null) {
+                throw('No valid subtitles found');
+            }
+
+            subtitles = reserveSubtitles;
+        }
+
+        const streamUrl = {
+            stream: hlsSource ? hlsSource.file : null,
+            subtitles: subtitles ? subtitles.file : null
+        };
+
+        return JSON.stringify(streamUrl);
 
     } catch (error) {
         console.error('Fetch error:', error);
-        return null;
+        return JSON.stringify({ stream: null, subtitles: null });
     }
 }
 
