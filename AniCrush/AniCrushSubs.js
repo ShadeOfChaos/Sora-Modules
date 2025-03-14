@@ -3,14 +3,6 @@ const SOURCE_API_URL = "https://api.anicrush.to";
 const SOURCE_STATIC_URL = "https://static.gniyonna.com/media/poster";
 const UTILITY_URL = "https://ac-api.ofchaos.com";
 
-// TODO - Remove tests below this line
-const results = await searchResults('Solo Leveling');
-const details = await extractDetails(JSON.parse(results)[0].href);
-const episodes = await extractEpisodes(JSON.parse(results)[0].href);
-const streamUrl = await extractStreamUrl(JSON.parse(episodes)[0].href);
-
-// TODO - Remove test above this line
-
 /**
  * Given an image path, returns the URL to the resized image on AniCrush's CDN.
  * @param {string} path - The image path to transform.
@@ -120,7 +112,7 @@ async function searchResults(keyword) {
             method: 'GET',
             headers: getCommonHeaders()
         });
-        const data = await response.json();
+        const data = JSON.parse(response);
 
         if(data?.status == false || data?.result?.movies?.length <= 0) {
             throw('No results found');
@@ -150,7 +142,7 @@ async function extractDetails(url) {
             method: 'GET',
             headers: getCommonHeaders()
         });
-        const data = await response.json();
+        const data = JSON.parse(response);
 
         if(data?.status == false || data?.result == null) {
             throw('No results found');
@@ -218,12 +210,12 @@ async function extractEpisodes(url) {
             method: 'GET',
             headers: getCommonHeaders()
         });
-        const data = await response.json();
+        const data = JSON.parse(response);
 
         if(data?.status == false || data?.result == null) {
             throw('No results found');
         }
-        
+
         for(let episodeList in data.result) {
             for(let episode of data.result[episodeList]) {
                 episodes.push({
@@ -284,7 +276,7 @@ async function extractStreamUrl(url) {
             method: 'GET',
             headers: getCommonHeaders()
         });
-        const serversData = await serversResponse.json();
+        const serversData = await JSON.parse(serversResponse);
 
         if(serversData.status == false || serversData.result == null) {
             throw('No servers found');
@@ -312,7 +304,7 @@ async function extractStreamUrl(url) {
             method: 'GET',
             headers: getCommonHeaders()
         });
-        const sourceData = await sourceResponse.json();
+        const sourceData = await JSON.parse(sourceResponse);
 
         if(
             sourceData.status == false || 
@@ -328,11 +320,11 @@ async function extractStreamUrl(url) {
         // Older version which might or might not work, new method incorporates getting the embed from the source
         // const hlsUrl = `${ UTILITY_URL }/api/anime/hls/${ id }?episode=${ episode }&server=${ server }&format=${ format }`;
         // const hlsResponse = await fetch(hlsUrl);
-        // const hlsData = await hlsResponse.json();
+        // const hlsData = await JSON.parse(hlsResponse);
 
         const hlsUrl = `${ UTILITY_URL }/api/anime/embed/convert?embedUrl=${ encodeURIComponent(source) }&host=${ encodeURIComponent(SOURCE_BASE_URL) }`;
         const hlsResponse = await fetch(hlsUrl);
-        const hlsData = await hlsResponse.json();
+        const hlsData = await JSON.parse(hlsResponse);
 
         if(hlsData?.status == false || hlsData?.result == null || hlsData?.error != null) {
             throw('No stream found');
