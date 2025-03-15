@@ -12,28 +12,28 @@
 ## Modules
 <section data-markdown>
     <textarea data-template>
-        <div class="flex-container"><!-- .element: style="display: flex; flex-direction: row;" -->
+        <div class="flex-container">
         <div>
             <img src="https://github.com/ShadeOfChaos/Sora-Modules/blob/f8c4018d432346da0b3a62a1f0542a9c7600127e/AniCrush/logo.png" width="125px"><br>
             **Source:** CrushAnime<br>
             **Language:** English (SUB)<br>
             **Minimum Sora version required:** <code style="color : fuschia">0.2.1</code>
             [<kbd> <br> Add to Sora <br> </kbd>](https://intradeus.github.io/http-protocol-redirector?r=sora://module?url=https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AniCrush/subs/AniCrush.json)
-        </div> <!-- .element: style="margin: 10px; padding: 20px;"-->
+        </div>
         <div>
             <img src="https://github.com/ShadeOfChaos/Sora-Modules/blob/f8c4018d432346da0b3a62a1f0542a9c7600127e/AniCrush/logo.png" width="125px"><br>
             **Source:** CrushAnime<br>
             **Language:** English (DUB)<br>
             **Minimum Sora version required:** <code style="color : fuschia">0.2.1</code>
             [<kbd> <br> Add to Sora <br> </kbd>](https://intradeus.github.io/http-protocol-redirector?r=sora://module?url=https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AniCrush/dubs/AniCrush.json)
-        </div> <!-- .element: style="margin: 10px; padding: 20px;"-->
+        </div>
         <div>
             <img src="https://github.com/ShadeOfChaos/Sora-Modules/blob/f8c4018d432346da0b3a62a1f0542a9c7600127e/AniCrush/logo.png" width="125px"><br>
             **Source:** CrushAnime<br>
             **Language:** RAW (Original language)<br>
             **Minimum Sora version required:** <code style="color : fuschia">0.2.1</code>
             [<kbd> <br> Add to Sora <br> </kbd>](https://intradeus.github.io/http-protocol-redirector?r=sora://module?url=https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AniCrush/raw/AniCrush.json)
-        </div> <!-- .element: style="margin: 10px; padding: 20px;"-->
+        </div>
         </div>
     </textarea>
 </section>
