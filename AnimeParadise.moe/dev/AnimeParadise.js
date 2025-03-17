@@ -1,11 +1,11 @@
 // import fs from 'node:fs';
 
 // //***** LOCAL TESTING
-// const results = await searchResults();
-// const details = await extractDetails();
-// const episodes = await extractEpisodes();
-// const streamUrl = await extractStreamUrl();
-// console.log('STREAMURL:', streamUrl);
+const results = await searchResults();
+const details = await extractDetails();
+const episodes = await extractEpisodes();
+const streamUrl = await extractStreamUrl();
+console.log('STREAMURL:', streamUrl);
 //***** LOCAL TESTING
 
 /**
@@ -73,12 +73,12 @@ async function extractStreamUrl(url) {
     }
 }
 
-// // Trims around the content, leaving only the area between the start and end string
-// function trimHtml(html, startString, endString) {
-//     const startIndex = html.indexOf(startString);
-//     const endIndex = html.indexOf(endString, startIndex);
-//     return html.substring(startIndex, endIndex);
-// }
+// Trims around the content, leaving only the area between the start and end string
+function trimHtml(html, startString, endString) {
+    const startIndex = html.indexOf(startString);
+    const endIndex = html.indexOf(endString, startIndex);
+    return html.substring(startIndex, endIndex);
+}
 
 // function writeFile(title, content) {
 //     fs.writeFile('debug/animeparadise-' + title, content, err => {
