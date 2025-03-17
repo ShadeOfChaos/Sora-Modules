@@ -1,11 +1,11 @@
-import fs from 'node:fs';
+// import fs from 'node:fs';
 
-//***** LOCAL TESTING
-const results = await searchResults();
-const details = await extractDetails();
-const episodes = await extractEpisodes();
-const streamUrl = await extractStreamUrl();
-console.log('STREAMURL:', streamUrl);
+// //***** LOCAL TESTING
+// const results = await searchResults();
+// const details = await extractDetails();
+// const episodes = await extractEpisodes();
+// const streamUrl = await extractStreamUrl();
+// console.log('STREAMURL:', streamUrl);
 //***** LOCAL TESTING
 
 /**
@@ -16,7 +16,7 @@ console.log('STREAMURL:', streamUrl);
 async function searchResults(keyword) {
     const episodeListUrl = 'https://www.animeonsen.xyz/details/VW2uXR5DvjxlLSw5';
 
-    return JSON.stringify([{ title: 'Test show', image: '', href: 'https://www.animeonsen.xyz/details/VW2uXR5DvjxlLSw5' }]);
+    return JSON.stringify([{ title: 'Test show', image: 'https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AniCrush/ofchaos.jpg', href: 'https://www.animeonsen.xyz/details/VW2uXR5DvjxlLSw5' }]);
 }
 
 /**
@@ -57,7 +57,7 @@ async function extractEpisodes(url) {
 async function extractStreamUrl(url) {
     try {
         const response = await fetch('https://www.animeparadise.moe/watch/deffc3d9-1308-498a-82f2-b3635aecbc42?origin=Y45v9Oh6TpXU1EEY');
-        const html = await response.text();
+        const html = await response;
 
         const trimmedHtml = trimHtml(html, '__NEXT_DATA__', '</script>');
         const jsonString = trimmedHtml.slice(39);
@@ -73,19 +73,19 @@ async function extractStreamUrl(url) {
     }
 }
 
-// Trims around the content, leaving only the area between the start and end string
-function trimHtml(html, startString, endString) {
-    const startIndex = html.indexOf(startString);
-    const endIndex = html.indexOf(endString, startIndex);
-    return html.substring(startIndex, endIndex);
-}
+// // Trims around the content, leaving only the area between the start and end string
+// function trimHtml(html, startString, endString) {
+//     const startIndex = html.indexOf(startString);
+//     const endIndex = html.indexOf(endString, startIndex);
+//     return html.substring(startIndex, endIndex);
+// }
 
-function writeFile(title, content) {
-    fs.writeFile('debug/animeparadise-' + title, content, err => {
-        if (err) {
-            console.log('Failed to write to file', err.message);
-        } else {
-            console.log('Successfully saved file: ', title);
-        }
-    });
-}
+// function writeFile(title, content) {
+//     fs.writeFile('debug/animeparadise-' + title, content, err => {
+//         if (err) {
+//             console.log('Failed to write to file', err.message);
+//         } else {
+//             console.log('Successfully saved file: ', title);
+//         }
+//     });
+// }
