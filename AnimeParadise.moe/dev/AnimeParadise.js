@@ -60,12 +60,13 @@ async function extractStreamUrl(url) {
         const html = await response;
 
         const trimmedHtml = trimHtml(html, '__NEXT_DATA__', '</script>');
+
         const jsonString = trimmedHtml.slice(39);
         const json = JSON.parse(jsonString);
 
         const streamUrl = json?.props?.pageProps?.episode?.streamLink;
         const subtitles = json?.props?.pageProps?.episode?.subData.find(sub => sub.type === 'vtt' && sub.label === 'English');
-        return JSON.stringify({ stream: streamUrl, subtitles: subtitles?.src });
+        return JSON.stringify({ stream: streamUrl, subtitles: subtitles });
         
     } catch(e) {
         console.log('Error:', e);
