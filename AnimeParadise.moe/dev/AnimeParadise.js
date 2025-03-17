@@ -1,11 +1,11 @@
 // import fs from 'node:fs';
 
 // //***** LOCAL TESTING
-const results = await searchResults();
-const details = await extractDetails();
-const episodes = await extractEpisodes();
-const streamUrl = await extractStreamUrl();
-console.log('STREAMURL:', streamUrl);
+// const results = await searchResults();
+// const details = await extractDetails();
+// const episodes = await extractEpisodes();
+// const streamUrl = await extractStreamUrl();
+// console.log('STREAMURL:', streamUrl);
 //***** LOCAL TESTING
 
 /**
