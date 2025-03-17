@@ -9,7 +9,7 @@
     "language": "English (SUB)",
     "streamType": "HLS",
     "quality": "1080p",
-    "baseUrl": "www.animeparadise.moe",
+    "baseUrl": "https://megacloud.club/",
     "searchBaseUrl": "https://www.animeparadise.moe/search?q=%s",
     "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeParadise.moe/dev/AnimeParadise.js",
     "asyncJS": true,
