@@ -16,7 +16,7 @@ console.log('STREAMURL:', streamUrl);
 async function searchResults(keyword) {
     const episodeListUrl = 'https://www.animeonsen.xyz/details/VW2uXR5DvjxlLSw5';
 
-    return JSON.stringify({ title: 'Test show', image: '', href: 'https://www.animeonsen.xyz/details/VW2uXR5DvjxlLSw5' });
+    return JSON.stringify([{ title: 'Test show', image: '', href: 'https://www.animeonsen.xyz/details/VW2uXR5DvjxlLSw5' }]);
 }
 
 /**
