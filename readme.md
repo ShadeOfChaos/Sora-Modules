@@ -10,34 +10,31 @@
 > **Should you feel compelled to use a dev version, use the WebUI version.**<br>
 
 ## Modules
-<section data-markdown>
-    <textarea data-template>
-        <div class="flex-container">
-        <div>
-            <img src="https://github.com/ShadeOfChaos/Sora-Modules/blob/f8c4018d432346da0b3a62a1f0542a9c7600127e/AniCrush/logo.png" width="125px"><br>
-            **Source:** CrushAnime<br>
-            **Language:** English (SUB)<br>
-            **Minimum Sora version required:** <code style="color : fuschia">0.2.1</code>
-            [<kbd> <br> Add to Sora <br> </kbd>](https://intradeus.github.io/http-protocol-redirector?r=sora://module?url=https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AniCrush/subs/AniCrush.json)
-        </div>
-        <div>
-            <img src="https://github.com/ShadeOfChaos/Sora-Modules/blob/f8c4018d432346da0b3a62a1f0542a9c7600127e/AniCrush/logo.png" width="125px"><br>
-            **Source:** CrushAnime<br>
-            **Language:** English (DUB)<br>
-            **Minimum Sora version required:** <code style="color : fuschia">0.2.1</code>
-            [<kbd> <br> Add to Sora <br> </kbd>](https://intradeus.github.io/http-protocol-redirector?r=sora://module?url=https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AniCrush/dubs/AniCrush.json)
-        </div>
-        <div>
-            <img src="https://github.com/ShadeOfChaos/Sora-Modules/blob/f8c4018d432346da0b3a62a1f0542a9c7600127e/AniCrush/logo.png" width="125px"><br>
-            **Source:** CrushAnime<br>
-            **Language:** RAW (Original language)<br>
-            **Minimum Sora version required:** <code style="color : fuschia">0.2.1</code>
-            [<kbd> <br> Add to Sora <br> </kbd>](https://intradeus.github.io/http-protocol-redirector?r=sora://module?url=https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AniCrush/raw/AniCrush.json)
-        </div>
-        </div>
-    </textarea>
-</section>
 
+<span><img src="https://github.com/ShadeOfChaos/Sora-Modules/blob/f8c4018d432346da0b3a62a1f0542a9c7600127e/AniCrush/logo.png" width="125px" align="left">
+**Source:** CrushAnime<br>
+**Language:** English (SUB)<br>
+**Minimum Sora version required:** 0.2.1<br>
+<span></span>
+[<kbd> <br> Add to Sora <br> </kbd>](https://intradeus.github.io/http-protocol-redirector?r=sora://module?url=https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AniCrush/subs/AniCrush.json)
+</span>
+<br><br>
+<span><img src="https://github.com/ShadeOfChaos/Sora-Modules/blob/f8c4018d432346da0b3a62a1f0542a9c7600127e/AniCrush/logo.png" width="125px" align="left"><br>
+**Source:** CrushAnime<br>
+**Language:** English (DUB)<br>
+**Minimum Sora version required:** 0.2.1<br>
+<span></span>
+[<kbd> <br> Add to Sora <br> </kbd>](https://intradeus.github.io/http-protocol-redirector?r=sora://module?url=https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AniCrush/dubs/AniCrush.json)
+</span>
+<br><br>
+<span><img src="https://github.com/ShadeOfChaos/Sora-Modules/blob/f8c4018d432346da0b3a62a1f0542a9c7600127e/AniCrush/logo.png" width="125px" align="left"><br>
+**Source:** CrushAnime<br>
+**Language:** RAW (Original language)<br>
+**Minimum Sora version required:** 0.2.1<br>
+<span></span>
+[<kbd> <br> Add to Sora <br> </kbd>](https://intradeus.github.io/http-protocol-redirector?r=sora://module?url=https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AniCrush/raw/AniCrush.json)
+</span>
+<br><br>
 
 > [!TIP]
 > **Something going wrong, open an issue or @mention me on the sora discord server.**
