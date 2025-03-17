@@ -1,11 +1,9 @@
-import fs from 'node:fs';
-
 //***** LOCAL TESTING
-const results = await searchResults();
-const details = await extractDetails();
-const episodes = await extractEpisodes();
-const streamUrl = await extractStreamUrl();
-console.log('STREAMURL:', streamUrl);
+// const results = await searchResults();
+// const details = await extractDetails();
+// const episodes = await extractEpisodes();
+// const streamUrl = await extractStreamUrl();
+// console.log('STREAMURL:', streamUrl);
 //***** LOCAL TESTING
 
 /**
@@ -16,7 +14,7 @@ console.log('STREAMURL:', streamUrl);
 async function searchResults(keyword) {
     const episodeListUrl = 'https://www.animeonsen.xyz/details/VW2uXR5DvjxlLSw5';
 
-    return JSON.stringify([{ title: 'Test show', image: '', href: 'https://www.animeonsen.xyz/details/VW2uXR5DvjxlLSw5' }]);
+    return JSON.stringify([{ title: 'Test show', image: 'https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AniCrush/ofchaos.jpg', href: 'https://www.animeonsen.xyz/details/VW2uXR5DvjxlLSw5' }]);
 }
 
 /**
