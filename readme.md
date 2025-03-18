@@ -51,6 +51,30 @@
 [<kbd> <br> Add to Sora <br> </kbd>](https://intradeus.github.io/http-protocol-redirector?r=sora://module?url=https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeParadise.moe/raw/AnimeParadise.json)
 </span>
 <br><br>
+<span><img src="https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeParadise.moe/logo.png" width="125px" align="left"><br>
+**Source:** AnimeParadise.moe<br>
+**Language:** Spanish (SUB)<br>
+**Minimum Sora version required:** 0.2.1<br>
+<span></span>
+[<kbd> <br> Add to Sora <br> </kbd>](https://intradeus.github.io/http-protocol-redirector?r=sora://module?url=https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeParadise.moe/subs-es/AnimeParadise.json)
+</span>
+<br><br>
+<span><img src="https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeParadise.moe/logo.png" width="125px" align="left"><br>
+**Source:** AnimeParadise.moe<br>
+**Language:** Italian (SUB)<br>
+**Minimum Sora version required:** 0.2.1<br>
+<span></span>
+[<kbd> <br> Add to Sora <br> </kbd>](https://intradeus.github.io/http-protocol-redirector?r=sora://module?url=https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeParadise.moe/subs-it/AnimeParadise.json)
+</span>
+<br><br>
+<span><img src="https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeParadise.moe/logo.png" width="125px" align="left"><br>
+**Source:** AnimeParadise.moe<br>
+**Language:** Portuguese (SUB)<br>
+**Minimum Sora version required:** 0.2.1<br>
+<span></span>
+[<kbd> <br> Add to Sora <br> </kbd>](https://intradeus.github.io/http-protocol-redirector?r=sora://module?url=https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeParadise.moe/subs-pt/AnimeParadise.json)
+</span>
+<br><br>
 
 > [!TIP]
 > **Something going wrong, open an issue or @mention me on the sora discord server.**
