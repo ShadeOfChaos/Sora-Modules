@@ -11,7 +11,7 @@ async function searchResults(keyword) {
 
     try {
         const response = await fetch(`${SEARCH_URL}${encodeURI(keyword)}`);
-        const html = await response;
+        const html = await response.text();//REVERT
 
         const matches = html.matchAll(REGEX);
 
@@ -40,7 +40,7 @@ async function extractDetails(url) {
 
     try {
         const response = await fetch(url);
-        const html = await response;
+        const html = await response.text();//REVERT
 
         const json = getNextData(html);
         if (json == null) throw('Error parsing NEXT_DATA json');
@@ -83,7 +83,7 @@ async function extractEpisodes(url) {
 
     try {
         const response = await fetch(url);
-        const html = await response;
+        const html = await response.text();//REVERT
         var episodes = [];
 
         const json = getNextData(html);
@@ -113,7 +113,7 @@ async function extractEpisodes(url) {
 async function extractStreamUrl(url) {
     try {
         const response = await fetch(url);
-        const html = await response;
+        const html = await response.text();//REVERT
 
         const json = getNextData(html);
         if (json == null) throw ('Error parsing NEXT_DATA json');
@@ -135,7 +135,7 @@ async function getEpisodesWithLanguageSubs(episodeUrl, language = 'English', typ
 
     try {
         const response = await fetch(episodeUrl);
-        const html = await response;
+        const html = await response.text();//REVERT
         var episodes = [];
 
         const json = getNextData(html);
@@ -144,7 +144,7 @@ async function getEpisodesWithLanguageSubs(episodeUrl, language = 'English', typ
         const origin = json?.props?.pageProps?.animeData?._id;
         const episodesList = json?.props?.pageProps?.episodeList;
 
-        for(ep of episodesList) {
+        for(let ep of episodesList) {
             let subtitles = ep.subData.find(sub => sub.type === type && sub.label === language);
             if(subtitles == null) continue;
 

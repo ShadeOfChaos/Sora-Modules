@@ -144,7 +144,7 @@ async function getEpisodesWithLanguageSubs(episodeUrl, language = 'English', typ
         const origin = json?.props?.pageProps?.animeData?._id;
         const episodesList = json?.props?.pageProps?.episodeList;
 
-        for(ep of episodesList) {
+        for(let ep of episodesList) {
             let subtitles = ep.subData.find(sub => sub.type === type && sub.label === language);
             if(subtitles == null) continue;
 
