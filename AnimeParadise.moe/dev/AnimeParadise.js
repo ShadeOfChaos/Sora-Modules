@@ -1,9 +1,9 @@
 // // //***** LOCAL TESTING
-const results = await searchResults('Solo leveling');
-const details = await extractDetails(JSON.parse(results)[0].href);
-const episodesa = await extractEpisodes(JSON.parse(results)[0].href);
-const streamUrl = await extractStreamUrl(JSON.parse(episodesa)[0].href);
-console.log('STREAMURL:', streamUrl);
+// const results = await searchResults('Solo leveling');
+// const details = await extractDetails(JSON.parse(results)[0].href);
+// const episodesa = await extractEpisodes(JSON.parse(results)[0].href);
+// const streamUrl = await extractStreamUrl(JSON.parse(episodesa)[0].href);
+// console.log('STREAMURL:', streamUrl);
 //***** LOCAL TESTING
 
 /**
@@ -56,7 +56,11 @@ async function extractDetails(url) {
         const data = json?.props?.pageProps?.data;
         if(data == null) throw('Error obtaining data');
 
-        const aliases = data?.synonyms.join(', ');
+        let aliasArray = data?.synonyms;
+        if(aliasArray != null && aliasArray.length > 5) {
+            aliasArray = aliasArray.slice(0, 5);
+        }
+        const aliases = aliasArray.join(', ');
 
         const details = {
             description: data?.synopsys,

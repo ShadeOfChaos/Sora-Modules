@@ -56,7 +56,11 @@ async function extractDetails(url) {
         const data = json?.props?.pageProps?.data;
         if(data == null) throw('Error obtaining data');
 
-        const aliases = data?.synonyms.join(', ');
+        let aliasArray = data?.synonyms;
+        if(aliasArray != null && aliasArray.length > 5) {
+            aliasArray = aliasArray.slice(0, 5);
+        }
+        const aliases = aliasArray.join(', ');
 
         const details = {
             description: data?.synopsys,
