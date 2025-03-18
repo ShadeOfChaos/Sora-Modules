@@ -1,10 +1,8 @@
-// import fs from 'node:fs';
-
-// //***** LOCAL TESTING
-// const results = await searchResults();
-// const details = await extractDetails();
-// const episodes = await extractEpisodes();
-// const streamUrl = await extractStreamUrl();
+// // //***** LOCAL TESTING
+// const results = await searchResults('Solo leveling');
+// const details = await extractDetails(JSON.parse(results)[0].href);
+// const episodesa = await extractEpisodes(JSON.parse(results)[0].href);
+// const streamUrl = await extractStreamUrl(JSON.parse(episodesa)[0].href);
 // console.log('STREAMURL:', streamUrl);
 //***** LOCAL TESTING
 
@@ -14,9 +12,30 @@
  * @returns {Promise<string>} A promise that resolves with a JSON string containing the search results in the format: `[{"title": "Title", "image": "Image URL", "href": "URL"}, ...]`
  */
 async function searchResults(keyword) {
-    const episodeListUrl = 'https://www.animeonsen.xyz/details/VW2uXR5DvjxlLSw5';
+    const BASE_URL = 'https://www.animeparadise.moe';
+    const SEARCH_URL = 'https://www.animeparadise.moe/search?q=';
+    const REGEX = /a href="(\/anime\/[^"]+)[\s\S]+?src="([^"]+)[\s\S]+?div[\s\S]+?[\s\S]+?div[\s\S]+?>([^<]+)/g;
+    var shows = [];
 
-    return JSON.stringify([{ title: 'Test show', image: 'https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AniCrush/ofchaos.jpg', href: 'https://www.animeonsen.xyz/details/VW2uXR5DvjxlLSw5' }]);
+    try {
+        const response = await fetch(`${SEARCH_URL}${encodeURI(keyword)}`);
+        const html = await response.text(); // TODO - REVERT
+
+        const matches = html.matchAll(REGEX);
+
+        for (let match of matches) {
+            shows.push({
+                title: match[3],
+                image: match[2],
+                href: BASE_URL + match[1]
+            });
+        }
+
+        return JSON.stringify(shows);
+    } catch (error) {
+        console.log('Fetch error:', error);
+        return JSON.stringify([{ title: 'Error', image: '', href: '' }]);
+    }
 }
 
 /**
@@ -25,13 +44,36 @@ async function searchResults(keyword) {
  * @returns {Promise<string>} A promise that resolves with a JSON string containing the details in the format: `[{"description": "Description", "aliases": "Aliases", "airdate": "Airdate"}]`
  */
 async function extractDetails(url) {
-    const details = {
-        description: 'Test show',
-        aliases: '',
-        airdate: ''
-    }
+    const REGEX = /style_specs_header_year.+?>.+([0-9]{4})[\s\S]+style_specs_container_middle.+?>([\s\S]+?)</g;
 
-    return JSON.stringify([details]);
+    try {
+        const response = await fetch(url);
+        const html = await response.text();// TODO - revert
+
+        const json = getNextData(html);
+        if (json == null) throw('Error parsing NEXT_DATA json');
+
+        const data = json?.props?.pageProps?.data;
+        if(data == null) throw('Error obtaining data');
+
+        const aliases = data?.synonyms.join(', ');
+
+        const details = {
+            description: data?.synopsys,
+            aliases: aliases,
+            airdate: data?.animeSeason?.season + ' ' + data?.animeSeason?.year
+        }
+
+        return JSON.stringify([details]);
+
+    } catch (error) {
+        console.log('Details error:', error);
+        return JSON.stringify([{
+            description: 'Error loading description',
+            aliases: 'Duration: Unknown',
+            airdate: 'Aired: Unknown'
+        }]);
+    }
 }
 
 /**
@@ -41,12 +83,35 @@ async function extractDetails(url) {
  * If an error occurs during the fetch operation, an empty array is returned in JSON format.
  */
 async function extractEpisodes(url) {
-    const episodeUrl = 'https://www.animeonsen.xyz/watch/VW2uXR5DvjxlLSw5?episode=1';
+    const BASE_URL = 'https://www.animeparadise.moe/watch/';
 
-    return JSON.stringify([{
-        href: episodeUrl,
-        number: 1
-    }]);
+    try {
+        const response = await fetch(url);
+        const html = await response.text();// TODO - revert
+        var episodes = [];
+
+        const json = getNextData(html);
+        if (json == null) throw ('Error parsing NEXT_DATA json');
+
+        const origin = json?.props?.pageProps?.data?._id;
+
+        const episodesList = json?.props?.pageProps?.data?.ep;
+        if(episodesList == null) throw('Error obtaining episodes');
+
+        for(let i=0,len=episodesList.length; i<len; i++) {
+            let url = `${ BASE_URL }${ episodesList[i] }?origin=${ origin }`;
+
+            episodes.push({
+                href: url,
+                number: i+1
+            })
+        }
+
+        return JSON.stringify(episodes);
+    } catch (error) {
+        console.error('Fetch error:', error);
+        return JSON.stringify([]);
+    }
 }
 
 /**
@@ -56,22 +121,32 @@ async function extractEpisodes(url) {
  */
 async function extractStreamUrl(url) {
     try {
-        const response = await fetch('https://www.animeparadise.moe/watch/deffc3d9-1308-498a-82f2-b3635aecbc42?origin=Y45v9Oh6TpXU1EEY');
-        const html = await response;
+        const response = await fetch(url);
+        const html = await response.text(); // TODO - REVERT
 
-        const trimmedHtml = trimHtml(html, '__NEXT_DATA__', '</script>');
-
-        const jsonString = trimmedHtml.slice(39);
-        const json = JSON.parse(jsonString);
+        const json = getNextData(html);
+        if (json == null) throw ('Error parsing NEXT_DATA json');
 
         const streamUrl = json?.props?.pageProps?.episode?.streamLink;
         const subtitles = json?.props?.pageProps?.episode?.subData.find(sub => sub.type === 'vtt' && sub.label === 'English');
 
-        return JSON.stringify({ stream: streamUrl, subtitles: subtitles });
-        
-    } catch(e) {
+        return JSON.stringify({ stream: streamUrl, subtitles: subtitles?.source });
+
+    } catch (e) {
         console.log('Error:', e);
         return JSON.stringify({ stream: null, subtitles: null });
+    }
+}
+
+function getNextData(html) {
+    const trimmedHtml = trimHtml(html, '__NEXT_DATA__', '</script>');
+    const jsonString = trimmedHtml.slice(39);
+
+    try {
+        return JSON.parse(jsonString);
+    } catch (e) {
+        console.log('Error parsing NEXT_DATA json');
+        return null;
     }
 }
 
@@ -81,13 +156,3 @@ function trimHtml(html, startString, endString) {
     const endIndex = html.indexOf(endString, startIndex);
     return html.substring(startIndex, endIndex);
 }
-
-// function writeFile(title, content) {
-//     fs.writeFile('debug/animeparadise-' + title, content, err => {
-//         if (err) {
-//             console.log('Failed to write to file', err.message);
-//         } else {
-//             console.log('Successfully saved file: ', title);
-//         }
-//     });
-// }
