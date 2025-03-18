@@ -1,11 +1,3 @@
-// // //***** LOCAL TESTING
-// const results = await searchResults('Solo leveling');
-// const details = await extractDetails(JSON.parse(results)[0].href);
-// const episodesa = await extractEpisodes(JSON.parse(results)[0].href);
-// const streamUrl = await extractStreamUrl(JSON.parse(episodesa)[0].href);
-// console.log('STREAMURL:', streamUrl);
-//***** LOCAL TESTING
-
 /**
  * Searches the website for anime with the given keyword and returns the results
  * @param {string} keyword The keyword to search for
