@@ -13,6 +13,6 @@
     "type": "movies/shows",
     "baseUrl": "https://catflix.su/",
     "searchBaseUrl": "https://catflix.su/search?q=%s",
-    "scriptUrl": "https://api.jm26.net/sora-modules/catflix/catflix.js",
+    "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/testing/cf.js",
     "asyncJS": true
  }
