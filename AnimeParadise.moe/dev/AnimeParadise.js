@@ -1,9 +1,9 @@
 // // //***** LOCAL TESTING
-// const results = await searchResults('Solo leveling');
-// const details = await extractDetails(JSON.parse(results)[0].href);
-// const episodesa = await extractEpisodes(JSON.parse(results)[0].href);
-// const streamUrl = await extractStreamUrl(JSON.parse(episodesa)[0].href);
-// console.log('STREAMURL:', streamUrl);
+const results = await searchResults('Solo leveling');
+const details = await extractDetails(JSON.parse(results)[0].href);
+const episodesa = await extractEpisodes(JSON.parse(results)[0].href);
+const streamUrl = await extractStreamUrl(JSON.parse(episodesa)[0].href);
+console.log('STREAMURL:', streamUrl);
 //***** LOCAL TESTING
 
 /**
@@ -129,8 +129,10 @@ async function extractStreamUrl(url) {
 
         const streamUrl = json?.props?.pageProps?.episode?.streamLink;
         const subtitles = json?.props?.pageProps?.episode?.subData.find(sub => sub.type === 'vtt' && sub.label === 'English');
+        console.log('Subs:', subtitles);
+        // console.log(json?.props?.pageProps?.episode?.subData);
 
-        return JSON.stringify({ stream: streamUrl, subtitles: subtitles?.source });
+        return JSON.stringify({ stream: streamUrl, subtitles: subtitles?.src });
 
     } catch (e) {
         console.log('Error:', e);
