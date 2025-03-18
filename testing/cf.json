@@ -14,5 +14,6 @@
     "baseUrl": "https://catflix.su/",
     "searchBaseUrl": "https://catflix.su/search?q=%s",
     "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/testing/cf.js",
-    "asyncJS": true
+    "asyncJS": true,
+    "softsub": true
  }
