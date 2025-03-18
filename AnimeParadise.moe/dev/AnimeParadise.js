@@ -133,8 +133,6 @@ async function extractStreamUrl(url) {
 
         const streamUrl = json?.props?.pageProps?.episode?.streamLink;
         const subtitles = json?.props?.pageProps?.episode?.subData.find(sub => sub.type === 'ass' && sub.label === 'English');
-        console.log('Subs:', subtitles);
-        // console.log(json?.props?.pageProps?.episode?.subData);
 
         return JSON.stringify({ stream: streamUrl, subtitles: subtitles?.src });
 
