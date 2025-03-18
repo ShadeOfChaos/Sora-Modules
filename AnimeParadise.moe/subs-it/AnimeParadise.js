@@ -150,7 +150,7 @@ async function getEpisodesWithLanguageSubs(episodeUrl, language = 'English', typ
 
             episodes.push({
                 href: `${ BASE_URL }${ ep?.uid }?origin=${ origin }`,
-                number: ep.number
+                number: parseInt(ep.number)
             });
         }
 
