@@ -222,19 +222,21 @@ async function extractStreamUrl(url) {
         const { imdb_id: imdbId, season, episode } = JSON.parse(base64Decode(hashData));
         console.log("imdbId:" + imdbId + " | season:" + season + " | episode:" + episode);
 
-        // try {
-        //     subtitles = await fetchSubtitles(imdbId, season, episode, language);
-        //     console.log("Fetched subtitles:", subtitles);
-        // } catch (error) {
-        //     console.log("Subtitles error:", error);
-        // }
+        try {
+            subtitles = await fetchSubtitles(imdbId, season, episode, language);
+            console.log("Fetched subtitles:", subtitles);
+        } catch (error) {
+            console.log("Subtitles error:", error);
+        }
 
         // 4. Decrypt and return final url
-        return xorDecryptHex(encryptedPayload, juiceKeys.juice);
+        const streamUrl = xorDecryptHex(encryptedPayload, juiceKeys.juice);
+
+        return JSON.stringify({ stream: streamUrl, subtitles: subtitles });
 
     } catch (error) {
         console.log('Extraction failed:' + error);
-        return null;
+        return JSON.stringify({ stream: null, subtitles: null });
     }
 }
 
@@ -256,18 +258,26 @@ async function extractEmbedVariables(embedUrl) {
 }
 
 async function fetchSubtitles(imdbId, season, episode, language) {
-
-    let url = `https://justaproxy.xyz/subsApi.php?version=2&getsubs=simp&imdbid=${imdbId}&subkey=${language}`;
+  let url = `https://justaproxy.xyz/subsApi.php?version=2&getsubs=simp&imdbid=${imdbId}&subkey=${language}`;
     if (season && episode) {
         url += `&season=${season}&episode=${episode}`;
     }
-    console.log("Subtitles url:", url);
-    // const headers = "Origin=https://turbovid.eu|Referer=https://turbovid.eu/";
-    // const vercelUrl = `https://sora-passthrough.vercel.app/passthrough?url=${ url }&headers=${ headers }`;
+
     const response = await fetch(url);
+    const responseJson = await response.json();
+    console.log('RJSON: ', responseJson);
+
+    // let url = `https://justaproxy.xyz/subsApi.php?version=2&getsubs=simp&imdbid=${imdbId}&subkey=${language}`;
+    // if (season && episode) {
+    //     url += `&season=${season}&episode=${episode}`;
+    // }
+    // console.log("Subtitles url:", url);
+    // // const headers = "Origin=https://turbovid.eu|Referer=https://turbovid.eu/";
+    // // const vercelUrl = `https://sora-passthrough.vercel.app/passthrough?url=${ url }&headers=${ headers }`;
     // const response = await fetch(url);
-    console.log("Subtitles response:", response);
-    const responseJson = JSON.parse(response);
+    // // const response = await fetch(url);
+    // console.log("Subtitles response:", response);
+    // const responseJson = JSON.parse(response);
     /*
     [
   {
@@ -283,7 +293,9 @@ async function fetchSubtitles(imdbId, season, episode, language) {
         return null;
     }
 
-    const subtitle = responseJson[0].SubDownloadLink;
+    const subtitleObject = responseJson.find(subs => subs.SubFormat === 'vtt');
+
+    const subtitle = subtitleObject.SubDownloadLink;
     return subtitle;
 }
 
