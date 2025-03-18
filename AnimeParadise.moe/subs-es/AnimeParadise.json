@@ -1,0 +1,18 @@
+{
+    "sourceName": "AnimeParadise (ES SUB)",
+    "iconUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeParadise.moe/logo.png",
+    "author": {
+        "name": "ShadeOfChaos",
+        "icon": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeParadise.moe/ofchaos.jpg"
+    },
+    "version": "1.0.1",
+    "language": "Spanish (SUB)",
+    "streamType": "HLS",
+    "quality": "1080p",
+    "baseUrl": "https://megacloud.club/",
+    "searchBaseUrl": "https://www.animeparadise.moe/search?q=%s",
+    "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeParadise.moe/subs-es/AnimeParadise.js",
+    "asyncJS": true,
+    "streamAsyncJS": true,
+    "softsub": true
+ }
