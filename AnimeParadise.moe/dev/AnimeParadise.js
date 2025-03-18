@@ -132,7 +132,7 @@ async function extractStreamUrl(url) {
         if (json == null) throw ('Error parsing NEXT_DATA json');
 
         const streamUrl = json?.props?.pageProps?.episode?.streamLink;
-        const subtitles = json?.props?.pageProps?.episode?.subData.find(sub => sub.type === 'vtt' && sub.label === 'English');
+        const subtitles = json?.props?.pageProps?.episode?.subData.find(sub => sub.type === 'ass' && sub.label === 'English');
         console.log('Subs:', subtitles);
         // console.log(json?.props?.pageProps?.episode?.subData);
 
