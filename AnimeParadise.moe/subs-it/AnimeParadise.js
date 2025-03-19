@@ -100,7 +100,7 @@ async function extractEpisodes(url) {
 
         return JSON.stringify(episodes);
     } catch (error) {
-        console.error('Fetch error:', error);
+        console.log('Fetch error:', error);
         return JSON.stringify([]);
     }
 }

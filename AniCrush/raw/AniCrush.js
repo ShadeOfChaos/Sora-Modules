@@ -147,7 +147,7 @@ async function extractEpisodes(url) {
 
         return JSON.stringify(episodes);
     } catch (error) {
-        console.error('Fetch error:', error);
+        console.log('Fetch error:', error);
         return JSON.stringify([]);
     }
 }
@@ -269,7 +269,7 @@ async function extractStreamUrl(url) {
         return streamUrl;
 
     } catch (error) {
-        console.error('Fetch error:', error);
+        console.log('Fetch error:', error);
         return null;
     }
 }
