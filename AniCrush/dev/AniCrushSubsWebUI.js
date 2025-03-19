@@ -251,21 +251,28 @@ async function extractStreamUrl(url) {
             throw('No source found');
         }
 
-        let hlsSource = null;
+        let streamSource = null;
+        let mp4Source = null;
 
         for(let source of hlsData.result.sources) {
             if(source.type === 'hls') {
-                hlsSource = source;
+                streamSource = source;
                 break;
+            }
+            if(source.type === 'mp4') {
+                mp4Source = source;
             }
         }
 
-        if(hlsSource == null) {
-            throw('No valid HLS stream found');
+        if(streamSource == null) {
+            if(mp4Source == null) {
+                throw('No valid stream found');
+            }
+            streamSource = mp4Source;
         }
 
         if(hlsData.result?.tracks?.length <= 0) {
-            throw('No valid substitles found');
+            return JSON.stringify({ stream: streamSource?.file, subtitles: null });
         }
 
         let reserveSubtitles = null;
@@ -273,7 +280,7 @@ async function extractStreamUrl(url) {
 
         for(let track of hlsData.result.tracks) {
             if(track.kind === 'captions') {
-                if(track?.label !== 'English') {
+                if(!track?.label.startsWith('English')) {
                     continue;
                 }
                 if(track?.default === true) {
@@ -285,15 +292,13 @@ async function extractStreamUrl(url) {
         }
 
         if(subtitles == null) {
-            if(reserveSubtitles == null) {
-                throw('No valid subtitles found');
+            if(reserveSubtitles != null) {
+                subtitles = reserveSubtitles;
             }
-
-            subtitles = reserveSubtitles;
         }
 
         const streamUrl = {
-            stream: hlsSource ? hlsSource.file : null,
+            stream: streamSource ? streamSource.file : null,
             subtitles: subtitles ? subtitles.file : null
         };
 
