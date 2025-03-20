@@ -22,7 +22,12 @@ async function searchResults(keyword) {
 
     try {
         const response = await fetch(`${SEARCH_URL}${encodeURI(keyword)}`);
-        const html = typeof response === 'object' ? await response.text() : await response;
+        var html = '';
+        if(typeof response === 'object') {
+            html = await response.text();
+        } else {
+            html = await response;
+        }
 
         const matches = html.matchAll(REGEX);
 
@@ -51,7 +56,12 @@ async function extractDetails(url) {
 
     try {
         const response = await fetch(url);
-        const html = typeof response === 'object' ? await response.text() : await response;
+        var html = '';
+        if(typeof response === 'object') {
+            html = await response.text();
+        } else {
+            html = await response;
+        }
 
         const json = getNextData(html);
         if (json == null) throw('Error parsing NEXT_DATA json');
@@ -94,7 +104,12 @@ async function extractEpisodes(url) {
 
     try {
         const response = await fetch(url);
-        const html = typeof response === 'object' ? await response.text() : await response;
+        var html = '';
+        if(typeof response === 'object') {
+            html = await response.text();
+        } else {
+            html = await response;
+        }
         var episodes = [];
 
         const json = getNextData(html);
@@ -129,7 +144,12 @@ async function extractEpisodes(url) {
 async function extractStreamUrl(url) {
     try {
         const response = await fetch(url);
-        const html = typeof response === 'object' ? await response.text() : await response;
+        var html = '';
+        if(typeof response === 'object') {
+            html = await response.text();
+        } else {
+            html = await response;
+        }
 
         const json = getNextData(html);
         if (json == null) throw ('Error parsing NEXT_DATA json');
@@ -163,3 +183,8 @@ function trimHtml(html, startString, endString) {
     const endIndex = html.indexOf(endString, startIndex);
     return html.substring(startIndex, endIndex);
 }
+
+// async function awaitResponse(res, type) {
+//     if(typeof res === 'object') {
+//         return await response.
+// }
