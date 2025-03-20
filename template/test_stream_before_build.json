@@ -14,5 +14,5 @@
     "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/template/test_stream_before_build.js",
     "asyncJS": true,
     "streamAsyncJS": true,
-    "softsub": true
+    "softsub": false
  }
