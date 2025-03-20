@@ -5,10 +5,10 @@
         "name": "ShadeOfChaos",
         "icon": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeGG/ofchaos.jpg"
     },
-    "version": "1.0.6.2",
+    "version": "1.0.6.3",
     "language": "English (SUB)",
     "streamType": "HLS",
-    "quality": "1080p",
+    "quality": "720p",
     "baseUrl": "https://www.animegg.org/",
     "searchBaseUrl": "https://www.animegg.org/search/?q=%s",
     "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeGG/dev/AnimeGG.js",

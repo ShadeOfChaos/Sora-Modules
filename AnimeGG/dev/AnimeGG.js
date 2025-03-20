@@ -153,20 +153,12 @@ async function extractStreamUrl(url) {
                 // bk: m[3],
                 isBk: m[4] === 'true' ? true : false
             }
-        }).sort((a, b) => a?.quality === b?.quality ? 0 : a?.quality > b?.quality ? -1 : 1);
+        }); //.sort((a, b) => a?.quality === b?.quality ? 0 : a?.quality > b?.quality ? -1 : 1);
 
-        // console.log(sources);
+        // const p1080 = sources.find(s => s.quality === 1080);
+        const p720 = sources.find(s => s.quality === 720);
 
-        const x = await fetch(sources[0].file, { headers: { referer: 'https://animegg.org/' } });
-        const vidcacheUrl = x.url;
-
-        const a = await fetch(vidcacheUrl.url, { headers: { referer: 'https://animegg.org/' } });
-        const vidUndirectedUrl = a.url;
-
-        // console.log(vidcacheUrl);
-        
-        // return sources[0]?.bk;
-        return vidUndirectedUrl;
+        return p720.file;
 
     } catch(e) {
         console.log('Error:', e);
