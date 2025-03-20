@@ -1,0 +1,18 @@
+{
+    "sourceName": "TESTING ONLY - MARU",
+    "iconUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AniCrush/ofchaos.jpg",
+    "author": {
+        "name": "ShadeOfChaos",
+        "icon": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AniCrush/ofchaos.jpg"
+    },
+    "version": "1.0.0",
+    "language": "English (SUB)",
+    "streamType": "HLS",
+    "quality": "1080p",
+    "baseUrl": "www.animeparadise.moe",
+    "searchBaseUrl": "https://www.animeparadise.moe/search?q=%s",
+    "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeFlv/dev/test_sw.js",
+    "asyncJS": true,
+    "streamAsyncJS": true,
+    "softsub": true
+ }

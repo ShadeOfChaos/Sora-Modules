@@ -1,11 +1,11 @@
 //***** LOCAL TESTING
-(async() => {
-const results = await searchResults();
-const details = await extractDetails();
-const episodes = await extractEpisodes();
-const streamUrl = await extractStreamUrl();
-console.log('STREAMURL:', streamUrl);
-})();
+// (async() => {
+// const results = await searchResults();
+// const details = await extractDetails();
+// const episodes = await extractEpisodes();
+// const streamUrl = await extractStreamUrl();
+// console.log('STREAMURL:', streamUrl);
+// })();
 //***** LOCAL TESTING
 
 /**
@@ -75,11 +75,11 @@ async function extractStreamUrl(url) {
         const SW = "https://eewh6zs51u.cdn-centaurus.com/hls2/01/09130/fn8n5g7b2i68_,l,n,.urlset/master.m3u8?t=OXR_ic53qjtnGRskLEJqnIAQXJV2PKNEg83I5-JJRyU&s=1742459210&e=129600&f=45652619&srv=mhe7qdnw6bsc&i=0.4&sp=500&p1=mhe7qdnw6bsc&p2=mhe7qdnw6bsc&asn=62240"; // P.A.C.K.E.D
         const YOUR_UPLOAD = "https://vidcache.net:8161/a20250320uQ2qsMaL8jr/video.mp4"; // Metadata OR jwplayerOptions.file
 
-        return JSON.stringify({ stream: MAIL_RU, subtitles: null });
+        // return JSON.stringify({ stream: MAIL_RU, subtitles: null });
         // return JSON.stringify({ stream: NETU, subtitles: null });
         // return JSON.stringify({ stream: STAPE, subtitles: null });
         // return JSON.stringify({ stream: STAPE2, subtitles: null });
-        // return JSON.stringify({ stream: SW, subtitles: null });
+        return JSON.stringify({ stream: SW, subtitles: null });
         // return JSON.stringify({ stream: YOUR_UPLOAD, subtitles: null });
         
 
