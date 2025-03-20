@@ -5,7 +5,7 @@
         "name": "ShadeOfChaos",
         "icon": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AniCrush/ofchaos.jpg"
     },
-    "version": "1.0.2",
+    "version": "1.0.3",
     "language": "English (SUB)",
     "streamType": "HLS",
     "quality": "1080p",
@@ -14,6 +14,6 @@
     "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeGG/dev/AnimeGG.js",
     "asyncJS": true,
     "streamAsyncJS": true,
-    "softsub": true,
+    "softsub": false,
     "ocfTest": "sub"
  }

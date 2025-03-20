@@ -5,15 +5,15 @@ const FORMAT = 'SUB'; // SUB | DUB
 
 
 //***** LOCAL TESTING
-// (async() => {
-// const results = await searchResults('Solo leveling');
-// const details = await extractDetails(JSON.parse(results)[0].href);
-// // console.log('DETAILS:', details);
-// const episodes = await extractEpisodes(JSON.parse(results)[0].href);
-// // console.log('EPISODES:', episodes);
+(async() => {
+const results = await searchResults('Sentai red');
+const details = await extractDetails(JSON.parse(results)[0].href);
+console.log('DETAILS:', details);
+const episodes = await extractEpisodes(JSON.parse(results)[0].href);
+console.log('EPISODES:', episodes);
 // const streamUrl = await extractStreamUrl(JSON.parse(episodes)[0].href);
 // console.log('STREAMURL:', streamUrl);
-// })();
+})();
 //***** LOCAL TESTING
 
 /**
@@ -52,19 +52,19 @@ async function searchResults(keyword) {
  * @returns {Promise<string>} A promise that resolves with a JSON string containing the details in the format: `[{"description": "Description", "aliases": "Aliases", "airdate": "Airdate"}]`
  */
 async function extractDetails(url) {
-    const REGEX = /Alternate Titles: ([\s\S]+?)<[\s\S]+?ptext">([\s\S]+?)</;
+    // const REGEX = /Alternate Titles: ([\s\S]+?)<[\s\S]+?ptext">([\s\S]+?)</;
+    const REGEX = /(?:Alternate Titles: ([\s\S]+?)<[\s\S]+?ptext">([\s\S]+?)<)|(?:ptext">([\s\S]+?)<)/;
 
     try {
         const response = await fetch(url);
         const html = typeof response === 'object' ? await response.text() : await response;
 
-        const trimmedHtml = trimText(html, '"media-body"', '<!--footer-->');
-
+        const trimmedHtml = trimText(html, '"media-body"', 'class="upbit"');
         const match = trimmedHtml.match(REGEX);
 
         const details = {
-            description: match[2],
-            aliases: match[1],
+            description: match[3] != null ? match[3] : match[2],
+            aliases: match[1] != null ? match[1] : '',
             airdate: 'Aired: Unknown'
         };
 
@@ -88,8 +88,8 @@ async function extractDetails(url) {
 async function extractEpisodes(url) {
     const INIT_REGEX = /<div>([\s\S]+?)<\/div>/g;
     const INNER_REGEX = /a href="([\s\S]+?)" class="anm_det_pop"[\s\S]+?anititle">Episode ([0-9]+)/;
-    var subbed_episodes = [];
-    var dubbed_episodes = [];
+    let subbed_episodes = [];
+    let dubbed_episodes = [];
 
     try {
         const response = await fetch(url);
@@ -112,10 +112,10 @@ async function extractEpisodes(url) {
         }
 
         if(FORMAT === 'SUB') {
-            return JSON.stringify(subbed_episodes);
+            return JSON.stringify(subbed_episodes.reverse());
         }
 
-        return JSON.stringify(dubbed_episodes);
+        return JSON.stringify(dubbed_episodes.reverse());
 
     } catch (error) {
         console.log('Fetch error:', error);
@@ -154,13 +154,13 @@ async function extractStreamUrl(url) {
                 bk: m[3],
                 isBk: m[4] === 'true' ? true : false
             }
-        }).sort((a, b) => a.quality === b.quality ? 0 : a.quality > b.quality ? -1 : 1);
+        }).sort((a, b) => a?.quality === b?.quality ? 0 : a?.quality > b?.quality ? -1 : 1);
         
-        return JSON.stringify({ stream: sources[0].file, subtitles: null });
+        return sources[0]?.file;
 
     } catch(e) {
         console.log('Error:', e);
-        return JSON.stringify({ stream: null, subtitles: null });
+        return null;
     }
 }
 
