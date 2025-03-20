@@ -4,15 +4,15 @@ const UTILITY_URL = 'https://ac-api.ofchaos.com';
 const FORMAT = 'SUB'; // SUB | DUB
 
 //***** LOCAL TESTING
-(async() => {
-    const results = await searchResults('Sentai red');
-    const details = await extractDetails(JSON.parse(results)[0].href);
-    // console.log('DETAILS:', details);
-    const episodes = await extractEpisodes(JSON.parse(results)[0].href);
-    // console.log('EPISODES:', episodes);
-    const streamUrl = await extractStreamUrl(JSON.parse(episodes)[0].href);
-    console.log('STREAMURL:', streamUrl);
-})();
+// (async() => {
+//     const results = await searchResults('Sentai red');
+//     const details = await extractDetails(JSON.parse(results)[0].href);
+//     // console.log('DETAILS:', details);
+//     const episodes = await extractEpisodes(JSON.parse(results)[0].href);
+//     // console.log('EPISODES:', episodes);
+//     const streamUrl = await extractStreamUrl(JSON.parse(episodes)[0].href);
+//     console.log('STREAMURL:', streamUrl);
+// })();
 //***** LOCAL TESTING
 
 /**
@@ -155,13 +155,15 @@ async function extractStreamUrl(url) {
             }
         }).sort((a, b) => a?.quality === b?.quality ? 0 : a?.quality > b?.quality ? -1 : 1);
 
-        console.log(sources);
+        // console.log(sources);
 
         const x = await fetch(sources[0].file, { headers: { referer: 'https://animegg.org/' } });
         const vidcacheUrl = x.url;
 
         const a = await fetch(x.url, { headers: { referer: 'https://animegg.org/' } });
         const vidUndirectedUrl = a.url;
+
+        // console.log(vidcacheUrl);
         
         // return sources[0]?.bk;
         return vidcacheUrl;
