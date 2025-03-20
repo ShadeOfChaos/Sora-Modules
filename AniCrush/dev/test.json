@@ -1,0 +1,18 @@
+{
+    "sourceName": "AniCrush (TESTING)",
+    "iconUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AniCrush/logo.png",
+    "author": {
+        "name": "ShadeOfChaos",
+        "icon": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AniCrush/ofchaos.jpg"
+    },
+    "version": "2.0.3",
+    "language": "English (SUB)",
+    "streamType": "HLS",
+    "quality": "1080p",
+    "baseUrl": "https://megacloud.club/",
+    "searchBaseUrl": "https://ac-api.ofchaos.com/api/anime/search?keyword=%s",
+    "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AniCrush/dev/test.js",
+    "asyncJS": true,
+    "streamAsyncJS": true,
+    "softsub": true
+ }
