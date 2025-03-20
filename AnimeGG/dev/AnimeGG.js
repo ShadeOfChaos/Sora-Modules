@@ -1,11 +1,11 @@
 //***** LOCAL TESTING
-(async() => {
-const results = await searchResults();
-const details = await extractDetails();
-const episodes = await extractEpisodes();
-const streamUrl = await extractStreamUrl();
-console.log('STREAMURL:', streamUrl);
-})();
+// (async() => {
+// const results = await searchResults();
+// const details = await extractDetails();
+// const episodes = await extractEpisodes();
+// const streamUrl = await extractStreamUrl();
+// console.log('STREAMURL:', streamUrl);
+// })();
 //***** LOCAL TESTING
 
 /**
