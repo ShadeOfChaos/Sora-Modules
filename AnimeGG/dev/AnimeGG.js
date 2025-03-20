@@ -131,7 +131,7 @@ async function extractEpisodes(url) {
 async function extractStreamUrl(url) {
     const SUB_REGEX = /subbed-Animegg[\s\S]+?src="([\s\S]+?)"/;
     const DUB_REGEX = /dubbed-Animegg[\s\S]+?src="([\s\S]+?)"/;
-    var embedUrl = null;
+    const SOURCES_REGEX = /file: "([\s\S]+?)", label: "([\s\S]+?)", bk: "([\s\S]+?)", isBk: (false|true)/g;
 
     try {
         const response = await fetch(url);
@@ -139,23 +139,27 @@ async function extractStreamUrl(url) {
 
         const trimmedHtml = trimText(html, 'tab-content', 'class="container"');
         
-        if(FORMAT === 'SUB') {
-            embedUrl = FORMAT === 'SUB' ? trimmedHtml.match(SUB_REGEX)[1] : trimmedHtml.match(DUB_REGEX)[1];
-        }
+        const embedUrl = FORMAT === 'SUB' ? trimmedHtml.match(SUB_REGEX)[1] : trimmedHtml.match(DUB_REGEX)[1];
 
-        // const embedUrl = "https://www.animegg.org/embed/27657";
         const embedResponse = await fetch(`${ BASE_URL }${ embedUrl }`);
         const embedHtml = typeof embedResponse === 'object' ? await embedResponse.text() : await embedResponse;
 
-        const playUrl = "https://www.animegg.org/play/240636/video.mp4?for=101742467443530";
-        // const playResponse = await fetch(playUrl, { headers: { referer:"https://www.animegg.org/" }});
-        // console.log(playResponse);
+        const trimmedEmbed = trimText(embedHtml, 'var videoSources = ', ';');
+        // const sourcesJson = JSON.parse(trimmedScript);
 
-        const vercelUrl = `https://sora-passthrough.vercel.app/passthrough?url=${ playUrl }&headers=${ referer="https://www.animegg.org/" } }`;
-// const vercelResponse = await fetch(vercelUrl);
-// const vercelData = await vercelResponse.json();
+        const sources = Array.from(trimmedEmbed.matchAll(SOURCES_REGEX)).map(m => {
+            return {
+                file: `${ BASE_URL }${ m[1] }`,
+                quality: parseInt(m[2].replace('p', '')),
+                // bk: decodeURIComponent(atob(m[3])),
+                bk: m[3],
+                isBk: m[4] === 'true' ? true : false
+            }
+        }).sort((a, b) => a.quality === b.quality ? 0 : a.quality > b.quality ? -1 : 1);
+
+        // IF DOES NOT WORK, decode and atob bk, mp4upload url, fetch it's html, get the .mp4 url from there
         
-        return JSON.stringify({ stream: vercelUrl, subtitles: null });
+        return JSON.stringify({ stream: sources[0].file, subtitles: null });
 
     } catch(e) {
         console.log('Error:', e);
