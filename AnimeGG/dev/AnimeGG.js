@@ -155,9 +155,16 @@ async function extractStreamUrl(url) {
             }
         }).sort((a, b) => a?.quality === b?.quality ? 0 : a?.quality > b?.quality ? -1 : 1);
 
-        console.log(sources[0].bk);
+        console.log(sources);
+
+        const x = await fetch(sources[0].file, { headers: { referer: 'https://animegg.org/' } });
+        const vidcacheUrl = x.url;
+
+        const a = await fetch(x.url, { headers: { referer: 'https://animegg.org/' } });
+        const vidUndirectedUrl = a.url;
         
-        return sources[0]?.bk;
+        // return sources[0]?.bk;
+        return vidcacheUrl;
 
     } catch(e) {
         console.log('Error:', e);
