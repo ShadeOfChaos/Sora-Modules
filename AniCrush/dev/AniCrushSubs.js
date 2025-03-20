@@ -40,12 +40,12 @@ function getImage(path, type = "poster") {
 async function searchResults(keyword) {
     const BASE_URL = 'https://anicrush.to';
     const UTILITY_URL = 'https://ac-api.ofchaos.com';
-    
+
     try {
         const page = 1;
         const limit = 24;
         const response = await fetch(`${ UTILITY_URL }/api/anime/search?keyword=${encodeURIComponent(keyword)}&page=${ page }&limit=${ limit }`);
-        const data = await response.json();
+        const data = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
         if(data?.status == false || data?.result?.movies?.length <= 0) {
             throw('No results found');
@@ -75,7 +75,7 @@ async function extractDetails(url) {
 
     try {
         const response = await fetch(`${ UTILITY_URL }/api/anime/info/${ movieId }`);
-        const data = await response.json();
+        const data = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
         if(data?.status == false || data?.result == null) {
             throw('No results found');
@@ -139,20 +139,20 @@ async function extractEpisodes(url) {
 
     try {
         const serverId = 4;
-        const format = 'sub';
+        const streamType = 'sub';
         var episodes = [];
 
         const response = await fetch(`${ UTILITY_URL }/api/anime/episodes?movieId=${ movieId }`);
-        const data = await response.json();
+        const data = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
         if(data?.status == false || data?.result == null) {
             throw('No results found');
         }
-        
+
         for(let episodeList in data.result) {
             for(let episode of data.result[episodeList]) {
                 episodes.push({
-                    href: `${ SOURCE_API_URL }/shared/v2/episode/sources?_movieId=${ movieId }&ep=${ episode.number }&sv=${ serverId }&sc=${ format }`,
+                    href: `${ SOURCE_API_URL }/shared/v2/episode/sources?_movieId=${ movieId }&ep=${ episode.number }&sv=${ serverId }&sc=${ streamType }`,
                     number: episode.number
                 });
             }
@@ -209,7 +209,7 @@ async function extractStreamUrl(url) {
         }
 
         const serversResponse = await fetch(`${ UTILITY_URL }/api/anime/servers/${ id }?episode=${ episode }`);
-        const serversData = await serversResponse.json();
+        const serversData = typeof serversResponse === 'object' ? await serversResponse.json() : await JSON.parse(serversResponse);
 
         if(serversData.status == false || serversData.result == null) {
             throw('No servers found');
@@ -234,7 +234,7 @@ async function extractStreamUrl(url) {
         }
 
         const sourceResponse = await fetch(`${ UTILITY_URL }/api/anime/sources?movieId=${ id }&episode=${ episode }&server=${ server }&format=${ format }`);
-        const sourceData = await sourceResponse.json();
+        const sourceData = typeof sourceResponse === 'object' ? await sourceResponse.json() : await JSON.parse(sourceResponse);
 
         if(
             sourceData.status == false || 
@@ -250,11 +250,11 @@ async function extractStreamUrl(url) {
         // Older version which might or might not work, new method incorporates getting the embed from the source
         // const hlsUrl = `${ UTILITY_URL }/api/anime/hls/${ id }?episode=${ episode }&server=${ server }&format=${ format }`;
         // const hlsResponse = await fetch(hlsUrl);
-        // const hlsData = await hlsResponse.json();
+        // const hlsData = await JSON.parse(hlsResponse);
 
         const hlsUrl = `${ UTILITY_URL }/api/anime/embed/convert?embedUrl=${ encodeURIComponent(source) }&host=${ encodeURIComponent(SOURCE_BASE_URL) }`;
         const hlsResponse = await fetch(hlsUrl);
-        const hlsData = await hlsResponse.json();
+        const hlsData = typeof hlsResponse === 'object' ? await hlsResponse.json() : await JSON.parse(hlsResponse);
 
         if(hlsData?.status == false || hlsData?.result == null || hlsData?.error != null) {
             throw('No stream found');
