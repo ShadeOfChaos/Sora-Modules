@@ -57,15 +57,15 @@ async function extractEpisodes(url) {
 async function extractStreamUrl(url) {
     url = 'https://www3.animeflv.net/ver/honey-lemon-soda-11'; // TEMP
     try {
-        const response = await fetch(url);
-        const html = typeof response === 'object' ? await response.text() : await response;
+        // const response = await fetch(url);
+        // const html = typeof response === 'object' ? await response.text() : await response;
 
-        const json = getVideos(html);
-        if (json == null) throw ('Error parsing video data');
-        // Try to get stream here first so you don't waste time
+        // const json = getVideos(html);
+        // if (json == null) throw ('Error parsing video data');
+        // // Try to get stream here first so you don't waste time
         
-        const streamSource = await decideStreamUrl(json, 'SUB');
-        console.log('Stream source:', streamSource);
+        // const streamSource = await decideStreamUrl(json, 'SUB');
+        // console.log('Stream source:', streamSource);
 
         // Let's test this shiiiiiiit
         const MAIL_RU = "https://my.mail.ru/mail/aylaz9ymde/_myvideo/9299"; // movieSrc
@@ -117,20 +117,7 @@ async function decideStreamUrl(JSON, expectedFormat = 'SUB') {
             headers: headers
         });
         let html = await res.text();
-
-        writeFile(source.title + '.html', html);
     }
 
     return null;
-}
-
-import fs from 'node:fs';
-function writeFile(title, content) {
-    fs.writeFile('debug/AnimeFLV/' + title, content, err => {
-        if (err) {
-            console.log('Failed to write to file', err.message);
-        } else {
-            console.log('Successfully saved file: ', title);
-        }
-    });
 }
