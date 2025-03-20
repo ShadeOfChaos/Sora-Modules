@@ -1,12 +1,12 @@
 // // //***** LOCAL TESTING
 const results = await searchResults('Solo leveling');
-console.log('RESULTS:', results);
-// const details = await extractDetails(JSON.parse(results)[0].href);
+// console.log('RESULTS:', results);
+const details = await extractDetails(JSON.parse(results)[0].href);
 // console.log('DETAILS:', details);
-// const episodesa = await extractEpisodes(JSON.parse(results)[0].href);
+const episodesa = await extractEpisodes(JSON.parse(results)[0].href);
 // console.log('EPISODES:', episodesa);
-// const streamUrl = await extractStreamUrl(JSON.parse(episodesa)[0].href);
-// console.log('STREAMURL:', streamUrl);
+const streamUrl = await extractStreamUrl(JSON.parse(episodesa)[0].href);
+console.log('STREAMURL:', streamUrl);
 //***** LOCAL TESTING
 
 /**
@@ -51,7 +51,7 @@ async function extractDetails(url) {
 
     try {
         const response = await fetch(url);
-        const html = await response.text();// TODO - revert
+        const html = typeof response === 'object' ? await response.text() : await response;
 
         const json = getNextData(html);
         if (json == null) throw('Error parsing NEXT_DATA json');
@@ -94,7 +94,7 @@ async function extractEpisodes(url) {
 
     try {
         const response = await fetch(url);
-        const html = await response.text();// TODO - revert
+        const html = typeof response === 'object' ? await response.text() : await response;
         var episodes = [];
 
         const json = getNextData(html);
@@ -129,7 +129,7 @@ async function extractEpisodes(url) {
 async function extractStreamUrl(url) {
     try {
         const response = await fetch(url);
-        const html = await response.text(); // TODO - REVERT
+        const html = typeof response === 'object' ? await response.text() : await response;
 
         const json = getNextData(html);
         if (json == null) throw ('Error parsing NEXT_DATA json');
