@@ -160,7 +160,7 @@ async function extractStreamUrl(url) {
         const x = await fetch(sources[0].file, { headers: { referer: 'https://animegg.org/' } });
         const vidcacheUrl = x.url;
 
-        const a = await fetch(x.url, { headers: { referer: 'https://animegg.org/' } });
+        const a = await fetch(vidcacheUrl.url, { headers: { referer: 'https://animegg.org/' } });
         const vidUndirectedUrl = a.url;
 
         // console.log(vidcacheUrl);
