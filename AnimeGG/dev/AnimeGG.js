@@ -166,7 +166,7 @@ async function extractStreamUrl(url) {
         // console.log(vidcacheUrl);
         
         // return sources[0]?.bk;
-        return vidcacheUrl;
+        return vidUndirectedUrl;
 
     } catch(e) {
         console.log('Error:', e);
