@@ -1,11 +1,19 @@
+const BASE_URL = 'https://www.animegg.org';
+const SEARCH_URL = 'https://www.animegg.org/search/?q=';
+const UTILITY_URL = 'https://ac-api.ofchaos.com';
+const FORMAT = 'SUB'; // SUB | DUB
+
+
 //***** LOCAL TESTING
-// (async() => {
-// const results = await searchResults();
-// const details = await extractDetails();
-// const episodes = await extractEpisodes();
-// const streamUrl = await extractStreamUrl();
-// console.log('STREAMURL:', streamUrl);
-// })();
+(async() => {
+const results = await searchResults('Solo leveling');
+const details = await extractDetails(JSON.parse(results)[0].href);
+// console.log('DETAILS:', details);
+const episodes = await extractEpisodes(JSON.parse(results)[0].href);
+// console.log('EPISODES:', episodes);
+const streamUrl = await extractStreamUrl(JSON.parse(episodes)[0].href);
+console.log('STREAMURL:', streamUrl);
+})();
 //***** LOCAL TESTING
 
 /**
@@ -14,9 +22,28 @@
  * @returns {Promise<string>} A promise that resolves with a JSON string containing the search results in the format: `[{"title": "Title", "image": "Image URL", "href": "URL"}, ...]`
  */
 async function searchResults(keyword) {
-    const episodeListUrl = 'https://www.animeonsen.xyz/details/VW2uXR5DvjxlLSw5';
+    const REGEX = /a href="([\s\S]+?)"[\s\S]+?img src="([\s\S]+?)"[\s\S]+?h2>([\s\S]+?)</g;
 
-    return JSON.stringify([{ title: 'Test show', image: 'https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AniCrush/ofchaos.jpg', href: 'https://www.animeonsen.xyz/details/VW2uXR5DvjxlLSw5' }]);
+    try {
+        const response = await fetch(`${SEARCH_URL}${encodeURI(keyword)}`);
+        const html = typeof response === 'object' ? await response.text() : await response;
+
+        const trimmedHtml = trimText(html, 'class="moose page"', 'class="container"');
+        
+        const matchesArray = Array.from(trimmedHtml.matchAll(REGEX)).map(m => {
+            return {
+                title: m[3],
+                image: m[2],
+                href: BASE_URL + m[1]
+            }
+        });
+
+        return JSON.stringify(matchesArray);
+
+    } catch (error) {
+        console.log('Fetch error:', error);
+        return JSON.stringify([{ title: 'Error', image: '', href: '' }]);
+    }
 }
 
 /**
@@ -25,13 +52,31 @@ async function searchResults(keyword) {
  * @returns {Promise<string>} A promise that resolves with a JSON string containing the details in the format: `[{"description": "Description", "aliases": "Aliases", "airdate": "Airdate"}]`
  */
 async function extractDetails(url) {
-    const details = {
-        description: 'Test show',
-        aliases: '',
-        airdate: ''
-    }
+    const REGEX = /Alternate Titles: ([\s\S]+?)<[\s\S]+?ptext">([\s\S]+?)</;
 
-    return JSON.stringify([details]);
+    try {
+        const response = await fetch(url);
+        const html = typeof response === 'object' ? await response.text() : await response;
+
+        const trimmedHtml = trimText(html, '"media-body"', '<!--footer-->');
+
+        const match = trimmedHtml.match(REGEX);
+
+        const details = {
+            description: match[2],
+            aliases: match[1],
+            airdate: 'Aired: Unknown'
+        };
+
+        return JSON.stringify([details]);
+    } catch(error) {
+        console.log('Details error:', error);
+        return JSON.stringify([{
+            description: 'Error loading description',
+            aliases: '',
+            airdate: 'Aired: Unknown'
+        }]);
+    }
 }
 
 /**
@@ -41,12 +86,41 @@ async function extractDetails(url) {
  * If an error occurs during the fetch operation, an empty array is returned in JSON format.
  */
 async function extractEpisodes(url) {
-    const episodeUrl = 'https://www.animeonsen.xyz/watch/VW2uXR5DvjxlLSw5?episode=1';
+    const INIT_REGEX = /<div>([\s\S]+?)<\/div>/g;
+    const INNER_REGEX = /a href="([\s\S]+?)" class="anm_det_pop"[\s\S]+?anititle">Episode ([0-9]+)/;
+    var subbed_episodes = [];
+    var dubbed_episodes = [];
 
-    return JSON.stringify([{
-        href: episodeUrl,
-        number: 1
-    }]);
+    try {
+        const response = await fetch(url);
+        const html = typeof response === 'object' ? await response.text() : await response;
+
+        const trimmedHtml = trimText(html, 'class="newmanga"', '</ul>');
+
+        const matchesArray = Array.from(trimmedHtml.matchAll(INIT_REGEX));
+
+        for(let match of matchesArray) {
+            let fragment = match[1];
+            let innerMatch = fragment.match(INNER_REGEX);
+
+            if(fragment.indexOf('#subbed') > 0) {
+                subbed_episodes.push({ href: `${ BASE_URL }${ innerMatch[1] }#subbed`, number: innerMatch[2] });
+            }
+            if(fragment.indexOf('#dubbed') > 0) {
+                dubbed_episodes.push({ href: `${ BASE_URL }${ innerMatch[1] }#dubbed`, number: innerMatch[2] });
+            }
+        }
+
+        if(FORMAT === 'SUB') {
+            return JSON.stringify(subbed_episodes);
+        }
+
+        return JSON.stringify(dubbed_episodes);
+
+    } catch (error) {
+        console.log('Fetch error:', error);
+        return JSON.stringify([]);
+    }
 }
 
 /**
@@ -55,23 +129,49 @@ async function extractEpisodes(url) {
  * @returns {Promise<string|null>} A promise that resolves with the stream URL if successful, or null if an error occurs during the fetch operation.
  */
 async function extractStreamUrl(url) {
-    url = 'https://www.animegg.org/one-piece-episode-1'; // TEMP
+    const SUB_REGEX = /subbed-Animegg[\s\S]+?src="([\s\S]+?)"/;
+    const DUB_REGEX = /dubbed-Animegg[\s\S]+?src="([\s\S]+?)"/;
+    var embedUrl = null;
+
     try {
         const response = await fetch(url);
         const html = typeof response === 'object' ? await response.text() : await response;
 
-        const embedUrl = "https://www.animegg.org/embed/27657";
-        const embedResponse = await fetch(embedUrl);
+        const trimmedHtml = trimText(html, 'tab-content', 'class="container"');
+        
+        if(FORMAT === 'SUB') {
+            embedUrl = FORMAT === 'SUB' ? trimmedHtml.match(SUB_REGEX)[1] : trimmedHtml.match(DUB_REGEX)[1];
+        }
+
+        // const embedUrl = "https://www.animegg.org/embed/27657";
+        const embedResponse = await fetch(`${ BASE_URL }${ embedUrl }`);
         const embedHtml = typeof embedResponse === 'object' ? await embedResponse.text() : await embedResponse;
 
         const playUrl = "https://www.animegg.org/play/240636/video.mp4?for=101742467443530";
         // const playResponse = await fetch(playUrl, { headers: { referer:"https://www.animegg.org/" }});
         // console.log(playResponse);
+
+        const vercelUrl = `https://sora-passthrough.vercel.app/passthrough?url=${ playUrl }&headers=${ referer="https://www.animegg.org/" } }`;
+// const vercelResponse = await fetch(vercelUrl);
+// const vercelData = await vercelResponse.json();
         
-        return JSON.stringify({ stream: playUrl, subtitles: null });
+        return JSON.stringify({ stream: vercelUrl, subtitles: null });
 
     } catch(e) {
         console.log('Error:', e);
         return JSON.stringify({ stream: null, subtitles: null });
     }
+}
+
+/**
+ * Trims around the content, leaving only the area between the start and end string
+ * @param {string} text The text to trim
+ * @param {string} startString The string to start at (inclusive)
+ * @param {string} endString The string to end at (exclusive)
+ * @returns The trimmed text
+ */
+function trimText(text, startString, endString) {
+    const startIndex = text.indexOf(startString);
+    const endIndex = text.indexOf(endString, startIndex);
+    return text.substring(startIndex, endIndex);
 }
