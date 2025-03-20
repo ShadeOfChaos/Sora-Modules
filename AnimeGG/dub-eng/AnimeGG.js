@@ -3,6 +3,19 @@ const SEARCH_URL = 'https://www.animegg.org/search/?q=';
 const UTILITY_URL = 'https://ac-api.ofchaos.com';
 const FORMAT = 'SUB'; // SUB | DUB
 
+
+//***** LOCAL TESTING
+(async() => {
+const results = await searchResults('Sentai red');
+const details = await extractDetails(JSON.parse(results)[0].href);
+console.log('DETAILS:', details);
+const episodes = await extractEpisodes(JSON.parse(results)[0].href);
+console.log('EPISODES:', episodes);
+const streamUrl = await extractStreamUrl(JSON.parse(episodes)[0].href);
+console.log('STREAMURL:', streamUrl);
+})();
+//***** LOCAL TESTING
+
 /**
  * Searches the website for anime with the given keyword and returns the results
  * @param {string} keyword The keyword to search for

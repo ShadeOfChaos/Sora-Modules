@@ -1,0 +1,18 @@
+{
+    "sourceName": "AnimeGG (ENG DUB)",
+    "iconUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeGG/logo.png",
+    "author": {
+        "name": "ShadeOfChaos",
+        "icon": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeGG/ofchaos.jpg"
+    },
+    "version": "1.0.4",
+    "language": "English (DUB)",
+    "streamType": "HLS",
+    "quality": "1080p",
+    "baseUrl": "https://www.animegg.org/",
+    "searchBaseUrl": "https://www.animegg.org/search/?q=%s",
+    "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeGG/dub-eng/AnimeGG.js",
+    "asyncJS": true,
+    "streamAsyncJS": true,
+    "softsub": false
+ }
