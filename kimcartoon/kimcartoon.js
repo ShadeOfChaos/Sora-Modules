@@ -1,3 +1,16 @@
+//***** LOCAL TESTING
+const results = await searchResults('witcher');
+// console.log(results);
+const details = await extractDetails(JSON.parse(results)[0].href);
+// console.log('DETAILS:', details);
+const episodes = await extractEpisodes(JSON.parse(results)[0].href);
+// console.log('OUTSIDE EPISODES:', episodes);
+var epis = JSON.parse(episodes);
+// console.log('Episodes', epis);
+const streamUrl = await extractStreamUrl(epis[0].href);
+console.log('STREAMURL:', streamUrl);
+//***** LOCAL TESTING
+
 async function searchResults(keyword) {
     const searchUrl = `https://kimcartoon.com.co/?s=${encodeURIComponent(keyword)}`;
     try {
@@ -81,6 +94,9 @@ async function extractStreamUrl(url) {
         const embedUrl = embedMatch[1];
 
         const embedPageResponse = await fetch('https:' + embedUrl);
+        console.log('https:' + embedUrl);
+        console.log('=====================================================');
+        console.log(embedPageResponse);
         const embedPageData = typeof embedPageResponse === 'object' ? await embedPageResponse.text() : await embedPageResponse;
 
         const m3u8Match = embedPageData.match(/sources:\s*\[\{file:"(https:\/\/[^"]*\.m3u8)"/);
