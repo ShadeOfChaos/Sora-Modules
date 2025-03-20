@@ -1,16 +1,16 @@
 {
-    "sourceName": "TESTING ONLY - MARU",
+    "sourceName": "TESTING ONLY - NETU",
     "iconUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AniCrush/ofchaos.jpg",
     "author": {
         "name": "ShadeOfChaos",
         "icon": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AniCrush/ofchaos.jpg"
     },
     "version": "1.0.0",
-    "language": "English (SUB)",
+    "language": "SPANISH (SUB)",
     "streamType": "HLS",
     "quality": "1080p",
-    "baseUrl": "www.animeparadise.moe",
-    "searchBaseUrl": "https://www.animeparadise.moe/search?q=%s",
+    "baseUrl": "www3.animeflv.net",
+    "searchBaseUrl": "https://www3.animeflv.net/browse?q=%s",
     "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeFlv/dev/test_netu.js",
     "asyncJS": true,
     "streamAsyncJS": true,
