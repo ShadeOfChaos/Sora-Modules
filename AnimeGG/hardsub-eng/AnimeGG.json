@@ -1,19 +1,18 @@
 {
-    "sourceName": "TESTING ONLY - AnimeGG",
-    "iconUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeGG/ofchaos.jpg",
+    "sourceName": "AnimeGG (ENG SUB)",
+    "iconUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeGG/logo.png",
     "author": {
         "name": "ShadeOfChaos",
         "icon": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeGG/ofchaos.jpg"
     },
     "version": "1.0.4",
-    "language": "English (SUB)",
+    "language": "English (HARDSUB)",
     "streamType": "HLS",
     "quality": "1080p",
     "baseUrl": "https://www.animegg.org/",
     "searchBaseUrl": "https://www.animegg.org/search/?q=%s",
-    "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeGG/dev/AnimeGG.js",
+    "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeGG/hardsub-eng/AnimeGG.js",
     "asyncJS": true,
     "streamAsyncJS": true,
-    "softsub": false,
-    "ocfTest": "sub"
+    "softsub": false
  }
