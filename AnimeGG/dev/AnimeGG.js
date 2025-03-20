@@ -74,14 +74,3 @@ async function extractStreamUrl(url) {
         return JSON.stringify({ stream: null, subtitles: null });
     }
 }
-
-import fs from 'node:fs';
-function writeFile(title, content) {
-    fs.writeFile('debug/AnimeGG/' + title, content, err => {
-        if (err) {
-            console.log('Failed to write to file', err.message);
-        } else {
-            console.log('Successfully saved file: ', title);
-        }
-    });
-}
