@@ -66,8 +66,11 @@ async function extractStreamUrl(url) {
 
         const playUrl = "https://www.animegg.org/play/240636/video.mp4?for=101742467443530";
         const playResponse = await fetch(playUrl, { headers: { referer:"https://www.animegg.org/" }});
+        const blob = await playResponse.blob();
+
+        const streamBlob = URL.createObjectURL(blob);
         
-        return JSON.stringify({ stream: playUrl, subtitles: null });
+        return JSON.stringify({ stream: streamBlob, subtitles: null });
 
     } catch(e) {
         console.log('Error:', e);
