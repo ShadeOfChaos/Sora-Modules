@@ -14,5 +14,6 @@
     "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeGG/dev/AnimeGG.js",
     "asyncJS": true,
     "streamAsyncJS": true,
-    "softsub": true
+    "softsub": true,
+    "ocfTest": "sub"
  }
