@@ -5,15 +5,15 @@ const FORMAT = 'SUB'; // SUB | DUB
 
 
 //***** LOCAL TESTING
-(async() => {
-const results = await searchResults('Solo leveling');
-const details = await extractDetails(JSON.parse(results)[0].href);
-// console.log('DETAILS:', details);
-const episodes = await extractEpisodes(JSON.parse(results)[0].href);
-// console.log('EPISODES:', episodes);
-const streamUrl = await extractStreamUrl(JSON.parse(episodes)[0].href);
-console.log('STREAMURL:', streamUrl);
-})();
+// (async() => {
+// const results = await searchResults('Solo leveling');
+// const details = await extractDetails(JSON.parse(results)[0].href);
+// // console.log('DETAILS:', details);
+// const episodes = await extractEpisodes(JSON.parse(results)[0].href);
+// // console.log('EPISODES:', episodes);
+// const streamUrl = await extractStreamUrl(JSON.parse(episodes)[0].href);
+// console.log('STREAMURL:', streamUrl);
+// })();
 //***** LOCAL TESTING
 
 /**
@@ -104,10 +104,10 @@ async function extractEpisodes(url) {
             let innerMatch = fragment.match(INNER_REGEX);
 
             if(fragment.indexOf('#subbed') > 0) {
-                subbed_episodes.push({ href: `${ BASE_URL }${ innerMatch[1] }#subbed`, number: innerMatch[2] });
+                subbed_episodes.push({ href: `${ BASE_URL }${ innerMatch[1] }#subbed`, number: parseInt(innerMatch[2]) });
             }
             if(fragment.indexOf('#dubbed') > 0) {
-                dubbed_episodes.push({ href: `${ BASE_URL }${ innerMatch[1] }#dubbed`, number: innerMatch[2] });
+                dubbed_episodes.push({ href: `${ BASE_URL }${ innerMatch[1] }#dubbed`, number: parseInt(innerMatch[2]) });
             }
         }
 
@@ -145,7 +145,6 @@ async function extractStreamUrl(url) {
         const embedHtml = typeof embedResponse === 'object' ? await embedResponse.text() : await embedResponse;
 
         const trimmedEmbed = trimText(embedHtml, 'var videoSources = ', ';');
-        // const sourcesJson = JSON.parse(trimmedScript);
 
         const sources = Array.from(trimmedEmbed.matchAll(SOURCES_REGEX)).map(m => {
             return {
@@ -156,8 +155,6 @@ async function extractStreamUrl(url) {
                 isBk: m[4] === 'true' ? true : false
             }
         }).sort((a, b) => a.quality === b.quality ? 0 : a.quality > b.quality ? -1 : 1);
-
-        // IF DOES NOT WORK, decode and atob bk, mp4upload url, fetch it's html, get the .mp4 url from there
         
         return JSON.stringify({ stream: sources[0].file, subtitles: null });
 
