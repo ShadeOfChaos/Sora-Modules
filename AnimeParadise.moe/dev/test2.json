@@ -11,7 +11,7 @@
     "quality": "1080p",
     "baseUrl": "https://megacloud.club/",
     "searchBaseUrl": "https://www.animeparadise.moe/search?q=%s",
-    "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeParadise.moe/dev/test.js",
+    "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeParadise.moe/dev/test2.js",
     "asyncJS": true,
     "streamAsyncJS": true,
     "softsub": true

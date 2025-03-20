@@ -1,12 +1,12 @@
 // // //***** LOCAL TESTING
 const results = await searchResults('Solo leveling');
 console.log('RESULTS:', results);
-const details = await extractDetails(JSON.parse(results)[0].href);
-console.log('DETAILS:', details);
-const episodesa = await extractEpisodes(JSON.parse(results)[0].href);
-console.log('EPISODES:', episodesa);
-const streamUrl = await extractStreamUrl(JSON.parse(episodesa)[0].href);
-console.log('STREAMURL:', streamUrl);
+// const details = await extractDetails(JSON.parse(results)[0].href);
+// console.log('DETAILS:', details);
+// const episodesa = await extractEpisodes(JSON.parse(results)[0].href);
+// console.log('EPISODES:', episodesa);
+// const streamUrl = await extractStreamUrl(JSON.parse(episodesa)[0].href);
+// console.log('STREAMURL:', streamUrl);
 //***** LOCAL TESTING
 
 /**
@@ -22,9 +22,7 @@ async function searchResults(keyword) {
 
     try {
         const response = await fetch(`${SEARCH_URL}${encodeURI(keyword)}`);
-        console.log('Response type:', typeof response);
-        const html = await response.text(); // TODO - REVERT
-        
+        const html = typeof response === 'object' ? await response.text() : await response;
 
         const matches = html.matchAll(REGEX);
 
