@@ -60,7 +60,6 @@ async function extractEpisodes(url) {
         });
     }
     if (movieMatch) {
-        console.log('Movie url: ' + movieMatch[1].trim());
         episodes.push({
             href: movieMatch[1].trim(),
             number: 1
@@ -75,6 +74,9 @@ async function extractEpisodes(url) {
 async function extractStreamUrl(url) {
     const embedResponse = await fetch(url);
     const data = typeof embedResponse === 'object' ? await embedResponse.text() : await embedResponse;
+
+    console.log('================== DATA ==================');
+    console.log(data);
 
     const embedMatch = data.match(/<div class="pembed" data-embed="(\/\/.*?)"/);
 
