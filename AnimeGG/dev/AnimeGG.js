@@ -5,13 +5,13 @@ const FORMAT = 'SUB'; // SUB | DUB
 
 //***** LOCAL TESTING
 // (async() => {
-//     const results = await searchResults('Sentai red');
-//     const details = await extractDetails(JSON.parse(results)[0].href);
-//     // console.log('DETAILS:', details);
-//     const episodes = await extractEpisodes(JSON.parse(results)[0].href);
-//     // console.log('EPISODES:', episodes);
-//     const streamUrl = await extractStreamUrl(JSON.parse(episodes)[0].href);
-//     console.log('STREAMURL:', streamUrl);
+    // const results = await searchResults('sentai red');
+    // const details = await extractDetails(JSON.parse(results)[0].href);
+    // console.log('DETAILS:', details);
+    // const episodes = await extractEpisodes(JSON.parse(results)[0].href);
+    // console.log('EPISODES:', episodes);
+    // const streamUrl = await extractStreamUrl(JSON.parse(episodes)[0].href);
+    // console.log('STREAMURL:', streamUrl);
 // })();
 //***** LOCAL TESTING
 
@@ -40,7 +40,7 @@ async function searchResults(keyword) {
         return JSON.stringify(matchesArray);
 
     } catch (error) {
-        console.log('Fetch error:', error);
+        console.log('Fetch error:', error.message);
         return JSON.stringify([{ title: 'Error', image: '', href: '' }]);
     }
 }
@@ -69,7 +69,7 @@ async function extractDetails(url) {
 
         return JSON.stringify([details]);
     } catch(error) {
-        console.log('Details error:', error);
+        console.log('Details error:', error.message);
         return JSON.stringify([{
             description: 'Error loading description',
             aliases: '',
@@ -85,8 +85,8 @@ async function extractDetails(url) {
  * If an error occurs during the fetch operation, an empty array is returned in JSON format.
  */
 async function extractEpisodes(url) {
-    const INIT_REGEX = /<div>([\s\S]+?)<\/div>/g;
-    const INNER_REGEX = /a href="([\s\S]+?)" class="anm_det_pop"[\s\S]+?anititle">Episode ([0-9]+)/;
+    const INIT_REGEX = /(<div>[\s\S]+?)<\/div>/g;
+    const INNER_REGEX = /div><a\s*href="([\s\S]+?([0-9]*))"/;
     let subbed_episodes = [];
     let dubbed_episodes = [];
 
@@ -117,7 +117,7 @@ async function extractEpisodes(url) {
         return JSON.stringify(dubbed_episodes.reverse());
 
     } catch (error) {
-        console.log('Fetch error:', error);
+        console.log('Fetch error:', error.message);
         return JSON.stringify([]);
     }
 }
@@ -150,7 +150,6 @@ async function extractStreamUrl(url) {
                 file: `${ BASE_URL }${ m[1] }`,
                 quality: parseInt(m[2].replace('p', '')),
                 bk: decodeURIComponent(atob(m[3])),
-                // bk: m[3],
                 isBk: m[4] === 'true' ? true : false
             }
         }); //.sort((a, b) => a?.quality === b?.quality ? 0 : a?.quality > b?.quality ? -1 : 1);
@@ -161,7 +160,7 @@ async function extractStreamUrl(url) {
         return p720.file;
 
     } catch(e) {
-        console.log('Error:', e);
+        console.log('Error:', e.message);
         return null;
     }
 }
