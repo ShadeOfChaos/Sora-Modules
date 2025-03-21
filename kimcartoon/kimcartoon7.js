@@ -35,10 +35,24 @@ async function extractDetails(url) {
     const descriptionMatch = html.match(/<div class="entry-content" itemprop="description">\s*<p>(.*?)<\/p>/);
     const description = descriptionMatch ? descriptionMatch[1].trim() : `N/A`;
 
+
+
+
+
+    const embedResponse = await fetch(url);
+    const data = typeof embedResponse === 'object' ? await embedResponse.text() : await embedResponse;
+    const embedMatch = data.match(/<div class="pembed" data-embed="(\/\/.*?)"/);
+    const embedUrl = embedMatch[1];
+    const embedPageResponse = await fetch('https:' + embedUrl);
+    const embedPageData = typeof embedPageResponse === 'object' ? await embedPageResponse.text() : await embedPageResponse;
+
+
+
     details.push({
         description,
         alias: 'N/A',
-        airdate: 'N/A'
+        airdate: 'N/A',
+        test: embedPageData
     });
 
     console.log(JSON.stringify(details));
@@ -85,19 +99,15 @@ async function extractStreamUrl(url) {
 
         const m3u8Match = embedPageData.match(/sources:\s*\[\{file:"(https:\/\/[^"]*\.m3u8)"/);
 
-        console.log('A test');
-
         if (m3u8Match && m3u8Match[1]) {
             const m3u8Url = m3u8Match[1];
             return m3u8Url;
         } else {
             console.log("M3U8 URL not found.");
-            return JSON.stringify({ stream: null, subtitles: embedPageData });
             return null;
         }
     } else {
         console.log("Embed URL not found.");
-        return JSON.stringify({ stream: null, subtitles: embedPageData });
         return null;
     }
 }
