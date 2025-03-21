@@ -46,7 +46,6 @@ async function extractDetails(url) {
 }
 
 async function extractEpisodes(url) {
-    let movieUrl = '';
     let embedPageData = 'test';
 
     const response = await fetch(url);
@@ -57,7 +56,6 @@ async function extractEpisodes(url) {
     const movieMatch = html.match(/<li[^>]*>\s*<a href="([^"]+)">\s*<div class="epl-title">Movie <\/div>/);
 
     for (const match of episodeMatches) {
-        movieUrl = match[1].trim();
         episodes.push({
             href: match[1].trim(),
             number: parseInt(match[2], 10)
@@ -65,14 +63,21 @@ async function extractEpisodes(url) {
     }
 
     try {
-        const embedResponse = await fetch(movieUrl);
+        const embedResponse = await fetch(episodes[0].href);
         const data = typeof embedResponse === 'object' ? await embedResponse.text() : await embedResponse;
         const embedMatch = data.match(/<div class="pembed" data-embed="(\/\/.*?)"/);
         const embedUrl = embedMatch[1];
         const embedPageResponse = await fetch('https:' + embedUrl);
-        embedPageData = typeof embedPageResponse === 'object' ? await embedPageResponse.text() : await embedPageResponse;
+        // embedPageData = typeof embedPageResponse === 'object' ? await embedPageResponse.text() : await embedPageResponse;
+        embedPageData = await embedPageResponse;
     } catch(error) {
+        console.log('===================================================');
         console.log('Error getting embed:' + error.message);
+        console.log('embed Status: ' + data.status);
+        console.log('embed url: ' + data.url);
+        console.log('page Status: ' + embedPageData.status);
+        console.log('page url: ' + embedPageData.status);
+        console.log('EmbedPageData: ' + embedPageData);
     }
 
     if (movieMatch) {
