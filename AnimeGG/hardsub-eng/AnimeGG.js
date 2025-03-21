@@ -3,19 +3,6 @@ const SEARCH_URL = 'https://www.animegg.org/search/?q=';
 const UTILITY_URL = 'https://ac-api.ofchaos.com';
 const FORMAT = 'SUB'; // SUB | DUB
 
-
-//***** LOCAL TESTING
-(async() => {
-const results = await searchResults('Sentai red');
-const details = await extractDetails(JSON.parse(results)[0].href);
-console.log('DETAILS:', details);
-const episodes = await extractEpisodes(JSON.parse(results)[0].href);
-console.log('EPISODES:', episodes);
-const streamUrl = await extractStreamUrl(JSON.parse(episodes)[0].href);
-console.log('STREAMURL:', streamUrl);
-})();
-//***** LOCAL TESTING
-
 /**
  * Searches the website for anime with the given keyword and returns the results
  * @param {string} keyword The keyword to search for
@@ -150,13 +137,15 @@ async function extractStreamUrl(url) {
             return {
                 file: `${ BASE_URL }${ m[1] }`,
                 quality: parseInt(m[2].replace('p', '')),
-                // bk: decodeURIComponent(atob(m[3])),
-                bk: m[3],
+                bk: decodeURIComponent(atob(m[3])),
                 isBk: m[4] === 'true' ? true : false
             }
-        }).sort((a, b) => a?.quality === b?.quality ? 0 : a?.quality > b?.quality ? -1 : 1);
+        }); //.sort((a, b) => a?.quality === b?.quality ? 0 : a?.quality > b?.quality ? -1 : 1);
         
-        return sources[0]?.file;
+        // return sources[0]?.file;
+        const p720 = sources.find(s => s.quality === 720);
+
+        return p720.file;
 
     } catch(e) {
         console.log('Error:', e);
@@ -175,4 +164,24 @@ function trimText(text, startString, endString) {
     const startIndex = text.indexOf(startString);
     const endIndex = text.indexOf(endString, startIndex);
     return text.substring(startIndex, endIndex);
+}
+
+function atob(input) {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+    let str = String(input).replace(/=+$/, '');
+    let output = '';
+
+    if (str.length % 4 == 1) {
+        throw new Error("atob failed: The input is not correctly encoded.");
+    }
+
+    for (let bc = 0, bs, buffer, i = 0;
+        (buffer = str.charAt(i++));
+        ~buffer && (bs = bc % 4 ? bs * 64 + buffer : buffer, bc++ % 4)
+            ? output += String.fromCharCode(255 & (bs >> ((-2 * bc) & 6)))
+            : 0) {
+        buffer = chars.indexOf(buffer);
+    }
+
+    return output;
 }
