@@ -76,5 +76,22 @@
 </span>
 <br><br>
 
+<span><img src="https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeGG/logo.png" width="125px" align="left"><br>
+**Source:** AnimeGG.org<br>
+**Language:** English (HARDSUB)<br>
+**Minimum Sora version required:** 0.2.1<br>
+<span></span>
+[<kbd> <br> Add to Sora <br> </kbd>](https://intradeus.github.io/http-protocol-redirector?r=sora://module?url=https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeGG/hardsub-eng/AnimeGG.json)
+</span>
+<br><br>
+<span><img src="https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeGG/logo.png" width="125px" align="left"><br>
+**Source:** AnimeGG.org<br>
+**Language:** English (DUB)<br>
+**Minimum Sora version required:** 0.2.1<br>
+<span></span>
+[<kbd> <br> Add to Sora <br> </kbd>](https://intradeus.github.io/http-protocol-redirector?r=sora://module?url=https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeGG/dub-eng/AnimeGG.json)
+</span>
+<br><br>
+
 > [!TIP]
 > **Something going wrong, open an issue or @mention me on the sora discord server.**
