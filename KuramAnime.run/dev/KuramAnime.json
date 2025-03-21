@@ -1,0 +1,18 @@
+{
+    "sourceName": "TESTING ONLY",
+    "iconUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/KuramAnime.run/logo.png",
+    "author": {
+        "name": "ShadeOfChaos",
+        "icon": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/KuramAnime.run/ofchaos.jpg"
+    },
+    "version": "1.0.0",
+    "language": "Indonesian (SUB)",
+    "streamType": "MP4",
+    "quality": "720p",
+    "baseUrl": "https://v6.kuramanime.run/",
+    "searchBaseUrl": "https://v6.kuramanime.run/anime?search=solo%s",
+    "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/KuramAnime.run/KuramAnime.js",
+    "asyncJS": true,
+    "streamAsyncJS": true,
+    "softsub": false
+ }
