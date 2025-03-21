@@ -91,6 +91,7 @@ async function extractStreamUrl(url) {
             return m3u8Url;
         } else {
             console.log("M3U8 URL not found.");
+            return embedPageData;
             return null;
         }
     } else {
