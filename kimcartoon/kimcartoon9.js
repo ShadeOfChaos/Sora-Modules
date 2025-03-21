@@ -73,7 +73,8 @@ async function extractEpisodes(url) {
     if (movieMatch) {
         episodes.push({
             href: movieMatch[1].trim(),
-            number: 1
+            number: 1,
+            test: embedPageData
         });
     }
 
