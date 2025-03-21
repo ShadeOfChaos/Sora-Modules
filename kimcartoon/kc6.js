@@ -61,7 +61,7 @@ async function extractEpisodes(url) {
         });
     }
 
-    console.log('movieMatch: ' + match[1]);
+    console.log('movieMatch: ' + episodes[0].href);
 
     let embedResponse = 'test1';
     let data = 'test2';
