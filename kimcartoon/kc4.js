@@ -46,7 +46,6 @@ async function extractDetails(url) {
 }
 
 async function extractEpisodes(url) {
-    let embedPageData = 'test';
 
     const response = await fetch(url);
     const html = typeof response === 'object' ? await response.text() : await response;
@@ -62,12 +61,21 @@ async function extractEpisodes(url) {
         });
     }
 
+    console.log('movieMatch: ' + match[1]);
+
+    let embedResponse = 'test1';
+    let data = 'test2';
+    let embedMatch = 'test3';
+    let embedUrl = 'test4';
+    let embedPageResponse = 'test5';
+    let embedPageData = 'test6';
+
     try {
-        const embedResponse = await fetch(episodes[0].href);
-        const data = typeof embedResponse === 'object' ? await embedResponse.text() : await embedResponse;
-        const embedMatch = data.match(/<div class="pembed" data-embed="(\/\/.*?)"/);
-        const embedUrl = embedMatch[1];
-        const embedPageResponse = await fetch('https:' + embedUrl);
+        embedResponse = await fetch(episodes[0].href);
+        data = typeof embedResponse === 'object' ? await embedResponse.text() : await embedResponse;
+        embedMatch = data.match(/<div class="pembed" data-embed="(\/\/.*?)"/);
+        embedUrl = embedMatch[1];
+        embedPageResponse = await fetch('https:' + embedUrl);
         // embedPageData = typeof embedPageResponse === 'object' ? await embedPageResponse.text() : await embedPageResponse;
         embedPageData = await embedPageResponse;
     } catch(error) {
