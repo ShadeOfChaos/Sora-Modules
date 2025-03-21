@@ -46,6 +46,7 @@ async function extractDetails(url) {
 }
 
 async function extractEpisodes(url) {
+
     const response = await fetch(url);
     const html = typeof response === 'object' ? await response.text() : await response;
     const episodes = [];
@@ -59,10 +60,39 @@ async function extractEpisodes(url) {
             number: parseInt(match[2], 10)
         });
     }
+
+    console.log('movieMatch: ' + episodes[0].href);
+
+    let embedResponse = 'test1';
+    let data = 'test2';
+    let embedMatch = 'test3';
+    let embedUrl = 'test4';
+    let embedPageResponse = 'test5';
+    let embedPageData = 'test6';
+
+    try {
+        embedResponse = await fetch(episodes[0].href);
+        data = typeof embedResponse === 'object' ? await embedResponse.text() : await embedResponse;
+        embedMatch = data.match(/<div class="pembed" data-embed="(\/\/.*?)"/);
+        embedUrl = embedMatch[1];
+        embedPageResponse = await fetch('https:' + embedUrl);
+        // embedPageData = typeof embedPageResponse === 'object' ? await embedPageResponse.text() : await embedPageResponse;
+        embedPageData = await embedPageResponse;
+    } catch(error) {
+        console.log('===================================================');
+        console.log('Error getting embed:' + error.message);
+        console.log('embed Status: ' + data.status);
+        console.log('embed url: ' + data.url);
+        console.log('page Status: ' + embedPageData.status);
+        console.log('page url: ' + embedPageData.status);
+        console.log('EmbedPageData: ' + embedPageData);
+    }
+
     if (movieMatch) {
         episodes.push({
             href: movieMatch[1].trim(),
-            number: 1
+            number: 1,
+            test: embedPageData
         });
     }
 
@@ -87,14 +117,13 @@ async function extractStreamUrl(url) {
 
         if (m3u8Match && m3u8Match[1]) {
             const m3u8Url = m3u8Match[1];
-            console.log(m3u8Url);
             return m3u8Url;
         } else {
-            console.error("M3U8 URL not found.");
+            console.log("M3U8 URL not found.");
             return null;
         }
     } else {
-        console.error("Embed URL not found.");
+        console.log("Embed URL not found.");
         return null;
     }
 }
