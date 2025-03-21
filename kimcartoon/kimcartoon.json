@@ -11,7 +11,6 @@
     "quality": "1080p",
     "baseUrl": "https://kimcartoon.com.co/",
     "searchBaseUrl": "https://kimcartoon.com.co/?s=%s",
-    "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/kimcartoon/kimc6.js",
-    "asyncJS": true,
-    "softsub": true
+    "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/kimcartoon/kimcartoon.js",
+    "asyncJS": true
 }
