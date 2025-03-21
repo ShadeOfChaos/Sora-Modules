@@ -7,11 +7,11 @@ const FORMAT = 'SUB'; // SUB | DUB
 (async() => {
     const results = await searchResults('naruto');
     const details = await extractDetails(JSON.parse(results)[0].href);
-    // console.log('DETAILS:', details);
+    console.log('DETAILS:', details);
     const episodes = await extractEpisodes(JSON.parse(results)[0].href);
-    console.log('EPISODES:', episodes);
-    // const streamUrl = await extractStreamUrl(JSON.parse(episodes)[0].href);
-    // console.log('STREAMURL:', streamUrl);
+    // console.log('EPISODES:', episodes);
+    const streamUrl = await extractStreamUrl(JSON.parse(episodes)[0].href);
+    console.log('STREAMURL:', streamUrl);
 })();
 //***** LOCAL TESTING
 
@@ -126,7 +126,8 @@ async function extractEpisodes(url) {
 async function extractStreamUrl(url) {
     const SUB_REGEX = /subbed-Animegg[\s\S]+?src="([\s\S]+?)"/;
     const DUB_REGEX = /dubbed-Animegg[\s\S]+?src="([\s\S]+?)"/;
-    const SOURCES_REGEX = /file: "([\s\S]+?)", label: "([\s\S]+?)", bk: "([\s\S]+?)", isBk: (false|true)/g;
+    // const SOURCES_REGEX = /file: "([\s\S]+?)", label: "([\s\S]+?)", bk: "([\s\S]+?)", isBk: (false|true)/g;
+    const SOURCES_REGEX = /file: "([\s\S]+?)", label: "([\s\S]+?)", bk: "([\s\S]*?)", isBk: (false|true)/g;
 
     try {
         const response = await fetch(url);

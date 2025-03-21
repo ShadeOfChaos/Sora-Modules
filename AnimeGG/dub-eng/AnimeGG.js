@@ -114,7 +114,7 @@ async function extractEpisodes(url) {
 async function extractStreamUrl(url) {
     const SUB_REGEX = /subbed-Animegg[\s\S]+?src="([\s\S]+?)"/;
     const DUB_REGEX = /dubbed-Animegg[\s\S]+?src="([\s\S]+?)"/;
-    const SOURCES_REGEX = /file: "([\s\S]+?)", label: "([\s\S]+?)", bk: "([\s\S]+?)", isBk: (false|true)/g;
+    const SOURCES_REGEX = /file: "([\s\S]+?)", label: "([\s\S]+?)", bk: "([\s\S]*?)", isBk: (false|true)/g;
 
     try {
         const response = await fetch(url);
