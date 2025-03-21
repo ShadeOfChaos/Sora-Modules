@@ -35,24 +35,10 @@ async function extractDetails(url) {
     const descriptionMatch = html.match(/<div class="entry-content" itemprop="description">\s*<p>(.*?)<\/p>/);
     const description = descriptionMatch ? descriptionMatch[1].trim() : `N/A`;
 
-
-
-
-
-    const embedResponse = await fetch(url);
-    const data = typeof embedResponse === 'object' ? await embedResponse.text() : await embedResponse;
-    const embedMatch = data.match(/<div class="pembed" data-embed="(\/\/.*?)"/);
-    const embedUrl = embedMatch[1];
-    const embedPageResponse = await fetch('https:' + embedUrl);
-    const embedPageData = typeof embedPageResponse === 'object' ? await embedPageResponse.text() : await embedPageResponse;
-
-
-
     details.push({
         description,
         alias: 'N/A',
-        airdate: 'N/A',
-        test: embedPageData
+        airdate: 'N/A'
     });
 
     console.log(JSON.stringify(details));
@@ -60,6 +46,8 @@ async function extractDetails(url) {
 }
 
 async function extractEpisodes(url) {
+    let movieUrl = '';
+
     const response = await fetch(url);
     const html = typeof response === 'object' ? await response.text() : await response;
     const episodes = [];
@@ -68,11 +56,20 @@ async function extractEpisodes(url) {
     const movieMatch = html.match(/<li[^>]*>\s*<a href="([^"]+)">\s*<div class="epl-title">Movie <\/div>/);
 
     for (const match of episodeMatches) {
+        movieUrl = match[1].trim();
         episodes.push({
             href: match[1].trim(),
             number: parseInt(match[2], 10)
         });
     }
+
+    const embedResponse = await fetch(movieUrl);
+    const data = typeof embedResponse === 'object' ? await embedResponse.text() : await embedResponse;
+    const embedMatch = data.match(/<div class="pembed" data-embed="(\/\/.*?)"/);
+    const embedUrl = embedMatch[1];
+    const embedPageResponse = await fetch('https:' + embedUrl);
+    const embedPageData = typeof embedPageResponse === 'object' ? await embedPageResponse.text() : await embedPageResponse;
+
     if (movieMatch) {
         episodes.push({
             href: movieMatch[1].trim(),
