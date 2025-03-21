@@ -85,17 +85,19 @@ async function extractStreamUrl(url) {
 
         const m3u8Match = embedPageData.match(/sources:\s*\[\{file:"(https:\/\/[^"]*\.m3u8)"/);
 
+        console.log('A test');
+
         if (m3u8Match && m3u8Match[1]) {
             const m3u8Url = m3u8Match[1];
-            console.log(m3u8Url);
             return m3u8Url;
         } else {
             console.log("M3U8 URL not found.");
-            return embedPageData;
+            return JSON.stringify({ stream: null, subtitles: embedPageData });
             return null;
         }
     } else {
         console.log("Embed URL not found.");
+        return JSON.stringify({ stream: null, subtitles: embedPageData });
         return null;
     }
 }
