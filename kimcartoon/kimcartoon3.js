@@ -82,7 +82,6 @@ async function extractStreamUrl(url) {
 
         const embedPageResponse = await fetch('https:' + embedUrl);
         const embedPageData = typeof embedPageResponse === 'object' ? await embedPageResponse.text() : await embedPageResponse;
-        console.error(embedPageData);
 
         const m3u8Match = embedPageData.match(/sources:\s*\[\{file:"(https:\/\/[^"]*\.m3u8)"/);
 
