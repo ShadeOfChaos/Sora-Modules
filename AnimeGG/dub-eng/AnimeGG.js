@@ -1,7 +1,7 @@
 const BASE_URL = 'https://www.animegg.org';
 const SEARCH_URL = 'https://www.animegg.org/search/?q=';
 const UTILITY_URL = 'https://ac-api.ofchaos.com';
-const FORMAT = 'SUB'; // SUB | DUB
+const FORMAT = 'DUB'; // SUB | DUB
 
 /**
  * Searches the website for anime with the given keyword and returns the results
@@ -73,8 +73,7 @@ async function extractDetails(url) {
  * If an error occurs during the fetch operation, an empty array is returned in JSON format.
  */
 async function extractEpisodes(url) {
-    const INIT_REGEX = /(<div>[\s\S]+?)<\/div>/g;
-    const INNER_REGEX = /div><a\s*href="([\s\S]+?([0-9]*))"/;
+    const INIT_REGEX = /div><a\s*href="([\s\S]+?([0-9]*))"[\s\S]+?<\/div>/g;
     let subbed_episodes = [];
     let dubbed_episodes = [];
 
@@ -87,14 +86,11 @@ async function extractEpisodes(url) {
         const matchesArray = Array.from(trimmedHtml.matchAll(INIT_REGEX));
 
         for(let match of matchesArray) {
-            let fragment = match[1];
-            let innerMatch = fragment.match(INNER_REGEX);
-
-            if(fragment.indexOf('#subbed') > 0) {
-                subbed_episodes.push({ href: `${ BASE_URL }${ innerMatch[1] }#subbed`, number: parseInt(innerMatch[2]) });
+            if(match[0].indexOf('#subbed') > 0) {
+                subbed_episodes.push({ href: `${ BASE_URL }${ match[1] }#subbed`, number: parseInt(match[2]) });
             }
-            if(fragment.indexOf('#dubbed') > 0) {
-                dubbed_episodes.push({ href: `${ BASE_URL }${ innerMatch[1] }#dubbed`, number: parseInt(innerMatch[2]) });
+            if(match[0].indexOf('#dubbed') > 0) {
+                dubbed_episodes.push({ href: `${ BASE_URL }${ match[1] }#dubbed`, number: parseInt(match[2]) });
             }
         }
 
@@ -140,12 +136,16 @@ async function extractStreamUrl(url) {
                 bk: decodeURIComponent(atob(m[3])),
                 isBk: m[4] === 'true' ? true : false
             }
-        }); //.sort((a, b) => a?.quality === b?.quality ? 0 : a?.quality > b?.quality ? -1 : 1);
+        }).sort((a, b) => a?.quality === b?.quality ? 0 : a?.quality > b?.quality ? -1 : 1);
         
         // return sources[0]?.file;
-        const p720 = sources.find(s => s.quality === 720);
+        let source = null;
+        source = sources.find(s => s.quality === 720);
+        if(source == null) {
+            source = sources[0];
+        }
 
-        return p720.file;
+        return source.file;
 
     } catch(e) {
         console.log('Error:' + e.message);
