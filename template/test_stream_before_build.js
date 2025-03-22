@@ -12,9 +12,7 @@
  * @returns {Promise<string>} A promise that resolves with a JSON string containing the search results in the format: `[{"title": "Title", "image": "Image URL", "href": "URL"}, ...]`
  */
 async function searchResults(keyword) {
-    const episodeListUrl = 'https://www.animeonsen.xyz/details/VW2uXR5DvjxlLSw5';
-
-    return JSON.stringify([{ title: 'Test show', image: 'https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AniCrush/ofchaos.jpg', href: 'https://www.animeonsen.xyz/details/VW2uXR5DvjxlLSw5' }]);
+    return JSON.stringify([{ title: 'Test show', image: 'https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AniCrush/ofchaos.jpg', href: '#' }]);
 }
 
 /**
@@ -39,10 +37,8 @@ async function extractDetails(url) {
  * If an error occurs during the fetch operation, an empty array is returned in JSON format.
  */
 async function extractEpisodes(url) {
-    const episodeUrl = 'https://www.animeonsen.xyz/watch/VW2uXR5DvjxlLSw5?episode=1';
-
     return JSON.stringify([{
-        href: episodeUrl,
+        href: '#',
         number: 1
     }]);
 }
@@ -53,13 +49,8 @@ async function extractEpisodes(url) {
  * @returns {Promise<string|null>} A promise that resolves with the stream URL if successful, or null if an error occurs during the fetch operation.
  */
 async function extractStreamUrl(url) {
-    let url = 'https://www3.animeflv.net/ver/honey-lemon-soda-11'; // TEMP
     try {
-        const response = await fetch(url);
-        const html = typeof response === 'object' ? await response.text() : await response;
-
-        // Fetch the stream url from within html and return it through streamUrl
-
+        const streamUrl = ''; // TODO - replace with actual stream url to see if stream url works
         return streamUrl;
 
     } catch(e) {
