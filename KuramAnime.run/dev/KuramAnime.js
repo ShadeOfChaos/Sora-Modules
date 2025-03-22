@@ -249,9 +249,9 @@ function atob(input) {
 }
 
 function generateRandomString(a) {
-        let b = "";
-        const c = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".length;
-        for (let d = 0; d < a; d++)
-            b += "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".charAt(Math.floor(Math.random() * c));
-        return b
-    }
+    let b = "";
+    const c = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".length;
+    for (let d = 0; d < a; d++)
+        b += "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".charAt(Math.floor(Math.random() * c));
+    return b
+}
