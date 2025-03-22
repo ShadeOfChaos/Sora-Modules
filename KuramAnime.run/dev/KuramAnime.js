@@ -109,22 +109,29 @@ async function extractEpisodes(url) {
  * @returns {Promise<string|null>} A promise that resolves with the stream URL if successful, or null if an error occurs during the fetch operation.
  */
 async function extractStreamUrl(url) {
+    console.log('DEBUG, STAGE 1');
+
     const BASE_URL = 'https://v6.kuramanime.run/';
     const kpsRegex = /data-kps="([\s\S]*?)"/;
     const envRegex = /([A-Z_]+):[\s]*'([\s\S]*?)'/g;
     const srcRegex = /src="([\s\S]*?)"[\s\S]+?size="([\s\S]*?)"/g;
 
     try {
+        console.log('DEBUG, STAGE 2');
         const response = await fetch(url);
         const html = typeof response === 'object' ? await response.text() : await response;
 
         const kpsMatch = html.match(kpsRegex);
+
+        console.log('DEBUG, STAGE 3');
 
         if(kpsMatch == null || kpsMatch[1] == null) {
             throw('Failed to capture kps data key');
         }
 
         const kps = kpsMatch[1]; // f
+
+        console.log('DEBUG, STAGE 4, kps: ' + kps);
 
         // Gets the 'env' from the txt file [MIX_PREFIX_AUTH_ROUTE_PARAM, MIX_AUTH_ROUTE_PARAM, MIX_AUTH_KEY, MIX_AUTH_TOKEN, MIX_PAGE_TOKEN_KEY, MIX_STREAM_SERVER_KEY]
         const scriptResponse = await fetch(`https://v6.kuramanime.run/assets/js/${ kps }.js`);
@@ -134,11 +141,15 @@ async function extractStreamUrl(url) {
             throw('Failed to capture env data');
         }
 
+        console.log('DEBUG, STAGE 5');
+
         let env = {};
         const jsMatched = Array.from(js.matchAll(envRegex));
         for(let [ source, key, value ] of jsMatched) {
             env[key] = value;
         }
+
+        console.log('DEBUG, STAGE 6');
 
         // Get access token
         const accessTokenResponse = await fetch(`${ BASE_URL }${ env.MIX_PREFIX_AUTH_ROUTE_PARAM }${ env.MIX_AUTH_ROUTE_PARAM }`, {
@@ -152,6 +163,8 @@ async function extractStreamUrl(url) {
         });
         const accessToken = typeof accessTokenResponse === 'object' ? await accessTokenResponse.text() : await accessTokenResponse;
 
+        console.log('DEBUG, STAGE 7, accessToken:' + accessToken);
+
         const streamUrlResponse = await fetch(`${ url }?${ env.MIX_PAGE_TOKEN_KEY }=${ accessToken }&${ env.MIX_STREAM_SERVER_KEY }=kuramadrive&page=1`, {
             method: 'GET',
             headers: {
@@ -162,8 +175,12 @@ async function extractStreamUrl(url) {
         });
         const streamHtml = typeof streamUrlResponse === 'object' ? await streamUrlResponse.text() : await streamUrlResponse;
 
+        console.log('DEBUG, STAGE 8');
+
         const trimmedStreamHtml = trimText(streamHtml, '<video', '</video>');
         const slimTrimStreamHtml = trimmedStreamHtml.replaceAll('  ', '');
+
+        console.log('DEBUG, STAGE 9, slimTrimStreamHtml: ' + slimTrimStreamHtml);
 
         const streamMatches = Array.from(slimTrimStreamHtml.matchAll(srcRegex)).map(m => {
             return {
@@ -172,8 +189,11 @@ async function extractStreamUrl(url) {
             }
         }).sort((a, b) => a?.quality === b?.quality ? 0 : a?.quality > b?.quality ? -1 : 1);
 
+        console.log('DEBUG, STAGE 10, streamUrl: ' + streamMatches[0].file);
+
         return streamMatches[0].file;
     } catch(e) {
+        console.log('DEBUG, STAGE 11, ERROR');
         console.log('Error:' + e.message);
         return null;
     }
