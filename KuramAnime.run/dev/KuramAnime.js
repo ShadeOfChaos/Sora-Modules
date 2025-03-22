@@ -1,9 +1,9 @@
 //***** LOCAL TESTING
-// const results = await searchResults('Solo leveling');
-// const details = await extractDetails(JSON.parse(results)[1].href);
-// const episodes = await extractEpisodes(JSON.parse(results)[1].href);
-// const streamUrl = await extractStreamUrl(JSON.parse(episodes)[0].href);
-// console.log('STREAMURL:', streamUrl);
+const results = await searchResults('Solo leveling');
+const details = await extractDetails(JSON.parse(results)[1].href);
+const episodes = await extractEpisodes(JSON.parse(results)[1].href);
+const streamUrl = await extractStreamUrl(JSON.parse(episodes)[0].href);
+console.log('STREAMURL:', streamUrl);
 //***** LOCAL TESTING
 
 /**
@@ -169,8 +169,8 @@ async function extractStreamUrl(url) {
             method: 'GET',
             headers: {
                 "X-Requested-With": "XMLHttpRequest",
-                // "Referer": "https://v6.kuramanime.run/anime/2475/ore-dake-level-up-na-ken/episode/1",
-                // "X-Csrf-Token": "A5i9Edt2t0xyckplfLfdYI50GFkZrgjiwzhe6kKi"
+                "Referer": "https://v6.kuramanime.run/anime/2475/ore-dake-level-up-na-ken/episode/1",
+                "X-Csrf-Token": "A5i9Edt2t0xyckplfLfdYI50GFkZrgjiwzhe6kKi"
             }
         });
         const streamHtml = typeof streamUrlResponse === 'object' ? await streamUrlResponse.text() : await streamUrlResponse;
