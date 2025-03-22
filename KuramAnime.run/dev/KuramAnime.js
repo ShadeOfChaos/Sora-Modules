@@ -1,9 +1,9 @@
 //***** LOCAL TESTING
-const results = await searchResults('Solo leveling');
-const details = await extractDetails(JSON.parse(results)[1].href);
-const episodes = await extractEpisodes(JSON.parse(results)[1].href);
-const streamUrl = await extractStreamUrl(JSON.parse(episodes)[0].href);
-console.log('STREAMURL:', streamUrl);
+// const results = await searchResults('Solo leveling');
+// const details = await extractDetails(JSON.parse(results)[1].href);
+// const episodes = await extractEpisodes(JSON.parse(results)[1].href);
+// const streamUrl = await extractStreamUrl(JSON.parse(episodes)[0].href);
+// console.log('STREAMURL:', streamUrl);
 //***** LOCAL TESTING
 
 /**
