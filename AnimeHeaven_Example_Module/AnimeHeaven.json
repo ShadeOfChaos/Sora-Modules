@@ -14,5 +14,5 @@
     "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeHeaven_Example_Module/AnimeHeaven.js",
     "asyncJS": true,
     "streamAsyncJS": true,
-    "softsub": true
+    "softsub": false
  }

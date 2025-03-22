@@ -76,13 +76,11 @@ async function extractEpisodes(url) {
         const response = await fetch(url);
         const html = typeof response === 'object' ? await response.text() : await response;
 
-        console.log(html);
-
         const matches = html.matchAll(REGEX);
         const matchesArray = Array.from(matches);
         const episodes = matchesArray.map(match => {
             return {
-                number: match[2],
+                number: parseInt(match[2]),
                 href: BASE_URL + match[1]
             }
         }).reverse(); // Reversing the resulting episodes array since the website lists episodes in descending order and Sora does not sort the episodes
