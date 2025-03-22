@@ -1,3 +1,7 @@
+// TEMPLATE TODO - Fill in the following variables
+const BASE_URL = '';
+const SEARCH_URL = '';
+
 /**
  * Searches the website for anime with the given keyword and returns the results
  * @param {string} keyword The keyword to search for
@@ -9,6 +13,11 @@ async function searchResults(keyword) {
         // TEMPLATE TODO
         // Either find the page url for the search page, fetch it, match it with regex and return the results
         // Or if you're lucky and the site has a search API return JSON use that instead
+
+        const response = await fetch(`${ SEARCH_URL }${ encodeURIComponent(keyword) }`);
+        const html = typeof response === 'object' ? await response.text() : await response; // Website response (Pick only one, both will give an error)
+        // const data = typeof response === 'object' ? await response.json() : await JSON.parse(response); // API response (Pick only one, both will give an error)
+
 
         return JSON.stringify(results);
     } catch (error) {
@@ -27,6 +36,10 @@ async function extractDetails(url) {
         // TEMPLATE TODO
         // Fetch the provided url, match it with regex and return the details
         // Or if you're lucky and the site has an API return JSON use that instead
+
+        const response = await fetch(url);
+        const html = typeof response === 'object' ? await response.text() : await response; // Website response (Pick only one, both will give an error)
+        // const data = typeof response === 'object' ? await response.json() : await JSON.parse(response); // API response (Pick only one, both will give an error)
 
 
         return JSON.stringify([details]);
@@ -53,6 +66,10 @@ async function extractEpisodes(url) {
         // Fetch the provided url, match it with regex and return the episodes
         // Or if you're lucky and the site has an API return JSON use that instead
 
+        const response = await fetch(url);
+        const html = typeof response === 'object' ? await response.text() : await response; // Website response (Pick only one, both will give an error)
+        // const data = typeof response === 'object' ? await response.json() : await JSON.parse(response); // API response (Pick only one, both will give an error)
+
 
         return JSON.stringify(episodes);
     } catch (error) {
@@ -72,6 +89,11 @@ async function extractStreamUrl(url) {
         // Fetch the provided url, match it with regex and return the stream URL
         // Or get the iframe through regex, fetch the iframe, match it with regex and return the stream URL
         // Or if you're lucky and the site has an API return JSON use that instead
+
+        const response = await fetch(url);
+        const html = typeof response === 'object' ? await response.text() : await response; // Website response (Pick only one, both will give an error)
+        // const data = typeof response === 'object' ? await response.json() : await JSON.parse(response); // API response (Pick only one, both will give an error)
+        
 
         return streamUrl;
 
