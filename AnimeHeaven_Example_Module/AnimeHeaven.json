@@ -1,0 +1,18 @@
+{
+    "sourceName": "AnimeHeaven EXAMPLE MODULE",
+    "iconUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeHeaven_Example_Module/logo.png",
+    "author": {
+        "name": "ShadeOfChaos",
+        "icon": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeHeaven_Example_Module/ofchaos.jpg"
+    },
+    "version": "1.0.0",
+    "language": "English (SUB)",
+    "streamType": "MP4",
+    "quality": "720p",
+    "baseUrl": "https://animeheaven.me/",
+    "searchBaseUrl": "https://animeheaven.me/search.php?s=%s",
+    "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeHeaven_Example_Module/AnimeHeaven.js",
+    "asyncJS": true,
+    "streamAsyncJS": true,
+    "softsub": true
+ }
