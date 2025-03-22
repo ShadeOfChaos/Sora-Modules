@@ -147,7 +147,7 @@ async function extractStreamUrl(url) {
                 "X-Fuck-ID": `${ env.MIX_AUTH_KEY }:${ env.MIX_AUTH_TOKEN }`,
                 "X-Request-ID": generateRandomString(6),
                 "X-Request-Index": 0,
-                "X-CSRF-TOKEN": "s2pxmYBRqf9ZeYLnitdeeTFSvhZVp8uQABn5mQu3"
+                // "X-CSRF-TOKEN": "s2pxmYBRqf9ZeYLnitdeeTFSvhZVp8uQABn5mQu3"
             }
         });
         const accessToken = typeof accessTokenResponse === 'object' ? await accessTokenResponse.text() : await accessTokenResponse;
@@ -156,8 +156,8 @@ async function extractStreamUrl(url) {
             method: 'GET',
             headers: {
                 "X-Requested-With": "XMLHttpRequest",
-                "Referer": "https://v6.kuramanime.run/anime/2475/ore-dake-level-up-na-ken/episode/1",
-                "X-Csrf-Token": "A5i9Edt2t0xyckplfLfdYI50GFkZrgjiwzhe6kKi"
+                // "Referer": "https://v6.kuramanime.run/anime/2475/ore-dake-level-up-na-ken/episode/1",
+                // "X-Csrf-Token": "A5i9Edt2t0xyckplfLfdYI50GFkZrgjiwzhe6kKi"
             }
         });
         const streamHtml = typeof streamUrlResponse === 'object' ? await streamUrlResponse.text() : await streamUrlResponse;
