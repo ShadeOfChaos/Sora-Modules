@@ -110,7 +110,9 @@ async function extractEpisodes(url) {
  */
 async function extractStreamUrl(url) {
     const BASE_URL = 'https://v6.kuramanime.run/';
-    const kpsRegex = /data-kps="([\s\S]*?)"/
+    const kpsRegex = /data-kps="([\s\S]*?)"/;
+    const envRegex = /([A-Z_]+):[\s]*'([\s\S]*?)'/g;
+    const srcRegex = /src="([\s\S]*?)"[\s\S]+?size="([\s\S]*?)"/g;
 
     try {
         const response = await fetch(url);
@@ -124,29 +126,25 @@ async function extractStreamUrl(url) {
 
         const kps = kpsMatch[1]; // f
 
-
-
-
         // Gets the 'env' from the txt file [MIX_PREFIX_AUTH_ROUTE_PARAM, MIX_AUTH_ROUTE_PARAM, MIX_AUTH_KEY, MIX_AUTH_TOKEN, MIX_PAGE_TOKEN_KEY, MIX_STREAM_SERVER_KEY]
-        // const scriptResponse = await fetch(`https://v6.kuramanime.run/assets/js/${ kps }.js`);
-        // const js = typeof scriptResponse === 'object' ? await scriptResponse.text() : await scriptResponse;
+        const scriptResponse = await fetch(`https://v6.kuramanime.run/assets/js/${ kps }.js`);
+        const js = typeof scriptResponse === 'object' ? await scriptResponse.text() : await scriptResponse;
 
-        // console.log(js);
-        const MIX_AUTH_KEY = "snWwNGMvBuHATEf";
-        const MIX_AUTH_ROUTE_PARAM = "VShKkA7y8EKMg4l.txt";
-        const MIX_AUTH_TOKEN = "WXTOBUbcRjxDSdd";
-        const MIX_PAGE_TOKEN_KEY = "GsO426IM48NzYIg";
-        const MIX_PREFIX_AUTH_ROUTE_PARAM = "assets/";
-        const MIX_STREAM_SERVER_KEY = "imi6b0f8oQPbXWd";
+        if(js == null || js == '') {
+            throw('Failed to capture env data');
+        }
 
-
-
+        let env = {};
+        const jsMatched = Array.from(js.matchAll(envRegex));
+        for(let [ source, key, value ] of jsMatched) {
+            env[key] = value;
+        }
 
         // Get access token
-        const accessTokenResponse = await fetch(`${ BASE_URL }${ MIX_PREFIX_AUTH_ROUTE_PARAM }${ MIX_AUTH_ROUTE_PARAM }`, {
+        const accessTokenResponse = await fetch(`${ BASE_URL }${ env.MIX_PREFIX_AUTH_ROUTE_PARAM }${ env.MIX_AUTH_ROUTE_PARAM }`, {
             method: 'GET',
             headers: {
-                "X-Fuck-ID": `${ MIX_AUTH_KEY }:${ MIX_AUTH_TOKEN }`,
+                "X-Fuck-ID": `${ env.MIX_AUTH_KEY }:${ env.MIX_AUTH_TOKEN }`,
                 "X-Request-ID": generateRandomString(6),
                 "X-Request-Index": 0,
                 "X-CSRF-TOKEN": "s2pxmYBRqf9ZeYLnitdeeTFSvhZVp8uQABn5mQu3"
@@ -154,64 +152,27 @@ async function extractStreamUrl(url) {
         });
         const accessToken = typeof accessTokenResponse === 'object' ? await accessTokenResponse.text() : await accessTokenResponse;
 
-        const streamUrlResponse = `${ url }?${ MIX_PAGE_TOKEN_KEY }=${ accessToken }&${ MIX_STREAM_SERVER_KEY }=kuramadrive&page=1`;
-        // const streamUrl = typeof accessTokenResponse === 'object' ? await accessTokenResponse.text() : await accessTokenResponse;
+        const streamUrlResponse = await fetch(`${ url }?${ env.MIX_PAGE_TOKEN_KEY }=${ accessToken }&${ env.MIX_STREAM_SERVER_KEY }=kuramadrive&page=1`, {
+            method: 'GET',
+            headers: {
+                "X-Requested-With": "XMLHttpRequest",
+                "Referer": "https://v6.kuramanime.run/anime/2475/ore-dake-level-up-na-ken/episode/1",
+                "X-Csrf-Token": "A5i9Edt2t0xyckplfLfdYI50GFkZrgjiwzhe6kKi"
+            }
+        });
+        const streamHtml = typeof streamUrlResponse === 'object' ? await streamUrlResponse.text() : await streamUrlResponse;
 
-        console.log(streamUrlResponse);
+        const trimmedStreamHtml = trimText(streamHtml, '<video', '</video>');
+        const slimTrimStreamHtml = trimmedStreamHtml.replaceAll('  ', '');
 
-        return streamUrlResponse;
+        const streamMatches = Array.from(slimTrimStreamHtml.matchAll(srcRegex)).map(m => {
+            return {
+                file: m[1],
+                quality: m[2]
+            }
+        }).sort((a, b) => a?.quality === b?.quality ? 0 : a?.quality > b?.quality ? -1 : 1);
 
-        // f = nzPZDajlscE1Qwc (data-kps value)
-        // https://v6.kuramanime.run/assets/js/${f}.js
-
-        // Get from data-kps="nzPZDajlscE1Qwc"
-        // "https://v6.kuramanime.run/anime/2475/ore-dake-level-up-na-ken/episode/1?GsO426IM48NzYIg=i72nm4qSP3&imi6b0f8oQPbXWd=kuramadrive&page=1"
-
-        // const MIX_AUTH_KEY = "snWwNGMvBuHATEf";
-        // const MIX_AUTH_ROUTE_PARAM = "VShKkA7y8EKMg4l.txt";
-        // const MIX_AUTH_TOKEN = "WXTOBUbcRjxDSdd";
-        // const MIX_PAGE_TOKEN_KEY = "GsO426IM48NzYIg";
-        // const MIX_PREFIX_AUTH_ROUTE_PARAM = "assets/";
-        // const MIX_STREAM_SERVER_KEY = "imi6b0f8oQPbXWd";
-        // const MIX_JS_ROUTE_PARAM_ATTR = "data-kps"
-        // const MIX_JS_ROUTE_PARAM_ATTR_KEY = "49C72148FE4F7"
-
-        // Get access token
-        // url = https://v6.kuramanime.run/assets/VShKkA7y8EKMg4l.txt
-        // f = snWwNGMvBuHATEf
-        // g = WXTOBUbcRjxDSdd
-        // h = 0
-        // headers: {
-        //     "X-Fuck-ID": `${f}:${g}`,
-        //     "X-Request-ID": generateRandomString(6),
-        //     "X-Request-Index": h
-        //     "X-CSRF-TOKEN": "s2pxmYBRqf9ZeYLnitdeeTFSvhZVp8uQABn5mQu3"
-        // }
-        // 
-        // function generateRandomString(a) {
-        //     let b = "";
-        //     const c = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".length;
-        //     for (let d = 0; d < a; d++)
-        //         b += "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".charAt(Math.floor(Math.random() * c));
-        //     return b
-        // }
-        //
-        // Result i72nm4qSP3 (String)
-        //
-        // OnSuccess
-        //
-        // const c = new URL(a.to = https://v6.kuramanime.run/anime/2475/ore-dake-level-up-na-ken/episode/1); // Watch url
-        // c.searchParams.set(process.env.MIX_PAGE_TOKEN_KEY, b = i72nm4qSP3),
-        // c.searchParams.set(process.env.MIX_STREAM_SERVER_KEY, streamServer = 'kuramadrive'),
-        // c.searchParams.set("page", a.page = 0)
-
-        
-
-        // Fetch the stream url from within html and return it through streamUrl
-        // console.log(html);
-
-        return atob('aHR0cHM6Ly9tdXRzdW1pLm15LmlkL2tkcml2ZS8wQm0ybHNVY1pzZi9LdXJhbWFuaW1lLVNPTE9MVkxfQkQtMDEtNzIwcC1LdXJhbWFCRC5tcDQ/Z2lkPTFXWVdXeHBUZHlZQW9tSko1cThhaGtRMmxvWEZfYUhtdCZpZD02NzE2MzM2NjY5MDEtMzB1OWpnMW51NWNtY2NzZDljMHBnaXJscnNrZmI5YnQuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20mc2M9R09DU1BYLURzaUR0UDVMcTlFNzUyOUlIaXVWVDFyRHY1Y0gmcnQ9MS8vMDNLR1lyVnZhWG52YkNnWUlBUkFBR0FNU053Ri1MOUlyREVIaUtOOXBTRXJ6NXkydE9BX0wtV0NrLS1rWFg4WHZ5bDNoWWNkaVFjLTdyQ1RJT0tLUGJDXzNOeUpMY25wdGl4RSZjY2U9MQ==');
-
+        return streamMatches[0].file;
     } catch(e) {
         console.log('Error:' + e.message);
         return null;
@@ -226,26 +187,6 @@ function trimText(text, startString, endString) {
 
 function cleanSynopsis(html) {
     return html.replaceAll('<br>', '\n').replaceAll('<i>', '').replaceAll('</i>', '');
-}
-
-function atob(input) {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
-    let str = String(input).replace(/=+$/, '');
-    let output = '';
-
-    if (str.length % 4 == 1) {
-        throw new Error("atob failed: The input is not correctly encoded.");
-    }
-
-    for (let bc = 0, bs, buffer, i = 0;
-        (buffer = str.charAt(i++));
-        ~buffer && (bs = bc % 4 ? bs * 64 + buffer : buffer, bc++ % 4)
-            ? output += String.fromCharCode(255 & (bs >> ((-2 * bc) & 6)))
-            : 0) {
-        buffer = chars.indexOf(buffer);
-    }
-
-    return output;
 }
 
 function generateRandomString(a) {
