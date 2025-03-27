@@ -9,6 +9,7 @@
     "language": "English (HARDSUB)",
     "streamType": "HLS",
     "quality": "720p",
+	"type": "anime",
     "baseUrl": "https://www.animegg.org/",
     "searchBaseUrl": "https://www.animegg.org/search/?q=%s",
     "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeGG/hardsub-eng/AnimeGG.js",

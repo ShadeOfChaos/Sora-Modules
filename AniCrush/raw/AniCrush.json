@@ -9,6 +9,7 @@
     "language": "Japanese (RAW)",
     "streamType": "HLS",
     "quality": "1080p",
+	"type": "anime",
     "baseUrl": "https://megacloud.club/",
     "searchBaseUrl": "https://ac-api.ofchaos.com/api/anime/search?keyword=%s",
     "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AniCrush/raw/AniCrush.js",

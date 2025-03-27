@@ -9,6 +9,7 @@
     "language": "English (SUB)",
     "streamType": "HLS",
     "quality": "720p",
+	"type": "anime",
     "baseUrl": "",
     "searchBaseUrl": "",
     "scriptUrl": "",

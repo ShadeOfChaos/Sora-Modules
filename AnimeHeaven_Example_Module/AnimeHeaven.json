@@ -9,6 +9,7 @@
     "language": "English (SUB)",
     "streamType": "MP4",
     "quality": "720p",
+	"type": "anime",
     "baseUrl": "https://animeheaven.me/",
     "searchBaseUrl": "https://animeheaven.me/search.php?s=%s",
     "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeHeaven_Example_Module/AnimeHeaven.js",

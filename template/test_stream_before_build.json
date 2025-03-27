@@ -9,6 +9,7 @@
     "language": "English (SUB)",
     "streamType": "HLS",
     "quality": "1080p",
+	"type": "anime",
     "baseUrl": "www.animeparadise.moe",
     "searchBaseUrl": "https://www.animeparadise.moe/search?q=%s",
     "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/template/test_stream_before_build.js",

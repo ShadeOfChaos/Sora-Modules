@@ -9,6 +9,7 @@
     "language": "Indonesian (SUB)",
     "streamType": "MP4",
     "quality": "720p",
+	"type": "anime",
     "baseUrl": "https://v6.kuramanime.run/",
     "searchBaseUrl": "https://v6.kuramanime.run/anime?search=solo%s",
     "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/KuramAnime.run/dev/KuramAnime.js",
