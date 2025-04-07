@@ -32,7 +32,7 @@ async function searchResults(keyword) {
         const animesWithSubtitles = await GetAnimes();
         
         for(let entry of data) {
-            if(!animesWithSubtitles.includes(entry.mappings.anilist.toString())) {
+            if(!animesWithSubtitles.includes(entry.mappings.anilist)) {
                 continue;
             }
 
@@ -114,10 +114,11 @@ async function extractEpisodes(url) {
         const episodesList = json?.props?.pageProps?.data?.ep;
         if(episodesList == null) throw('Error obtaining episodes');
 
-        const episodesWithSubtitles = await GetEpisodes(json.props.pageProps.data?.mappings?.anilist);
+        const episodesWithSubtitlesJson = await GetEpisodes(json.props.pageProps.data?.mappings?.anilist);
+        const episodesWithSubtitles = episodesWithSubtitlesJson.map((entry) => entry?.episode);
 
         for(let i=0,len=episodesList.length; i<len; i++) {
-            if(!episodesWithSubtitles.includes(i.toString())) {
+            if(!episodesWithSubtitles.includes(i)) {
                 continue;
             }
 
