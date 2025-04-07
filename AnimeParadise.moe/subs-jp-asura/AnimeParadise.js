@@ -36,6 +36,8 @@ async function searchResults(keyword) {
                 continue;
             }
 
+            console.log('FOUND ENTRY:', entry.mappings.anilist.toString());
+
             shows.push({
                 title: entry.title,
                 image: entry.posterImage.original,
@@ -149,9 +151,12 @@ async function extractStreamUrl(url) {
         const json = getNextData(html);
         if (json == null) throw ('Error parsing NEXT_DATA json');
 
+        console.log(json?.props?.pageProps?.episode);
+
         const streamUrl = json?.props?.pageProps?.episode?.streamLink;
         const subtitles = GetSubtitles(json.props.pageProps?.animeData?.mappings?.anilist, json.props.pageProps.episode?.number);
         if(subtitles == null) throw('Invalid data while attempting to get subtitles');
+        console.log('Subtitles:', subtitles);
 
         return JSON.stringify({ stream: streamUrl, subtitles: subtitles });
 
