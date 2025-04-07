@@ -1,3 +1,87 @@
+class Asura {
+    // This class is not meant to be instantiated. It is a utility class for fetching subtitles from Asura.
+    // It contains static methods that can be called directly without creating an instance of the class.
+    static referer = 'SoraApp';
+    static baseUrl = 'https://asura.ofchaos.com/api/anime';
+
+    constructor() {
+        console.log('[ASURA] Error, do not instantiate this class');
+        return null;
+    }
+
+    static async GetAnimes() {
+        try {
+            const response = await fetch(Asura.baseUrl, {
+                method: 'GET',
+                headers: {
+                    'Referer': Asura.referer
+                },
+            });
+            const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
+
+            if(json == null)                 throw('Error parsing Asura json');
+            if(json?.success !== true)       throw(json?.error || 'Error obtaining data from Asura API');
+            if(json?.result?.length == null) throw('Error obtaining data from Asura API');
+
+            return json?.result;
+
+        } catch(error) {
+            console.log('[ASURA][GetAnimes] Error: ' + error.message);
+            return [];
+        }
+    }
+
+    static async GetEpisodes(anilistId) {
+        if(anilistId == null || parseInt(anilistId) == NaN) {
+            return [];
+        }
+
+        try {
+            const response = await fetch(`${ Asura.baseUrl }/${ anilistId }`, {
+                method: 'GET',
+                headers: {
+                    'Referer': Asura.referer
+                },
+            });
+            const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
+
+            if(json == null)                 throw('Error parsing Asura json');
+            if(json?.success !== true)       throw(json?.error || 'Error obtaining data from Asura API');
+            if(json?.result?.length == null) throw('Error obtaining data from Asura API');
+
+            return json?.result;
+
+        } catch(error) {
+            console.log('[ASURA][GetEpisodes] Error: ' + error.message);
+            return [];
+        }
+    }
+
+    static GetSubtitles(anilistId, episodeNr) {
+        if(
+            anilistId == null ||
+            parseInt(anilistId) == NaN ||
+            episodeNr == null ||
+            parseInt(episodeNr) == NaN
+        ) {
+            return null;
+        }
+
+        return `${ Asura.baseUrl }/${ anilistId }/${ episodeNr }`;
+    }
+}
+
+// //***** LOCAL TESTING
+const results = await searchResults('cowboy bebop');
+console.log('RESULTS:', results);
+const details = await extractDetails(JSON.parse(results)[0].href);
+console.log('DETAILS:', details);
+const episodesa = await extractEpisodes(JSON.parse(results)[0].href);
+// console.log('EPISODES:', episodesa);
+const streamUrl = await extractStreamUrl(JSON.parse(episodesa)[0].href);
+console.log('STREAMURL:', streamUrl);
+//***** LOCAL TESTING
+
 /**
  * Searches the website for anime with the given keyword and returns the results
  * @param {string} keyword The keyword to search for
@@ -18,7 +102,7 @@ async function searchResults(keyword) {
         const data = json?.props?.pageProps?.data;
         if(data == null) throw('Error obtaining data');
 
-        const animesWithSubtitles = await GetAnimes();
+        const animesWithSubtitles = await Asura.GetAnimes();
         
         for(let entry of data) {
             if(!animesWithSubtitles.includes(entry.mappings.anilist.toString())) {
@@ -103,7 +187,7 @@ async function extractEpisodes(url) {
         const episodesList = json?.props?.pageProps?.data?.ep;
         if(episodesList == null) throw('Error obtaining episodes');
 
-        const episodesWithSubtitles = await GetEpisodes(json.props.pageProps.data?.mappings?.anilist);
+        const episodesWithSubtitles = await Asura.GetEpisodes(json.props.pageProps.data?.mappings?.anilist);
 
         for(let i=0,len=episodesList.length; i<len; i++) {
             if(!episodesWithSubtitles.includes(i.toString())) {
@@ -139,7 +223,7 @@ async function extractStreamUrl(url) {
         if (json == null) throw ('Error parsing NEXT_DATA json');
 
         const streamUrl = json?.props?.pageProps?.episode?.streamLink;
-        const subtitles = GetSubtitles(json.props.pageProps?.animeData?.mappings?.anilist, json.props.pageProps.episode?.number);
+        const subtitles = Asura.GetSubtitles(json.props.pageProps?.animeData?.mappings?.anilist, json.props.pageProps.episode?.number);
         if(subtitles == null) throw('Invalid data while attempting to get subtitles');
 
         return JSON.stringify({ stream: streamUrl, subtitles: subtitles });
@@ -167,72 +251,4 @@ function trimHtml(html, startString, endString) {
     const startIndex = html.indexOf(startString);
     const endIndex = html.indexOf(endString, startIndex);
     return html.substring(startIndex, endIndex);
-}
-
-async function GetAnimes() {
-    const referer = 'SoraApp';
-    const baseUrl = 'https://asura.ofchaos.com/api/anime';
-    try {
-        const response = await fetch(baseUrl, {
-            method: 'GET',
-            headers: {
-                'Referer': referer
-            }
-        });
-        const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
-
-        if(json == null)                 throw('Error parsing Asura json');
-        if(json?.success !== true)       throw(json?.error || 'Error obtaining data from Asura API');
-        if(json?.result?.length == null) throw('Error obtaining data from Asura API');
-
-        return json?.result;
-
-    } catch(error) {
-        console.log('[ASURA][GetAnimes] Error: ' + error.message);
-        return [];
-    }
-}
-
-async function GetEpisodes(anilistId) {
-    if(anilistId == null || isNaN(parseInt(anilistId))) {
-        return [];
-    }
-
-    const referer = 'SoraApp';
-    const baseUrl = 'https://asura.ofchaos.com/api/anime';
-
-    try {
-        const response = await fetch(`${ baseUrl }/${ anilistId }`, {
-            method: 'GET',
-            headers: {
-                'Referer': referer
-            }
-        });
-        const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
-
-        if(json == null)                 throw('Error parsing Asura json');
-        if(json?.success !== true)       throw(json?.error || 'Error obtaining data from Asura API');
-        if(json?.result?.length == null) throw('Error obtaining data from Asura API');
-
-        return json?.result;
-
-    } catch(error) {
-        console.log('[ASURA][GetEpisodes] Error: ' + error.message);
-        return [];
-    }
-}
-
-function GetSubtitles(anilistId, episodeNr) {
-    if(
-        anilistId == null ||
-        isNaN(parseInt(anilistId)) ||
-        episodeNr == null ||
-        isNaN(parseInt(episodeNr))
-    ) {
-        return null;
-    }
-
-    const baseUrl = 'https://asura.ofchaos.com/api/anime';
-
-    return `${ baseUrl }/${ anilistId }/${ episodeNr }`;
 }

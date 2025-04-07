@@ -6,13 +6,13 @@
         "icon": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeParadise.moe/ofchaos.jpg"
     },
     "version": "1.0.0",
-    "language": "English (SUB)",
+    "language": "Japanese (SUB)",
     "streamType": "HLS",
     "quality": "1080p",
 	"type": "anime",
     "baseUrl": "https://megacloud.club/",
     "searchBaseUrl": "https://www.animeparadise.moe/search?q=%s",
-    "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeParadise.moe/dev/AnimeParadise.js",
+    "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeParadise.moe/subs-jp-asura/AnimeParadise.js",
     "asyncJS": true,
     "streamAsyncJS": true,
     "softsub": true
