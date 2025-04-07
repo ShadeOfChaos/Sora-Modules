@@ -1,15 +1,8 @@
-class Asura {
-    // This class is not meant to be instantiated. It is a utility class for fetching subtitles from Asura.
-    // It contains static methods that can be called directly without creating an instance of the class.
-    static referer = 'SoraApp';
-    static baseUrl = 'https://asura.ofchaos.com/api/anime';
+const Asura = {
+    referer: 'SoraApp',
+    baseUrl: 'https://asura.ofchaos.com/api/anime',
 
-    constructor() {
-        console.log('[ASURA] Error, do not instantiate this class');
-        return null;
-    }
-
-    static async GetAnimes() {
+    async GetAnimes() {
         try {
             const response = await fetch(Asura.baseUrl, {
                 method: 'GET',
@@ -29,9 +22,9 @@ class Asura {
             console.log('[ASURA][GetAnimes] Error: ' + error.message);
             return [];
         }
-    }
+    },
 
-    static async GetEpisodes(anilistId) {
+    async GetEpisodes(anilistId) {
         if(anilistId == null || parseInt(anilistId) == NaN) {
             return [];
         }
@@ -55,9 +48,9 @@ class Asura {
             console.log('[ASURA][GetEpisodes] Error: ' + error.message);
             return [];
         }
-    }
+    },
 
-    static GetSubtitles(anilistId, episodeNr) {
+    GetSubtitles(anilistId, episodeNr) {
         if(
             anilistId == null ||
             parseInt(anilistId) == NaN ||
@@ -69,7 +62,7 @@ class Asura {
 
         return `${ Asura.baseUrl }/${ anilistId }/${ episodeNr }`;
     }
-}
+};
 
 // //***** LOCAL TESTING
 // const results = await searchResults('cowboy bebop');
