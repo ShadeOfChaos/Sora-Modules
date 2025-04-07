@@ -1,15 +1,8 @@
-class Asura {
-    // This class is not meant to be instantiated. It is a utility class for fetching subtitles from Asura.
-    // It contains static methods that can be called directly without creating an instance of the class.
-    static referer = 'SoraApp';
-    static baseUrl = 'https://asura.ofchaos.com/api/anime';
+const Asura = {
+    referer: 'SoraApp',
+    baseUrl: 'https://asura.ofchaos.com/api/anime',
 
-    constructor() {
-        console.log('[ASURA] Error, do not instantiate this class');
-        return null;
-    }
-
-    static async GetAnimes() {
+    async GetAnimes() {
         try {
             const response = await fetch(Asura.baseUrl, {
                 method: 'GET',
@@ -29,9 +22,9 @@ class Asura {
             console.log('[ASURA][GetAnimes] Error: ' + error.message);
             return [];
         }
-    }
+    },
 
-    static async GetEpisodes(anilistId) {
+    async GetEpisodes(anilistId) {
         if(anilistId == null || parseInt(anilistId) == NaN) {
             return [];
         }
@@ -55,9 +48,9 @@ class Asura {
             console.log('[ASURA][GetEpisodes] Error: ' + error.message);
             return [];
         }
-    }
+    },
 
-    static GetSubtitles(anilistId, episodeNr) {
+    GetSubtitles(anilistId, episodeNr) {
         if(
             anilistId == null ||
             parseInt(anilistId) == NaN ||
@@ -71,16 +64,16 @@ class Asura {
     }
 }
 
-// // //***** LOCAL TESTING
-// const results = await searchResults('cowboy bebop');
-// console.log('RESULTS:', results);
-// const details = await extractDetails(JSON.parse(results)[0].href);
-// console.log('DETAILS:', details);
-// const episodesa = await extractEpisodes(JSON.parse(results)[0].href);
-// // console.log('EPISODES:', episodesa);
-// const streamUrl = await extractStreamUrl(JSON.parse(episodesa)[0].href);
-// console.log('STREAMURL:', streamUrl);
 // //***** LOCAL TESTING
+const results = await searchResults('cowboy bebop');
+console.log('RESULTS:', results);
+const details = await extractDetails(JSON.parse(results)[0].href);
+console.log('DETAILS:', details);
+const episodesa = await extractEpisodes(JSON.parse(results)[0].href);
+// console.log('EPISODES:', episodesa);
+const streamUrl = await extractStreamUrl(JSON.parse(episodesa)[0].href);
+console.log('STREAMURL:', streamUrl);
+//***** LOCAL TESTING
 
 /**
  * Searches the website for anime with the given keyword and returns the results
@@ -226,7 +219,7 @@ async function extractStreamUrl(url) {
         const subtitles = Asura.GetSubtitles(json.props.pageProps?.animeData?.mappings?.anilist, json.props.pageProps.episode?.number);
         if(subtitles == null) throw('Invalid data while attempting to get subtitles');
 
-        return JSON.stringify({ stream: streamUrl, subtitles: subtitles?.src });
+        return JSON.stringify({ stream: streamUrl, subtitles: subtitles });
 
     } catch (e) {
         console.log('Error:', e);
