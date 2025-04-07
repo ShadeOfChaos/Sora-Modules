@@ -193,7 +193,7 @@ async function GetAnimes() {
         const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
         if(json == null)                 throw('Error parsing Asura json');
-        if(json?.success !== true)       throw(json?.error || 'Error obtaining data from Asura API');
+        if(json?.success !== true)       throw(json?.error);
         if(json?.result?.length == null) throw('Error obtaining data from Asura API');
 
         return json?.result;
@@ -222,7 +222,7 @@ async function GetEpisodes(anilistId) {
         const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
         if(json == null)                 throw('Error parsing Asura json');
-        if(json?.success !== true)       throw(json?.error || 'Error obtaining data from Asura API');
+        if(json?.success !== true)       throw(json?.error);
         if(json?.result?.length == null) throw('Error obtaining data from Asura API');
 
         return json?.result;
