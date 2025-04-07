@@ -1,14 +1,3 @@
-//***** LOCAL TESTING
-// const results = await searchResults('cowboy bebop');
-// console.log('RESULTS:', results);
-// const details = await extractDetails(JSON.parse(results)[0].href);
-// console.log('DETAILS:', details);
-// const episodesa = await extractEpisodes(JSON.parse(results)[0].href);
-// // console.log('EPISODES:', episodesa);
-// const streamUrl = await extractStreamUrl(JSON.parse(episodesa)[0].href);
-// console.log('STREAMURL:', streamUrl);
-// ***** LOCAL TESTING
-
 /**
  * Searches the website for anime with the given keyword and returns the results
  * @param {string} keyword The keyword to search for
@@ -188,7 +177,7 @@ async function GetAnimes() {
             method: 'GET',
             headers: {
                 'Referer': referer
-            },
+            }
         });
         const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
@@ -205,7 +194,7 @@ async function GetAnimes() {
 }
 
 async function GetEpisodes(anilistId) {
-    if(anilistId == null || parseInt(anilistId) == NaN) {
+    if(anilistId == null || isNaN(parseInt(anilistId))) {
         return [];
     }
 
@@ -217,7 +206,7 @@ async function GetEpisodes(anilistId) {
             method: 'GET',
             headers: {
                 'Referer': referer
-            },
+            }
         });
         const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
@@ -236,9 +225,9 @@ async function GetEpisodes(anilistId) {
 function GetSubtitles(anilistId, episodeNr) {
     if(
         anilistId == null ||
-        parseInt(anilistId) == NaN ||
+        isNaN(parseInt(anilistId)) ||
         episodeNr == null ||
-        parseInt(episodeNr) == NaN
+        isNaN(parseInt(episodeNr))
     ) {
         return null;
     }
