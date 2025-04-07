@@ -1,15 +1,15 @@
-//***** LOCAL TESTING
-const results = await searchResults('Solo Leveling');
-// console.log(results);
-const details = await extractDetails(JSON.parse(results)[1].href);
-// console.log('DETAILS:', details);
-const episodes = await extractEpisodes(JSON.parse(results)[1].href);
-// console.log('OUTSIDE EPISODES:', episodes);
-var epis = JSON.parse(episodes);
-// console.log('Episodes', epis);
-const streamUrl = await extractStreamUrl(epis[1].href);
-console.log('STREAMURL:', streamUrl);
-//***** LOCAL TESTING
+// //***** LOCAL TESTING
+// const results = await searchResults('Solo Leveling');
+// // console.log(results);
+// const details = await extractDetails(JSON.parse(results)[1].href);
+// // console.log('DETAILS:', details);
+// const episodes = await extractEpisodes(JSON.parse(results)[1].href);
+// // console.log('OUTSIDE EPISODES:', episodes);
+// var epis = JSON.parse(episodes);
+// // console.log('Episodes', epis);
+// const streamUrl = await extractStreamUrl(epis[1].href);
+// console.log('STREAMURL:', streamUrl);
+// //***** LOCAL TESTING
 
 /**
  * Given an image path, returns the URL to the resized image on AniCrush's CDN.
@@ -60,7 +60,7 @@ async function searchResults(keyword) {
         return JSON.stringify(results);
     } catch (error) {
         console.log('Fetch error:', error);
-        return JSON.stringify([{ title: 'Error', image: '', href: '' }]);
+        return JSON.stringify([]);
     }
 }
 
