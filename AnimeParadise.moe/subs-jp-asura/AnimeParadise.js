@@ -32,11 +32,9 @@ async function searchResults(keyword) {
         const animesWithSubtitles = await GetAnimes();
         
         for(let entry of data) {
-            // if(!animesWithSubtitles.includes(entry.mappings.anilist.toString())) {
-            //     continue;
-            // }
-
-            console.log('FOUND ENTRY:', entry?.mappings?.anilist);
+            if(!animesWithSubtitles.includes(entry.mappings.anilist.toString())) {
+                continue;
+            }
 
             shows.push({
                 title: entry.title,
@@ -47,7 +45,7 @@ async function searchResults(keyword) {
 
         return JSON.stringify(shows);
     } catch (error) {
-        console.log('Fetch error:', error);
+        console.log('Fetch error: ' + error.message);
         return JSON.stringify([]);
     }
 }
@@ -85,7 +83,7 @@ async function extractDetails(url) {
         return JSON.stringify([details]);
 
     } catch (error) {
-        console.log('Details error:', error);
+        console.log('Details error: ' + error.message);
         return JSON.stringify([{
             description: 'Error loading description',
             aliases: 'Duration: Unknown',
@@ -133,7 +131,7 @@ async function extractEpisodes(url) {
 
         return JSON.stringify(episodes);
     } catch (error) {
-        console.log('Fetch error:', error);
+        console.log('Fetch error: ' + error.message);
         return JSON.stringify([]);
     }
 }
@@ -151,17 +149,14 @@ async function extractStreamUrl(url) {
         const json = getNextData(html);
         if (json == null) throw ('Error parsing NEXT_DATA json');
 
-        console.log(json?.props?.pageProps?.episode);
-
         const streamUrl = json?.props?.pageProps?.episode?.streamLink;
         const subtitles = GetSubtitles(json.props.pageProps?.animeData?.mappings?.anilist, json.props.pageProps.episode?.number);
         if(subtitles == null) throw('Invalid data while attempting to get subtitles');
-        console.log('Subtitles:', subtitles);
 
         return JSON.stringify({ stream: streamUrl, subtitles: subtitles });
 
-    } catch (e) {
-        console.log('Error:', e);
+    } catch (error) {
+        console.log('Error extracting stream url: ' + error.message);
         return JSON.stringify({ stream: null, subtitles: null });
     }
 }
