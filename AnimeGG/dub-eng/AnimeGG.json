@@ -5,7 +5,7 @@
         "name": "ShadeOfChaos",
         "icon": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeGG/ofchaos.jpg"
     },
-    "version": "1.0.8",
+    "version": "1.0.9",
     "language": "English (DUB)",
     "streamType": "HLS",
     "quality": "720p",

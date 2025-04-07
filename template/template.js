@@ -22,7 +22,7 @@ async function searchResults(keyword) {
         return JSON.stringify(results);
     } catch (error) {
         console.log('Fetch error:' + error.message);
-        return JSON.stringify([{ title: 'Error', image: '', href: '' }]);
+        return JSON.stringify([]);
     }
 }
 

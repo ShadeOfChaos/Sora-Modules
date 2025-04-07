@@ -35,7 +35,7 @@ async function searchResults(keyword) {
         return JSON.stringify(shows);
     } catch (error) {
         console.log('Fetch error:' + error.message);
-        return JSON.stringify([{ title: 'Error', image: '', href: '' }]);
+        return JSON.stringify([]);
     }
 }
 
@@ -196,6 +196,18 @@ async function extractStreamUrl(url) {
         console.log('DEBUG, STAGE 11, ERROR');
         console.log('Error:' + e.message);
         return null;
+    }
+}
+
+async function genericFetch(url, options) {
+    const isNode = (typeof process !== 'undefined') && (process?.release?.name === 'node');
+
+    if(isNode) {
+        return await fetch(url, options);
+
+    } else {
+        const { method, headers, body } = options;
+        return await fetchv2(url, headers, method, JSON.parse(body));
     }
 }
 

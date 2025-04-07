@@ -28,7 +28,7 @@ async function searchResults(keyword) {
 
     } catch (error) {
         console.log('Fetch error:' + error.message);
-        return JSON.stringify([{ title: 'Error', image: '', href: '' }]);
+        return JSON.stringify([]);
     }
 }
 
