@@ -12,7 +12,7 @@
 	"type": "anime",
     "baseUrl": "https://megacloud.club/",
     "searchBaseUrl": "https://www.animeparadise.moe/search?q=%s",
-    "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeParadise.moe/subs-jp-asura/fuckit/AnimeParadise8.js",
+    "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeParadise.moe/subs-jp-asura/fuckit/AnimeParadise9.js",
     "asyncJS": true,
     "streamAsyncJS": true,
     "softsub": true

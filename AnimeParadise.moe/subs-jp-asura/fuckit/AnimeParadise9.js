@@ -18,7 +18,7 @@ async function searchResults(keyword) {
         const data = json?.props?.pageProps?.data;
         if(data == null) throw('Error obtaining data');
 
-        const animesWithSubtitles = null;//await GetAnimes();
+        const animesWithSubtitles = await GetAnimes();
         
         for(let entry of data) {
             if(isInArray(animesWithSubtitles, entry.mappings.anilist) === null) {
@@ -171,29 +171,23 @@ function trimHtml(html, startString, endString) {
     return html.substring(startIndex, endIndex);
 }
 
-// async function GetAnimes() {
-//     const referer = 'SoraApp';
-//     const baseUrl = 'https://asura.ofchaos.com/api/anime';
-//     try {
-//         const response = await fetch(baseUrl, {
-//             method: 'GET',
-//             headers: {
-//                 'Referer': referer
-//             }
-//         });
-//         const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
+async function GetAnimes() {
+    const baseUrl = 'https://asura.ofchaos.com/api/anime';
+    try {
+        const response = await fetch(baseUrl);
+        const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
-//         if(json == null)                 throw('Error parsing Asura json');
-//         if(json?.success !== true)       throw(json?.error);
-//         if(json?.result?.length == null) throw('Error obtaining data from Asura API');
+        if(json == null)                 throw('Error parsing Asura json');
+        if(json?.success !== true)       throw(json?.error);
+        if(json?.result?.length == null) throw('Error obtaining data from Asura API');
 
-//         return json?.result;
+        return json?.result;
 
-//     } catch(error) {
-//         console.log('[ASURA][GetAnimes] Error: ' + error.message);
-//         return [];
-//     }
-// }
+    } catch(error) {
+        console.log('[ASURA][GetAnimes] Error: ' + error.message);
+        return [];
+    }
+}
 
 // async function GetEpisodes(anilistId) {
 //     if(anilistId == null || isNaN(parseInt(anilistId))) {
