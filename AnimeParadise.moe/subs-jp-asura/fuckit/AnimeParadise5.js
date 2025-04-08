@@ -21,7 +21,8 @@ async function searchResults(keyword) {
         const animesWithSubtitles = await GetAnimes();
         
         for(let entry of data) {
-            if(animesWithSubtitles.indexOf(entry.mappings.anilist) <= -1) {
+            let foundEntry = animesWithSubtitles.find(anilistId => { return anilistId == entry.mappings.anilist });
+            if(foundEntry == null) {
                 continue;
             }
 
@@ -34,6 +35,7 @@ async function searchResults(keyword) {
 
         return JSON.stringify(shows);
     } catch (error) {
+        console.log('Test');
         console.log('Fetch error: ' + error.message);
         return JSON.stringify([]);
     }
