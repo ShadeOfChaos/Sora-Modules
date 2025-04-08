@@ -1,14 +1,3 @@
-// //***** LOCAL TESTING
-// const results = await searchResults('cowboy bebop');
-// console.log('RESULTS:', results);
-// const details = await extractDetails(JSON.parse(results)[0].href);
-// console.log('DETAILS:', details);
-// const episodesa = await extractEpisodes(JSON.parse(results)[0].href);
-// // console.log('EPISODES:', episodesa);
-// const streamUrl = await extractStreamUrl(JSON.parse(episodesa)[0].href);
-// console.log('STREAMURL:', streamUrl);
-//***** LOCAL TESTING
-
 /**
  * Searches the website for anime with the given keyword and returns the results
  * @param {string} keyword The keyword to search for
@@ -45,6 +34,7 @@ async function searchResults(keyword) {
 
         return JSON.stringify(shows);
     } catch (error) {
+        console.log('Test');
         console.log('Fetch error: ' + error.message);
         return JSON.stringify([]);
     }
@@ -117,7 +107,7 @@ async function extractEpisodes(url) {
         const episodesWithSubtitlesJson = await GetEpisodes(json.props.pageProps.data?.mappings?.anilist);
         const episodesWithSubtitles = episodesWithSubtitlesJson.map((entry) => entry?.episode);
 
-        for(let i=0,len=episodesList.length; i<len; i++) {
+        for(let i=1,len=episodesList.length; i<=len; i++) {
             if(!episodesWithSubtitles.includes(i)) {
                 continue;
             }
@@ -126,7 +116,7 @@ async function extractEpisodes(url) {
 
             episodes.push({
                 href: url,
-                number: i+1
+                number: i
             })
         }
 
@@ -182,15 +172,9 @@ function trimHtml(html, startString, endString) {
 }
 
 async function GetAnimes() {
-    const referer = 'SoraApp';
     const baseUrl = 'https://asura.ofchaos.com/api/anime';
     try {
-        const response = await fetch(baseUrl, {
-            method: 'GET',
-            headers: {
-                'Referer': referer
-            }
-        });
+        const response = await fetch(baseUrl); // TODO - Add referer when implemented
         const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
         if(json == null)                 throw('Error parsing Asura json');
@@ -210,16 +194,10 @@ async function GetEpisodes(anilistId) {
         return [];
     }
 
-    const referer = 'SoraApp';
     const baseUrl = 'https://asura.ofchaos.com/api/anime';
 
     try {
-        const response = await fetch(`${ baseUrl }/${ anilistId }`, {
-            method: 'GET',
-            headers: {
-                'Referer': referer
-            }
-        });
+        const response = await fetch(`${ baseUrl }/${ anilistId }`); // TODO - Add referer when implemented
         const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
         if(json == null)                 throw('Error parsing Asura json');
