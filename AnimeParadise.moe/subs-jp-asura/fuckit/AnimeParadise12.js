@@ -108,7 +108,7 @@ async function extractEpisodes(url) {
         const episodesWithSubtitles = episodesWithSubtitlesJson.map((entry) => entry?.episode);
 
         for(let i=0,len=episodesList.length; i<len; i++) {
-            if(isInArray(episodesWithSubtitles, i) === null) {
+            if(!episodesWithSubtitles.includes(i)) {
                 continue;
             }
 
@@ -225,14 +225,4 @@ function GetSubtitles(anilistId, episodeNr) {
     const baseUrl = 'https://asura.ofchaos.com/api/anime';
 
     return `${ baseUrl }/${ anilistId }/${ episodeNr }`;
-}
-
-// TODO - Replace this later when array.includes, array.indexof or array.find is available
-function isInArray(array, value) {
-    for(let i=0; i<array.length; i++) {
-        if(array[i] == value) {
-            return value;
-        }
-    }
-    return null;
 }
