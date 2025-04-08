@@ -21,8 +21,7 @@ async function searchResults(keyword) {
         const animesWithSubtitles = await GetAnimes();
         
         for(let entry of data) {
-            let foundEntry = animesWithSubtitles.find(anilistId => { return anilistId == entry.mappings.anilist });
-            if(foundEntry == null) {
+            if(isInArray(animesWithSubtitles, entry.mappings.anilist) === null) {
                 continue;
             }
 
@@ -105,13 +104,13 @@ async function extractEpisodes(url) {
         const episodesList = json?.props?.pageProps?.data?.ep;
         if(episodesList == null) throw('Error obtaining episodes');
 
-        // const episodesWithSubtitlesJson = await GetEpisodes(json.props.pageProps.data?.mappings?.anilist);
-        // const episodesWithSubtitles = episodesWithSubtitlesJson.map((entry) => entry?.episode);
+        const episodesWithSubtitlesJson = await GetEpisodes(json.props.pageProps.data?.mappings?.anilist);
+        const episodesWithSubtitles = episodesWithSubtitlesJson.map((entry) => entry?.episode);
 
         for(let i=0,len=episodesList.length; i<len; i++) {
-            // if(!episodesWithSubtitles.includes(i)) {
-            //     continue;
-            // }
+            if(isInArray(episodesWithSubtitles, i) === null) {
+                continue;
+            }
 
             let url = `${ BASE_URL }${ episodesList[i] }?origin=${ origin }`;
 
@@ -142,7 +141,7 @@ async function extractStreamUrl(url) {
         if (json == null) throw ('Error parsing NEXT_DATA json');
 
         const streamUrl = json?.props?.pageProps?.episode?.streamLink;
-        // const subtitles = GetSubtitles(json.props.pageProps?.animeData?.mappings?.anilist, json.props.pageProps.episode?.number);
+        const subtitles = GetSubtitles(json.props.pageProps?.animeData?.mappings?.anilist, json.props.pageProps.episode?.number);
         if(subtitles == null) throw('Invalid data while attempting to get subtitles');
 
         return JSON.stringify({ stream: streamUrl, subtitles: subtitles });
@@ -196,46 +195,56 @@ async function GetAnimes() {
     }
 }
 
-// async function GetEpisodes(anilistId) {
-//     if(anilistId == null || isNaN(parseInt(anilistId))) {
-//         return [];
-//     }
+async function GetEpisodes(anilistId) {
+    if(anilistId == null || isNaN(parseInt(anilistId))) {
+        return [];
+    }
 
-//     const referer = 'SoraApp';
-//     const baseUrl = 'https://asura.ofchaos.com/api/anime';
+    const referer = 'SoraApp';
+    const baseUrl = 'https://asura.ofchaos.com/api/anime';
 
-//     try {
-//         const response = await fetch(`${ baseUrl }/${ anilistId }`, {
-//             method: 'GET',
-//             headers: {
-//                 'Referer': referer
-//             }
-//         });
-//         const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
+    try {
+        const response = await fetch(`${ baseUrl }/${ anilistId }`, {
+            method: 'GET',
+            headers: {
+                'Referer': referer
+            }
+        });
+        const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
-//         if(json == null)                 throw('Error parsing Asura json');
-//         if(json?.success !== true)       throw(json?.error);
-//         if(json?.result?.length == null) throw('Error obtaining data from Asura API');
+        if(json == null)                 throw('Error parsing Asura json');
+        if(json?.success !== true)       throw(json?.error);
+        if(json?.result?.length == null) throw('Error obtaining data from Asura API');
 
-//         return json?.result;
+        return json?.result;
 
-//     } catch(error) {
-//         console.log('[ASURA][GetEpisodes] Error: ' + error.message);
-//         return [];
-//     }
-// }
+    } catch(error) {
+        console.log('[ASURA][GetEpisodes] Error: ' + error.message);
+        return [];
+    }
+}
 
-// function GetSubtitles(anilistId, episodeNr) {
-//     if(
-//         anilistId == null ||
-//         isNaN(parseInt(anilistId)) ||
-//         episodeNr == null ||
-//         isNaN(parseInt(episodeNr))
-//     ) {
-//         return null;
-//     }
+function GetSubtitles(anilistId, episodeNr) {
+    if(
+        anilistId == null ||
+        isNaN(parseInt(anilistId)) ||
+        episodeNr == null ||
+        isNaN(parseInt(episodeNr))
+    ) {
+        return null;
+    }
 
-//     const baseUrl = 'https://asura.ofchaos.com/api/anime';
+    const baseUrl = 'https://asura.ofchaos.com/api/anime';
 
-//     return `${ baseUrl }/${ anilistId }/${ episodeNr }`;
-// }
+    return `${ baseUrl }/${ anilistId }/${ episodeNr }`;
+}
+
+// TODO - Replace this later when array.includes, array.indexof or array.find is available
+function isInArray(array, value) {
+    for(let i=0; i<array.length; i++) {
+        if(array[i] == value) {
+            return value;
+        }
+    }
+    return null;
+}
