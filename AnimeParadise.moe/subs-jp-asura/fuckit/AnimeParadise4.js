@@ -21,7 +21,7 @@ async function searchResults(keyword) {
         const animesWithSubtitles = await GetAnimes();
         
         for(let entry of data) {
-            if(!animesWithSubtitles.includes(entry.mappings.anilist)) {
+            if(animesWithSubtitles.indexOf(entry.mappings.anilist) <= -1) {
                 continue;
             }
 
