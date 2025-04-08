@@ -21,7 +21,7 @@ async function searchResults(keyword) {
         const animesWithSubtitles = await GetAnimes();
         
         for(let entry of data) {
-            if(isInArray(animesWithSubtitles, entry.mappings.anilist) === null) {
+            if(!animesWithSubtitles.includes(entry.mappings.anilist)) {
                 continue;
             }
 
