@@ -107,7 +107,7 @@ async function extractEpisodes(url) {
         const episodesWithSubtitlesJson = await GetEpisodes(json.props.pageProps.data?.mappings?.anilist);
         const episodesWithSubtitles = episodesWithSubtitlesJson.map((entry) => entry?.episode);
 
-        for(let i=0,len=episodesList.length; i<len; i++) {
+        for(let i=1,len=episodesList.length; i<=len; i++) {
             if(!episodesWithSubtitles.includes(i)) {
                 continue;
             }
@@ -116,7 +116,7 @@ async function extractEpisodes(url) {
 
             episodes.push({
                 href: url,
-                number: i+1
+                number: i
             })
         }
 
