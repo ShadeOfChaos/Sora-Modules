@@ -11,7 +11,7 @@ async function searchResults(keyword) {
     const REGEX = /coverimg' src='([\s\S]*?)'[\s\S]*?href='([\s\S]*?)'[\s\S]*?>([\s\S]*?)</g;
 
     try {
-        const response = await fetch(`${ SEARCH_URL }${ encodeURIComponent(keyword) }`);
+        const response = await soraFetch(`${ SEARCH_URL }${ encodeURIComponent(keyword) }`);
         const html = typeof response === 'object' ? await response.text() : await response;
 
         const matches = html.matchAll(REGEX);
@@ -41,7 +41,7 @@ async function extractDetails(url) {
     const REGEX = /infotitlejp c'>([\s\S]*?)<[\s\S]*?infodes c'>([\s\S]*?)<[\s\S]*?Year:[\s\S]*?>([\s\S]*?)</;
 
     try {
-        const response = await fetch(url);
+        const response = await soraFetch(url);
         const html = typeof response === 'object' ? await response.text() : await response;
 
         const match = html.match(REGEX);
@@ -73,7 +73,7 @@ async function extractEpisodes(url) {
     const REGEX = /href='(episode[\s\S]*?)'[\s\S]*?watch2[\s\S]*?>([\s\S]*?)</g;
 
     try {
-        const response = await fetch(url);
+        const response = await soraFetch(url);
         const html = typeof response === 'object' ? await response.text() : await response;
 
         const matches = html.matchAll(REGEX);
@@ -102,7 +102,7 @@ async function extractStreamUrl(url) {
     const REGEX = /source src='([\s\S]*?)'/g;
 
     try {
-        const response = await fetch(url);
+        const response = await soraFetch(url);
         const html = typeof response === 'object' ? await response.text() : await response;
 
         const matches = html.matchAll(REGEX);
@@ -116,5 +116,17 @@ async function extractStreamUrl(url) {
     } catch (error) {
         console.log('Fetch error:' + error.message);
         return null;
+    }
+}
+
+async function soraFetch(url, options = { headers: {}, method: 'GET', body: null }) {
+    try {
+        return await fetchv2(url, options.headers ?? {}, options.method ?? 'GET', options.body ?? null);
+    } catch(e) {
+        try {
+            return await fetch(url, options);
+        } catch(error) {
+            return null;
+        }
     }
 }
