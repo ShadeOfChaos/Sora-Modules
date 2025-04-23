@@ -24,7 +24,7 @@ async function searchResults(keyword) {
     const REGEX = /a href="([\s\S]+?)"[\s\S]+?img src="([\s\S]+?)"[\s\S]+?h2>([\s\S]+?)</g;
 
     try {
-        const response = await fetch(`${SEARCH_URL}${encodeURI(keyword)}`);
+        const response = await soraFetch(`${SEARCH_URL}${encodeURI(keyword)}`);
         const html = typeof response === 'object' ? await response.text() : await response;
 
         const trimmedHtml = trimText(html, 'class="moose page"', 'class="container"');
@@ -55,7 +55,7 @@ async function extractDetails(url) {
     const REGEX = /(?:Alternate Titles: ([\s\S]+?)<[\s\S]+?ptext">([\s\S]+?)<)|(?:ptext">([\s\S]+?)<)/;
 
     try {
-        const response = await fetch(url);
+        const response = await soraFetch(url);
         const html = typeof response === 'object' ? await response.text() : await response;
 
         const trimmedHtml = trimText(html, '"media-body"', 'class="upbit"');
@@ -90,7 +90,7 @@ async function extractEpisodes(url) {
     let dubbed_episodes = [];
 
     try {
-        const response = await fetch(url);
+        const response = await soraFetch(url);
         const html = typeof response === 'object' ? await response.text() : await response;
 
         const trimmedHtml = trimText(html, 'class="newmanga"', '</ul>');
@@ -130,14 +130,14 @@ async function extractStreamUrl(url) {
     const SOURCES_REGEX = /file: "([\s\S]+?)", label: "([\s\S]+?)", bk: "([\s\S]*?)", isBk: (false|true)/g;
 
     try {
-        const response = await fetch(url);
+        const response = await soraFetch(url);
         const html = typeof response === 'object' ? await response.text() : await response;
 
         const trimmedHtml = trimText(html, 'tab-content', 'class="container"');
         
         const embedUrl = FORMAT === 'SUB' ? trimmedHtml.match(SUB_REGEX)[1] : trimmedHtml.match(DUB_REGEX)[1];
 
-        const embedResponse = await fetch(`${ BASE_URL }${ embedUrl }`);
+        const embedResponse = await soraFetch(`${ BASE_URL }${ embedUrl }`);
         const embedHtml = typeof embedResponse === 'object' ? await embedResponse.text() : await embedResponse;
 
         const trimmedEmbed = trimText(embedHtml, 'var videoSources = ', ';');
@@ -197,4 +197,16 @@ function atob(input) {
     }
 
     return output;
+}
+
+async function soraFetch(url, options = { headers: {}, method: 'GET', body: null }) {
+    try {
+        return await fetchv2(url, options.headers ?? {}, options.method ?? 'GET', options.body ?? null);
+    } catch(e) {
+        try {
+            return await fetch(url, options);
+        } catch(error) {
+            return null;
+        }
+    }
 }
