@@ -167,10 +167,7 @@ function trimHtml(html, startString, endString) {
 
 async function soraFetch(url, options = { headers: {}, method: 'GET', body: null }) {
     try {
-        const res = await fetchv2(url, options.headers ?? {}, options.method ?? 'GET', options.body ?? null);
-        const resStatus = res.ok ? ' YES' : ' NO';
-        console.log('Fetchv2 working?' + resStatus);
-        return res;
+        return await fetchv2(url, options.headers ?? {}, options.method ?? 'GET', options.body ?? null);
     } catch(e) {
         try {
             return await fetch(url, options);
