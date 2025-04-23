@@ -44,7 +44,7 @@ async function searchResults(keyword) {
     try {
         const page = 1;
         const limit = 24;
-        const response = await fetch(`${ UTILITY_URL }/api/anime/search?keyword=${encodeURIComponent(keyword)}&page=${ page }&limit=${ limit }`);
+        const response = await soraFetch(`${ UTILITY_URL }/api/anime/search?keyword=${encodeURIComponent(keyword)}&page=${ page }&limit=${ limit }`);
         const data = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
         if(data?.status == false || data?.result?.movies?.length <= 0) {
@@ -74,7 +74,7 @@ async function extractDetails(url) {
     const movieId = url.split('.').pop();
 
     try {
-        const response = await fetch(`${ UTILITY_URL }/api/anime/info/${ movieId }`);
+        const response = await soraFetch(`${ UTILITY_URL }/api/anime/info/${ movieId }`);
         const data = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
         if(data?.status == false || data?.result == null) {
@@ -142,7 +142,7 @@ async function extractEpisodes(url) {
         const streamType = 'sub';
         var episodes = [];
 
-        const response = await fetch(`${ UTILITY_URL }/api/anime/episodes?movieId=${ movieId }`);
+        const response = await soraFetch(`${ UTILITY_URL }/api/anime/episodes?movieId=${ movieId }`);
         const data = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
         if(data?.status == false || data?.result == null) {
@@ -208,7 +208,7 @@ async function extractStreamUrl(url) {
             throw('Invalid _movieId provided');
         }
 
-        const serversResponse = await fetch(`${ UTILITY_URL }/api/anime/servers/${ id }?episode=${ episode }`);
+        const serversResponse = await soraFetch(`${ UTILITY_URL }/api/anime/servers/${ id }?episode=${ episode }`);
         const serversData = typeof serversResponse === 'object' ? await serversResponse.json() : await JSON.parse(serversResponse);
 
         if(serversData.status == false || serversData.result == null) {
@@ -233,7 +233,7 @@ async function extractStreamUrl(url) {
             serverObject = serverObjects[0].server;
         }
 
-        const sourceResponse = await fetch(`${ UTILITY_URL }/api/anime/sources?movieId=${ id }&episode=${ episode }&server=${ server }&format=${ format }`);
+        const sourceResponse = await soraFetch(`${ UTILITY_URL }/api/anime/sources?movieId=${ id }&episode=${ episode }&server=${ server }&format=${ format }`);
         const sourceData = typeof sourceResponse === 'object' ? await sourceResponse.json() : await JSON.parse(sourceResponse);
 
         if(
@@ -249,11 +249,11 @@ async function extractStreamUrl(url) {
 
         // Older version which might or might not work, new method incorporates getting the embed from the source
         // const hlsUrl = `${ UTILITY_URL }/api/anime/hls/${ id }?episode=${ episode }&server=${ server }&format=${ format }`;
-        // const hlsResponse = await fetch(hlsUrl);
+        // const hlsResponse = await soraFetch(hlsUrl);
         // const hlsData = await JSON.parse(hlsResponse);
 
         const hlsUrl = `${ UTILITY_URL }/api/anime/embed/convert?embedUrl=${ encodeURIComponent(source) }&host=${ encodeURIComponent(SOURCE_BASE_URL) }`;
-        const hlsResponse = await fetch(hlsUrl);
+        const hlsResponse = await soraFetch(hlsUrl);
         const hlsData = typeof hlsResponse === 'object' ? await hlsResponse.json() : await JSON.parse(hlsResponse);
 
         if(hlsData?.status == false || hlsData?.result == null || hlsData?.error != null) {
@@ -320,5 +320,17 @@ async function extractStreamUrl(url) {
     } catch (error) {
         console.log('Fetch error:', error);
         return JSON.stringify({ stream: null, subtitles: null });
+    }
+}
+
+async function soraFetch(url, options = { headers: {}, method: 'GET', body: null }) {
+    try {
+        return await fetchv2(url, options.headers ?? {}, options.method ?? 'GET', options.body ?? null);
+    } catch(e) {
+        try {
+            return await fetch(url, options);
+        } catch(error) {
+            return null;
+        }
     }
 }
