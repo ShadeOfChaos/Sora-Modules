@@ -10,7 +10,7 @@ async function searchResults(keyword) {
     var shows = [];
 
     try {
-        const response = await fetch(`${SEARCH_URL}${encodeURI(keyword)}`);
+        const response = await soraFetch(`${SEARCH_URL}${encodeURI(keyword)}`);
         const html = typeof response === 'object' ? await response.text() : await response;
         
         const matches = html.matchAll(REGEX);
@@ -39,7 +39,7 @@ async function extractDetails(url) {
     const REGEX = /style_specs_header_year.+?>.+([0-9]{4})[\s\S]+style_specs_container_middle.+?>([\s\S]+?)</g;
 
     try {
-        const response = await fetch(url);
+        const response = await soraFetch(url);
         const html = typeof response === 'object' ? await response.text() : await response;
 
         const json = getNextData(html);
@@ -82,7 +82,7 @@ async function extractEpisodes(url) {
     const BASE_URL = 'https://www.animeparadise.moe/watch/';
 
     try {
-        const response = await fetch(url);
+        const response = await soraFetch(url);
         const html = typeof response === 'object' ? await response.text() : await response;
         var episodes = [];
 
@@ -117,7 +117,7 @@ async function extractEpisodes(url) {
  */
 async function extractStreamUrl(url) {
     try {
-        const response = await fetch(url);
+        const response = await soraFetch(url);
         const html = typeof response === 'object' ? await response.text() : await response;
 
         const json = getNextData(html);
@@ -151,4 +151,16 @@ function trimHtml(html, startString, endString) {
     const startIndex = html.indexOf(startString);
     const endIndex = html.indexOf(endString, startIndex);
     return html.substring(startIndex, endIndex);
+}
+
+async function soraFetch(url, options = { headers: {}, method: 'GET', body: null }) {
+    try {
+        return await fetchv2(url, options.headers ?? {}, options.method ?? 'GET', options.body ?? null);
+    } catch(e) {
+        try {
+            return await fetch(url, options);
+        } catch(error) {
+            return null;
+        }
+    }
 }
