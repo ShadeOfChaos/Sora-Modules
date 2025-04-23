@@ -22,7 +22,7 @@ async function searchResults(keyword) {
 
     try {
         const response = await soraFetch(`${SEARCH_URL}${encodeURI(keyword)}`);
-        const html = typeof response === 'object' ? await response.text() : await response;
+        const html = await response.text();
 
 
         const matches = html.matchAll(REGEX);
@@ -52,7 +52,7 @@ async function extractDetails(url) {
 
     try {
         const response = await soraFetch(url);
-        const html = typeof response === 'object' ? await response.text() : await response;
+        const html = await response.text();
 
         const json = getNextData(html);
         if (json == null) throw('Error parsing NEXT_DATA json');
@@ -95,7 +95,7 @@ async function extractEpisodes(url) {
 
     try {
         const response = await soraFetch(url);
-        const html = typeof response === 'object' ? await response.text() : await response;
+        const html = await response.text();
         var episodes = [];
 
         const json = getNextData(html);
@@ -130,7 +130,7 @@ async function extractEpisodes(url) {
 async function extractStreamUrl(url) {
     try {
         const response = await soraFetch(url);
-        const html = typeof response === 'object' ? await response.text() : await response;
+        const html = await response.text();
 
         const json = getNextData(html);
         if (json == null) throw ('Error parsing NEXT_DATA json');
