@@ -9,7 +9,7 @@ async function searchResults(keyword) {
     var shows = [];
 
     try {
-        const response = await fetch(`${SEARCH_URL}${encodeURI(keyword)}`);
+        const response = await soraFetch(`${SEARCH_URL}${encodeURI(keyword)}`);
         const html = typeof response === 'object' ? await response.text() : await response;
 
         const json = getNextData(html);
@@ -49,7 +49,7 @@ async function extractDetails(url) {
     const REGEX = /style_specs_header_year.+?>.+([0-9]{4})[\s\S]+style_specs_container_middle.+?>([\s\S]+?)</g;
 
     try {
-        const response = await fetch(url);
+        const response = await soraFetch(url);
         const html = typeof response === 'object' ? await response.text() : await response;
 
         const json = getNextData(html);
@@ -92,7 +92,7 @@ async function extractEpisodes(url) {
     const BASE_URL = 'https://www.animeparadise.moe/watch/';
 
     try {
-        const response = await fetch(url);
+        const response = await soraFetch(url);
         const html = typeof response === 'object' ? await response.text() : await response;
         var episodes = [];
 
@@ -134,7 +134,7 @@ async function extractEpisodes(url) {
  */
 async function extractStreamUrl(url) {
     try {
-        const response = await fetch(url);
+        const response = await soraFetch(url);
         const html = typeof response === 'object' ? await response.text() : await response;
 
         const json = getNextData(html);
@@ -173,8 +173,9 @@ function trimHtml(html, startString, endString) {
 
 async function GetAnimes() {
     const baseUrl = 'https://asura.ofchaos.com/api/anime';
+    const referer = 'SoraApp';
     try {
-        const response = await fetch(baseUrl); // TODO - Add referer when implemented
+        const response = await soraFetch(baseUrl, { headers: { 'Referer': referer } });
         const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
         if(json == null)                 throw('Error parsing Asura json');
@@ -195,9 +196,10 @@ async function GetEpisodes(anilistId) {
     }
 
     const baseUrl = 'https://asura.ofchaos.com/api/anime';
+    const referer = 'SoraApp';
 
     try {
-        const response = await fetch(`${ baseUrl }/${ anilistId }`); // TODO - Add referer when implemented
+        const response = await soraFetch(`${ baseUrl }/${ anilistId }`, { headers: { 'Referer': referer } });
         const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
         if(json == null)                 throw('Error parsing Asura json');
@@ -225,4 +227,17 @@ function GetSubtitles(anilistId, episodeNr) {
     const baseUrl = 'https://asura.ofchaos.com/api/anime';
 
     return `${ baseUrl }/${ anilistId }/${ episodeNr }`;
+}
+
+// Uses Sora's fetchv2 on ipad, fallbacks to regular fetch on Windows
+async function soraFetch(url, options = { headers: {}, method: 'GET', body: null }) {
+    try {
+        return await fetchv2(url, options.headers ?? {}, options.method ?? 'GET', options.body ?? null);
+    } catch(e) {
+        try {
+            return await fetch(url, options);
+        } catch(error) {
+            return null;
+        }
+    }
 }
