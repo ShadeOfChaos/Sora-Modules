@@ -10,7 +10,7 @@ async function searchResults(keyword) {
 
     try {
         const response = await soraFetch(`${SEARCH_URL}${encodeURI(keyword)}`);
-        const html = typeof response === 'object' ? await response.text() : await response;
+        const html = response.text();
 
         const json = getNextData(html);
         if (json == null) throw('Error parsing NEXT_DATA json');
@@ -50,7 +50,7 @@ async function extractDetails(url) {
 
     try {
         const response = await soraFetch(url);
-        const html = typeof response === 'object' ? await response.text() : await response;
+        const html = response.text();
 
         const json = getNextData(html);
         if (json == null) throw('Error parsing NEXT_DATA json');
@@ -93,7 +93,7 @@ async function extractEpisodes(url) {
 
     try {
         const response = await soraFetch(url);
-        const html = typeof response === 'object' ? await response.text() : await response;
+        const html = response.text();
         var episodes = [];
 
         const json = getNextData(html);
@@ -135,7 +135,7 @@ async function extractEpisodes(url) {
 async function extractStreamUrl(url) {
     try {
         const response = await soraFetch(url);
-        const html = typeof response === 'object' ? await response.text() : await response;
+        const html = response.text();
 
         const json = getNextData(html);
         if (json == null) throw ('Error parsing NEXT_DATA json');
@@ -176,7 +176,7 @@ async function GetAnimes() {
     const referer = 'SoraApp';
     try {
         const response = await soraFetch(baseUrl, { headers: { 'Referer': referer } });
-        const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
+        const json = await response.json();
 
         if(json == null)                 throw('Error parsing Asura json');
         if(json?.success !== true)       throw(json?.error);
@@ -200,7 +200,7 @@ async function GetEpisodes(anilistId) {
 
     try {
         const response = await soraFetch(`${ baseUrl }/${ anilistId }`, { headers: { 'Referer': referer } });
-        const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
+        const json = await response.json();
 
         if(json == null)                 throw('Error parsing Asura json');
         if(json?.success !== true)       throw(json?.error);
