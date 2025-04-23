@@ -1,12 +1,12 @@
 // // //***** LOCAL TESTING
-const results = await searchResults('Solo leveling');
-console.log('RESULTS:', results);
-const details = await extractDetails(JSON.parse(results)[0].href);
-console.log('DETAILS:', details);
-const episodesa = await extractEpisodes(JSON.parse(results)[0].href);
-console.log('EPISODES:', episodesa);
-const streamUrl = await extractStreamUrl(JSON.parse(episodesa)[0].href);
-console.log('STREAMURL:', streamUrl);
+// const results = await searchResults('Solo leveling');
+// console.log('RESULTS:', results);
+// const details = await extractDetails(JSON.parse(results)[0].href);
+// console.log('DETAILS:', details);
+// const episodesa = await extractEpisodes(JSON.parse(results)[0].href);
+// console.log('EPISODES:', episodesa);
+// const streamUrl = await extractStreamUrl(JSON.parse(episodesa)[0].href);
+// console.log('STREAMURL:', streamUrl);
 //***** LOCAL TESTING
 
 /**
@@ -21,7 +21,7 @@ async function searchResults(keyword) {
     var shows = [];
 
     try {
-        const response = await fetch(`${SEARCH_URL}${encodeURI(keyword)}`);
+        const response = await soraFetch(`${SEARCH_URL}${encodeURI(keyword)}`);
         const html = typeof response === 'object' ? await response.text() : await response;
 
 
@@ -51,7 +51,7 @@ async function extractDetails(url) {
     const REGEX = /style_specs_header_year.+?>.+([0-9]{4})[\s\S]+style_specs_container_middle.+?>([\s\S]+?)</g;
 
     try {
-        const response = await fetch(url);
+        const response = await soraFetch(url);
         const html = typeof response === 'object' ? await response.text() : await response;
 
         const json = getNextData(html);
@@ -94,7 +94,7 @@ async function extractEpisodes(url) {
     const BASE_URL = 'https://www.animeparadise.moe/watch/';
 
     try {
-        const response = await fetch(url);
+        const response = await soraFetch(url);
         const html = typeof response === 'object' ? await response.text() : await response;
         var episodes = [];
 
@@ -129,7 +129,7 @@ async function extractEpisodes(url) {
  */
 async function extractStreamUrl(url) {
     try {
-        const response = await fetch(url);
+        const response = await soraFetch(url);
         const html = typeof response === 'object' ? await response.text() : await response;
 
         const json = getNextData(html);
@@ -163,4 +163,19 @@ function trimHtml(html, startString, endString) {
     const startIndex = html.indexOf(startString);
     const endIndex = html.indexOf(endString, startIndex);
     return html.substring(startIndex, endIndex);
+}
+
+async function soraFetch(url, options = { headers: {}, method: 'GET', body: null }) {
+    try {
+        const res = await fetchv2(url, options.headers ?? {}, options.method ?? 'GET', options.body ?? null);
+        const resStatus = res.ok ? ' YES' : ' NO';
+        console.log('Fetchv2 working?' + resStatus);
+        return res;
+    } catch(e) {
+        try {
+            return await fetch(url, options);
+        } catch(error) {
+            return null;
+        }
+    }
 }
