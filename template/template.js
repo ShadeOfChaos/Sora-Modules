@@ -270,3 +270,16 @@ function unpack(source) {
         return source;
     }
 }
+
+// Uses Sora's fetchv2 on ipad, fallbacks to regular fetch on Windows
+async function soraFetch(url, options = { headers: {}, method: 'GET', body: null }) {
+    try {
+        return await fetchv2(url, options.headers ?? {}, options.method ?? 'GET', options.body ?? null);
+    } catch(e) {
+        try {
+            return await fetch(url, options);
+        } catch(error) {
+            return null;
+        }
+    }
+}
