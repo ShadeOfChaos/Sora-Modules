@@ -21,9 +21,7 @@ async function searchResults(keyword) {
     try {
         const encodedKeyword = encodeURIComponent(keyword);
         const response = await soraFetch(searchUrl + encodedKeyword);
-        const json = await response.json();
-
-        console.log(json);
+        const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
         const jsonResults = json.results || [];
 
@@ -47,7 +45,7 @@ async function searchResults(keyword) {
 async function extractDetails(slug) {
     try {
         const response = await soraFetch(detailsUrl + slug);
-        const json = await response.json();
+        const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
         const details = {
             description: '',
@@ -89,7 +87,7 @@ async function extractDetails(slug) {
 async function extractEpisodes(slug) {
     try {
         const response = await soraFetch(episodesUrl + slug);
-        const json = await response.json();
+        const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
         const episodes = json.map(ep => {
             return {
@@ -112,7 +110,7 @@ async function extractStreamUrl(url) {
 
     try {
         const response = await soraFetch(url);
-        const json = await response.json();
+        const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
         const acceptableStreams = json.filter(stream => acceptabledProviders.includes(stream.embed_name));
         if(acceptableStreams.length <= 0) throw('No valid streams found');
