@@ -94,13 +94,15 @@ async function extractEpisodes(slug) {
 }
 
 async function extractStreamUrl(url) {
+    const typeMap = { 'SUB': 2, 'DUB': 3, 'MULTI': 4 };
+    const moduleType = 'SUB';
     const acceptabledProviders = ['Streamwish'];
 
     try {
         const response = await soraFetch(url);
         const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
-        const acceptableStreams = json.filter(stream => acceptabledProviders.includes(stream.embed_name));
+        const acceptableStreams = json.filter(stream => acceptabledProviders.includes(stream.embed_name) && stream.embed_type == typeMap[moduleType]);
         if(acceptableStreams.length <= 0) throw('No valid streams found');
         
         const frameUrl = acceptableStreams[0].embed_frame;
