@@ -40,7 +40,7 @@ async function searchResults(keyword) {
         return JSON.stringify(matchesArray);
 
     } catch (error) {
-        console.log('Fetch error:', error.message);
+        console.log('Fetch error:' + error.message);
         return JSON.stringify([]);
     }
 }
@@ -69,7 +69,7 @@ async function extractDetails(url) {
 
         return JSON.stringify([details]);
     } catch(error) {
-        console.log('Details error:', error.message);
+        console.log('Details error:' + error.message);
         return JSON.stringify([{
             description: 'Error loading description',
             aliases: '',
@@ -113,7 +113,7 @@ async function extractEpisodes(url) {
         return JSON.stringify(dubbed_episodes.reverse());
 
     } catch (error) {
-        console.log('Fetch error:', error.message);
+        console.log('Fetch error:' + error.message);
         return JSON.stringify([]);
     }
 }
@@ -161,7 +161,7 @@ async function extractStreamUrl(url) {
         return source.file;
 
     } catch(e) {
-        console.log('Error:', e.message);
+        console.log('Error: ' + error.message);
         return null;
     }
 }

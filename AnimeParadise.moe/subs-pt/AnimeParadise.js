@@ -25,7 +25,7 @@ async function searchResults(keyword) {
 
         return JSON.stringify(shows);
     } catch (error) {
-        console.log('Fetch error:', error);
+        console.log('Fetch error: ' + error.message);
         return JSON.stringify([]);
     }
 }
@@ -63,7 +63,7 @@ async function extractDetails(url) {
         return JSON.stringify([details]);
 
     } catch (error) {
-        console.log('Details error:', error);
+        console.log('Details error: ' + error.message);
         return JSON.stringify([{
             description: 'Error loading description',
             aliases: 'Duration: Unknown',
@@ -100,7 +100,7 @@ async function extractEpisodes(url) {
 
         return JSON.stringify(episodes);
     } catch (error) {
-        console.log('Fetch error:', error);
+        console.log('Fetch error: ' + error.message);
         return JSON.stringify([]);
     }
 }
@@ -125,7 +125,7 @@ async function extractStreamUrl(url) {
         return JSON.stringify({ stream: streamUrl, subtitles: subtitles?.src });
 
     } catch (e) {
-        console.log('Error:', e);
+        console.log('Error: ' + e.message);
         return JSON.stringify({ stream: null, subtitles: null });
     }
 }
@@ -156,7 +156,7 @@ async function getEpisodesWithLanguageSubs(episodeUrl, language = 'English', typ
 
         return episodes;
     } catch(e) {
-        console.log('Error:', e);
+        console.log('Error: ' + e.message);
         return [];
     }
 }

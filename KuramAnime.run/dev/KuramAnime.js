@@ -64,7 +64,7 @@ async function extractDetails(url) {
         return JSON.stringify([details]);
 
     } catch (error) {
-        console.log('Details error:', error);
+        console.log('Details error: ' + error.message);
         return JSON.stringify([{
             description: 'Error loading description',
             aliases: 'Duration: Unknown',
