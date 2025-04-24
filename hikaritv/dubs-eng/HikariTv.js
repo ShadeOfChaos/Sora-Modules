@@ -1,16 +1,3 @@
-// // //***** LOCAL TESTING
-(async () => {
-    const results = await searchResults('Solo leveling');
-    console.log('RESULTS:', results);
-    const details = await extractDetails(JSON.parse(results)[0].href);
-    console.log('DETAILS:', details);
-    const eps = await extractEpisodes(JSON.parse(results)[0].href);
-    console.log('EPISODES:', eps);
-    const streamUrl = await extractStreamUrl(JSON.parse(eps)[0].href);
-    console.log('STREAMURL:', streamUrl);
-})();
-//***** LOCAL TESTING
-
 async function searchResults(keyword) {
     const searchUrl = "https://api.hikari.gg/api/anime/?sort=created_at&order=asc&page=1&search=";
 
