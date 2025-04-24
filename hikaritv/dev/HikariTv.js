@@ -22,6 +22,7 @@ async function searchResults(keyword) {
         const encodedKeyword = encodeURIComponent(keyword);
         const response = await soraFetch(searchUrl + encodedKeyword);
         const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
+        console.log('JSON: ' + JSON.stringify(json));
 
         const jsonResults = json.results || [];
 
@@ -37,7 +38,7 @@ async function searchResults(keyword) {
 
         return JSON.stringify(results);
     } catch (error) {
-        console.log('soraFetch error:', error);
+        console.log('soraFetch error: ' + error.message);
         return JSON.stringify([]);
     }
 }
