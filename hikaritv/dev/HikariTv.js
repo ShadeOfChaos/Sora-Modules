@@ -1,9 +1,3 @@
-const baseUrl = "https://hikaritv.gg/";
-const searchUrl = "https://api.hikari.gg/api/anime/?sort=created_at&order=asc&page=1&search=";
-const detailsUrl = "https://api.hikari.gg/api/anime/uid/";
-const episodesUrl = "https://api.hikari.gg/api/episode/uid/";
-const embedUrl = "https://api.hikari.gg/api/embed/";
-
 // // //***** LOCAL TESTING
 // (async () => {
 //     const results = await searchResults('Solo leveling');
@@ -18,6 +12,8 @@ const embedUrl = "https://api.hikari.gg/api/embed/";
 //***** LOCAL TESTING
 
 async function searchResults(keyword) {
+    const searchUrl = "https://api.hikari.gg/api/anime/?sort=created_at&order=asc&page=1&search=";
+
     try {
         const encodedKeyword = encodeURIComponent(keyword);
         const response = await soraFetch(searchUrl + encodedKeyword);
@@ -44,6 +40,8 @@ async function searchResults(keyword) {
 }
 
 async function extractDetails(slug) {
+    const detailsUrl = "https://api.hikari.gg/api/anime/uid/";
+
     try {
         const response = await soraFetch(detailsUrl + slug);
         const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
@@ -86,6 +84,9 @@ async function extractDetails(slug) {
 }
 
 async function extractEpisodes(slug) {
+    const episodesUrl = "https://api.hikari.gg/api/episode/uid/";
+    const embedUrl = "https://api.hikari.gg/api/embed/";
+
     try {
         const response = await soraFetch(episodesUrl + slug);
         const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
