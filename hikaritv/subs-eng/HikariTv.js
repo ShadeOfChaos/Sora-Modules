@@ -168,8 +168,8 @@ function unpack(str) {
     var chunks = get_chunks(str),
     chunk;
     for (var i = 0; i < chunks.length; i++) {
-    chunk = chunks[i].replace(/\n$/, '');
-    str = str.split(chunk).join(unpack_chunk(chunk));
+        chunk = chunks[i].replace(/\n$/, '');
+        str = str.split(chunk).join(unpack_chunk(chunk));
     }
     return str;
 }
@@ -178,18 +178,18 @@ function unpack_chunk(str) {
     var unpacked_source = '';
     var __eval = eval;
     if (detect(str)) {
-    try {
-        eval = function (s) {
-        unpacked_source += s;
-        return unpacked_source;
-        };
-        __eval(str);
-        if (typeof unpacked_source === 'string' && unpacked_source) {
-        str = unpacked_source;
+        try {
+            eval = function (s) {
+            unpacked_source += s;
+            return unpacked_source;
+            };
+            __eval(str);
+            if (typeof unpacked_source === 'string' && unpacked_source) {
+            str = unpacked_source;
+            }
+        } catch (e) {
+            // well, it failed. we'll just return the original, instead of crashing on user.
         }
-    } catch (e) {
-        // well, it failed. we'll just return the original, instead of crashing on user.
-    }
     }
     eval = __eval;
     return str;
