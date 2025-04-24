@@ -74,7 +74,7 @@ async function extractDetails(slug) {
         return JSON.stringify([details]);
 
     } catch (error) {
-        console.log('Details error:', error);
+        console.log('Details error: '  + error.message);
         return JSON.stringify([{
             description: 'Error loading description',
             aliases: '',
@@ -101,7 +101,7 @@ async function extractEpisodes(slug) {
 
         return JSON.stringify(episodes);        
     } catch (error) {
-        console.error('soraFetch error:', error);
+        console.error('soraFetch error: ' + error.message);
         return JSON.stringify([]);
     }
 }
@@ -150,7 +150,7 @@ async function extractStreamUrl(url) {
         return streamUrl;
 
     } catch(error) {
-        console.error('soraFetch error:', error);
+        console.error('soraFetch error: ' + error.message);
         return null;
     }
 }
