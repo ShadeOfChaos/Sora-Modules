@@ -87,7 +87,7 @@
 </span>
 <br><br>
 
-<span><img src="https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeGG/logo_readme.png" width="125px" align="left"><br>
+<span><img src="https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/hikaritv/logo_readme.png" width="125px" align="left"><br>
 **Source:** HikariTV.gg<br>
 **Language:** English (HARDSUB)<br>
 **Minimum Sora version required:** 0.2.2<br>
