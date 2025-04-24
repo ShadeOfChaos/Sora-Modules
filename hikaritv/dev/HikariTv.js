@@ -1,14 +1,14 @@
 // // //***** LOCAL TESTING
-// (async () => {
-//     const results = await searchResults('Solo leveling');
-//     console.log('RESULTS:', results);
-//     const details = await extractDetails(JSON.parse(results)[0].href);
-//     console.log('DETAILS:', details);
-//     const eps = await extractEpisodes(JSON.parse(results)[0].href);
-//     console.log('EPISODES:', eps);
-//     const streamUrl = await extractStreamUrl(JSON.parse(eps)[0].href);
-//     console.log('STREAMURL:', streamUrl);
-// })();
+(async () => {
+    const results = await searchResults('Solo leveling');
+    console.log('RESULTS:', results);
+    const details = await extractDetails(JSON.parse(results)[0].href);
+    console.log('DETAILS:', details);
+    const eps = await extractEpisodes(JSON.parse(results)[0].href);
+    console.log('EPISODES:', eps);
+    const streamUrl = await extractStreamUrl(JSON.parse(eps)[0].href);
+    console.log('STREAMURL:', streamUrl);
+})();
 //***** LOCAL TESTING
 
 async function searchResults(keyword) {
@@ -107,13 +107,15 @@ async function extractEpisodes(slug) {
 }
 
 async function extractStreamUrl(url) {
+    const typeMap = { 'SUB': 2, 'DUB': 3, 'MULTI': 4 };
+    const moduleType = 'SUB';
     const acceptabledProviders = ['Streamwish'];
 
     try {
         const response = await soraFetch(url);
         const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
-        const acceptableStreams = json.filter(stream => acceptabledProviders.includes(stream.embed_name));
+        const acceptableStreams = json.filter(stream => acceptabledProviders.includes(stream.embed_name) && stream.embed_type == typeMap[moduleType]);
         if(acceptableStreams.length <= 0) throw('No valid streams found');
         
         const frameUrl = acceptableStreams[0].embed_frame;
