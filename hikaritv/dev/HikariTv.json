@@ -5,13 +5,13 @@
        "name": "ShadeOfChaos",
        "icon": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/hikaritv/ofchaos.jpg"
    },
-   "version": "1.0.3",
+   "version": "1.0.0",
    "language": "English (SUB)",
    "streamType": "HLS",
    "quality": "1080p",
 	"type": "anime",
-   "baseUrl": "https://watch.hikaritv.xyz/",
-   "searchBaseUrl": "https://watch.hikaritv.xyz/search?keyword=%s",
+   "baseUrl": "https://hikaritv.gg/",
+   "searchBaseUrl": "https://api.hikari.gg/api/anime/?sort=created_at&order=asc&page=1&search=%s",
    "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/HikariTV/dev/HikariTv.js",
    "asyncJS": true,
    "streamAsyncJS": true
