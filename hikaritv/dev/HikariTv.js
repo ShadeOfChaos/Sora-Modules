@@ -18,17 +18,12 @@ const embedUrl = "https://api.hikari.gg/api/embed/";
 //***** LOCAL TESTING
 
 async function searchResults(keyword) {
-    console.log('Searching for: ' + keyword);
     try {
         const encodedKeyword = encodeURIComponent(keyword);
-        console.log('Searching for encoded: ' + encodedKeyword);
         const response = await soraFetch(searchUrl + encodedKeyword);
-        console.log('Search for url: ' + searchUrl + encodedKeyword);
         const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
-        console.log('Json string: ' + JSON.stringify(json));
 
-        const jsonResults = json.results ?? [];
-        console.log('Json results: ' + JSON.stringify(jsonResults));
+        const jsonResults = json.results || [];
 
         // uid = Hikari internal slug
         if(jsonResults.length <= 0) throw("No results found");
@@ -42,7 +37,7 @@ async function searchResults(keyword) {
 
         return JSON.stringify(results);
     } catch (error) {
-        console.log('soraFetch error:' + error.message);
+        console.log('soraFetch error:', error);
         return JSON.stringify([]);
     }
 }
@@ -80,7 +75,7 @@ async function extractDetails(slug) {
         return JSON.stringify([details]);
 
     } catch (error) {
-        console.log('Details error: ' + error.message);
+        console.log('Details error:', error);
         return JSON.stringify([{
             description: 'Error loading description',
             aliases: '',
@@ -105,7 +100,7 @@ async function extractEpisodes(slug) {
 
         return JSON.stringify(episodes);        
     } catch (error) {
-        console.error('soraFetch error: ' + error.message);
+        console.error('soraFetch error:', error);
         return JSON.stringify([]);
     }
 }
@@ -154,7 +149,7 @@ async function extractStreamUrl(url) {
         return streamUrl;
 
     } catch(error) {
-        console.error('soraFetch error: ' + error.message);
+        console.error('soraFetch error:', error);
         return null;
     }
 }
@@ -216,7 +211,7 @@ function unfuck(str) {
     try {
         return unpack(str);
     } catch(error) {
-        console.error('Unpacking error: ' + error.message);
+        console.error('Unpacking error:', error);
         return str;
     }
 }
