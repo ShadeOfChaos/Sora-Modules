@@ -93,7 +93,6 @@ async function extractEpisodes(slug) {
 
         const episodes = json.map(ep => {
             return {
-                // href: watchUrl + slug + ep.ep_id_name,
                 href: embedUrl + slug + ep.ep_id_name,
                 number: parseInt(ep.ep_id_name),
                 title: ep.ep_name,
@@ -129,7 +128,7 @@ async function extractStreamUrl(url) {
 
             const streamwishPackerRegex = /<script type='text\/javascript'>(eval\(function\(p,a,c,k,e,d\)[\s\S]+?)<\/script>/;
             const streamwishPacker = streamHtml.match(streamwishPackerRegex);
-            const streamwishUnpacked = unfuck(streamwishPacker[1]);
+            const streamwishUnpacked = unpack(streamwishPacker[1]);
             
 
             const files = streamwishUnpacked.match(streamwishRegex);
@@ -169,51 +168,42 @@ async function soraFetch(url, options = { headers: {}, method: 'GET', body: null
 }
 
 // Adjusted from js-beautify (https://github.com/beautifier/js-beautify/blob/03e3cc02949b42970ab12c2bfbfb33c7bced8eba/js/src/unpackers/p_a_c_k_e_r_unpacker.js)
-function unfuck(str) {
-    function detect(str) {
-        return (get_chunks(str).length > 0);
-    }
+function detect(str) {
+    return (get_chunks(str).length > 0);
+}
 
-    function get_chunks(str) {
-        var chunks = str.match(/eval\(\(?function\(.*?(,0,\{\}\)\)|split\('\|'\)\)\))($|\n)/g);
-        return chunks ? chunks : [];
-    }
+function get_chunks(str) {
+    var chunks = str.match(/eval\(\(?function\(.*?(,0,\{\}\)\)|split\('\|'\)\)\))($|\n)/g);
+    return chunks ? chunks : [];
+}
 
-    function unpack(str) {
-        var chunks = get_chunks(str),
-        chunk;
-        for (var i = 0; i < chunks.length; i++) {
-        chunk = chunks[i].replace(/\n$/, '');
-        str = str.split(chunk).join(unpack_chunk(chunk));
-        }
-        return str;
+function unpack(str) {
+    var chunks = get_chunks(str),
+    chunk;
+    for (var i = 0; i < chunks.length; i++) {
+    chunk = chunks[i].replace(/\n$/, '');
+    str = str.split(chunk).join(unpack_chunk(chunk));
     }
-    
-    function unpack_chunk(str) {
-        var unpacked_source = '';
-        var __eval = eval;
-        if (detect(str)) {
-        try {
-            eval = function (s) {
-            unpacked_source += s;
-            return unpacked_source;
-            };
-            __eval(str);
-            if (typeof unpacked_source === 'string' && unpacked_source) {
-            str = unpacked_source;
-            }
-        } catch (e) {
-            // well, it failed. we'll just return the original, instead of crashing on user.
-        }
-        }
-        eval = __eval;
-        return str;
-    }
+    return str;
+}
 
+function unpack_chunk(str) {
+    var unpacked_source = '';
+    var __eval = eval;
+    if (detect(str)) {
     try {
-        return unpack(str);
-    } catch(error) {
-        console.error('Unpacking error:', error);
-        return str;
+        eval = function (s) {
+        unpacked_source += s;
+        return unpacked_source;
+        };
+        __eval(str);
+        if (typeof unpacked_source === 'string' && unpacked_source) {
+        str = unpacked_source;
+        }
+    } catch (e) {
+        // well, it failed. we'll just return the original, instead of crashing on user.
     }
+    }
+    eval = __eval;
+    return str;
 }
