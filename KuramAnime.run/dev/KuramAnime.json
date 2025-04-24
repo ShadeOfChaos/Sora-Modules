@@ -3,7 +3,8 @@
     "iconUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/KuramAnime.run/logo.png",
     "author": {
         "name": "ShadeOfChaos",
-        "icon": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/KuramAnime.run/ofchaos.jpg"
+        "icon": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/KuramAnime.run/ofchaos.jpg",
+        "url:": "https://github.com/ShadeOfChaos/Sora-Modules"
     },
     "version": "1.0.0",
     "language": "Indonesian (SUB)",

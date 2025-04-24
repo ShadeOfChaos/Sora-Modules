@@ -3,7 +3,8 @@
     "iconUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeHeaven_Example_Module/logo.png",
     "author": {
         "name": "ShadeOfChaos",
-        "icon": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeHeaven_Example_Module/ofchaos.jpg"
+        "icon": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeHeaven_Example_Module/ofchaos.jpg",
+        "url:": "https://github.com/ShadeOfChaos/Sora-Modules"
     },
     "version": "1.1.0",
     "language": "English (SUB)",

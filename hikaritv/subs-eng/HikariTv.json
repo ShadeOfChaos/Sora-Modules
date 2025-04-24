@@ -2,8 +2,9 @@
    "sourceName": "HikariTV (ENG SUB)",
    "iconUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/hikaritv/logo.png",
    "author": {
-       "name": "ShadeOfChaos",
-       "icon": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/hikaritv/ofchaos.jpg"
+      "name": "ShadeOfChaos",
+      "icon": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/hikaritv/ofchaos.jpg",
+      "url:": "https://github.com/ShadeOfChaos/Sora-Modules"
    },
    "version": "1.0.0",
    "language": "English (SUB)",

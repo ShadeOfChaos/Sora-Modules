@@ -3,7 +3,8 @@
     "iconUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AniCrush/ofchaos.jpg",
     "author": {
         "name": "ShadeOfChaos",
-        "icon": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AniCrush/ofchaos.jpg"
+        "icon": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AniCrush/ofchaos.jpg",
+        "url:": "https://github.com/ShadeOfChaos/Sora-Modules"
     },
     "version": "1.0.0",
     "language": "English (SUB)",
