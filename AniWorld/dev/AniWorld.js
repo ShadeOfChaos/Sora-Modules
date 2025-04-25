@@ -282,10 +282,18 @@ function base64Decode(str) {
 ////////////////////////////          from Shade          ////////////////////////
 /////////////////////////////////////////////////////////////////////////////////
 
-function voeExtractor(sourcePage) {
+/**
+ * Extracts a JSON object from the given source page by finding the
+ * encoded string marked with the regex /MKGMa="([\s\S]+?)"/ and
+ * decoding it using the voeDecoder function.
+ * @param {string} sourcePageHtml - The source page to be parsed.
+ * @returns {object|null} The extracted JSON object if successful,
+ *   otherwise null.
+ */
+function voeExtractor(sourcePageHtml) {
     const REGEX = /MKGMa="([\s\S]+?)"/;
 
-    const match = sourcePage.match(REGEX);
+    const match = sourcePageHtml.match(REGEX);
     if(match == null || match[1] == null) {
         console.log('Could not extract from Voe source');
         return null;
