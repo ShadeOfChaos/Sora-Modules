@@ -1,15 +1,3 @@
-// // //***** LOCAL TESTING
-const results = await searchResults('Solo leveling');
-console.log('RESULTS:', results);
-const details = await extractDetails(JSON.parse(results)[0].href);
-console.log('DETAILS:', details);
-const episodesa = await extractEpisodes(JSON.parse(results)[0].href);
-console.log('EPISODES:', episodesa);
-const streamUrl = await extractStreamUrl(JSON.parse(episodesa)[0].href);
-console.log('STREAMURL:', streamUrl);
-//***** LOCAL TESTING
-
-
 ///////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////       Main Functions          //////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -142,7 +130,11 @@ async function extractStreamUrl(url) {
         const hlsSourcePage = typeof hlsSourceResponse === 'object' ? await hlsSourceResponse.text() : await hlsSourceResponse;
 
         if(firstVideo.provider === 'VOE') {
+            console.log('Extracting VOE JSON...');
             const voeJson = voeExtractor(hlsSourcePage);
+
+            console.log('Extracted VOE JSON:' + JSON.stringify(voeJson));
+            console.log('VOE Source:' + voeJson.source);
             
             return voeJson.source;
         }
