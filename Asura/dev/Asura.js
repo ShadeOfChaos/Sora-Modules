@@ -43,16 +43,18 @@ async function searchResults(keyword) {
  */
 async function extractDetails(json) {
     try {
-        if(json == null) {
+        if(json == null || json == '') {
             throw('No data returned from Sora');
         }
 
-        if(json?.detailsUrl == 'https://graphql.anilist.co') {
-            return await getDetailsFromAnilist(json.anilistId);
+        const parsedJson = JSON.parse(json);
+
+        if(parsedJson?.detailsUrl == 'https://graphql.anilist.co') {
+            return await getDetailsFromAnilist(parsedJson.anilistId);
         }
 
-        if(json?.origin == 'AniCrush') {
-            return await getDetailsFromAniCrush(json.detailsUrl);
+        if(parsedJson?.origin == 'AniCrush') {
+            return await getDetailsFromAniCrush(parsedJson.detailsUrl);
         }
 
     } catch (error) {
@@ -72,19 +74,29 @@ async function extractDetails(json) {
  * If an error occurs during the fetch operation, an empty array is returned in JSON format.
  */
 async function extractEpisodes(json) {
-    if(json?.episodesUrl == null) {
+    try {
+        if(json == null || json == '') {
+            throw('No data returned from Sora');
+        }
+
+        const parsedJson = JSON.parse(json);
+
+        if(parsedJson?.episodesUrl == null) {
+            throw('No episodes found');
+        }
+
+        if(parsedJson?.origin == 'AnimeParadise') {
+            return await extractEpisodesFromAnimeParadise(parsedJson);
+        }
+
+        if(parsedJson?.origin == 'AniCrush') {
+            return await extractEpisodesFromAniCrush(parsedJson);
+        }
+
+    } catch(error) {
+        console.log('Episodes error: ' + error?.message);
         return JSON.stringify([]);
     }
-
-    if(json?.origin == 'AnimeParadise') {
-        return await extractEpisodesFromAnimeParadise(json);
-    }
-
-    if(json?.origin == 'AniCrush') {
-        return await extractEpisodesFromAniCrush(json);
-    }
-
-    return JSON.stringify([]);
 }
 
 /**
@@ -93,15 +105,20 @@ async function extractEpisodes(json) {
  * @returns {Promise<string|null>} A promise that resolves with the stream URL if successful, or null if an error occurs during the fetch operation.
  */
 async function extractStreamUrl(json) {
-    const url = json.url;
-
     try {
+        if(json == null || json == '') {
+            throw('No data returned from Sora in extractStreamUrl');
+        }
+        
+        const parsedJson = JSON.parse(json);
+        const url = parsedJson?.url;
+
         if(url.startsWith('https://www.animeparadise.moe')) {
-            return await extractStreamUrlFromAnimeParadise(json);
+            return await extractStreamUrlFromAnimeParadise(parsedJson);
         }
 
         if(url.startsWith('https://api.anicrush.to')) {
-            return await extractStreamUrlFromAniCrush(json);
+            return await extractStreamUrlFromAniCrush(parsedJson);
         }
 
         throw('Failed to extract stream URL from: ' + url);
@@ -243,13 +260,13 @@ async function animeParadiseSearch(keyword, asuraList = []) {
             shows.push({
                 title: 'AnimeParadise: ' + entry.title,
                 image: entry.posterImage.original,
-                href: {
+                href: JSON.stringify({
                     url: ANIME_URL + entry.link,
                     origin: 'AnimeParadise',
                     anilistId: entry.mappings.anilist,
                     detailsUrl: `https://graphql.anilist.co`,
                     episodesUrl: `https://api.animeparadise.moe/anime/${ entry._id }/episode`
-                }
+                })
             });
         }
 
@@ -287,13 +304,13 @@ async function aniCrushSearch(keyword, asuraList = []) {
             shows.push({
                 title: 'AniCrush: ' + entry.name,
                 image: getAniCrushImage(entry.poster_path),
-                href: {
+                href: JSON.stringify({
                     url: href,
                     origin: 'AniCrush',
                     anilistId: entry.anilistId,
                     detailsUrl: `https://api.anicrush.to/shared/v2/movie/getById/${ entry.id }`,
                     episodesUrl: `https://api.anicrush.to/shared/v2/episode/list?_movieId=${ entry.id }`
-                }
+                })
             });
         }
 
