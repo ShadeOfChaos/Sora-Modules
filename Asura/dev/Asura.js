@@ -2,9 +2,9 @@
 // (async () => {
 //     const results = await searchResults('Cowboy Bebop');
 //     console.log('RESULTS:', results);
-//     const details = await extractDetails(JSON.parse(results)[2].href);
+//     const details = await extractDetails(JSON.parse(results)[1].href);
 //     console.log('DETAILS:', details);
-//     const eps = await extractEpisodes(JSON.parse(results)[2].href);
+//     const eps = await extractEpisodes(JSON.parse(results)[1].href);
 //     console.log('EPISODES:', eps);
 //     const streamUrl = await extractStreamUrl(JSON.parse(eps)[0].href);
 //     console.log('STREAMURL:', streamUrl);
@@ -453,10 +453,10 @@ async function extractEpisodesFromAnimeParadise(json) {
 
         const episodes = data?.data.map(ep => {
             return {
-                href: {
+                href: JSON.stringify({
                     url: `${ BASE_URL }${ ep.uid }?origin=${ ep.origin }`,
                     anilistId: data.anilistId
-                },
+                }),
                 number: parseInt(ep.number)
             }
         });
@@ -489,11 +489,11 @@ async function extractEpisodesFromAniCrush(json) {
         for(let episodeList in data.result) {
             for(let episode of data.result[episodeList]) {
                 episodes.push({
-                    href: {
+                    href: JSON.stringify({
                         url: `${ SOURCE_API_URL }/episode/sources?_movieId=${ movieId }&ep=${ episode.number }&sv=${ serverId }&sc=${ format }`,
                         anilistId: json.anilistId
-                    },
-                    number: episode.number
+                    }),
+                    number: parseInt(episode.number)
                 });
             }
         }
