@@ -1,14 +1,14 @@
 // // //***** LOCAL TESTING
-// (async () => {
-//     const results = await searchResults('Cowboy Bebop');
-//     console.log('RESULTS:', results);
-//     const details = await extractDetails(JSON.parse(results)[1].href);
-//     console.log('DETAILS:', details);
-//     const eps = await extractEpisodes(JSON.parse(results)[1].href);
-//     console.log('EPISODES:', eps);
-//     const streamUrl = await extractStreamUrl(JSON.parse(eps)[0].href);
-//     console.log('STREAMURL:', streamUrl);
-// })();
+(async () => {
+    const results = await searchResults('Cowboy Bebop');
+    console.log('RESULTS:', results);
+    const details = await extractDetails(JSON.parse(results)[1].href);
+    console.log('DETAILS:', details);
+    const eps = await extractEpisodes(JSON.parse(results)[1].href);
+    console.log('EPISODES:', eps);
+    const streamUrl = await extractStreamUrl(JSON.parse(eps)[0].href);
+    console.log('STREAMURL:', streamUrl);
+})();
 //***** LOCAL TESTING
 
 
@@ -42,8 +42,11 @@ async function searchResults(keyword) {
  * @returns {Promise<string>} A promise that resolves with a JSON string containing the details in the format: `[{"description": "Description", "aliases": "Aliases", "airdate": "Airdate"}]`
  */
 async function extractDetails(json) {
+    console.log('RUNNING EXTRACT DETAILS');
+
     try {
         if(json == null || json == '') {
+            console.log("0. extractDetails: " + parsedJson.anilistId);
             throw('No data returned from Sora');
         }
 
@@ -81,6 +84,8 @@ async function extractDetails(json) {
  * If an error occurs during the fetch operation, an empty array is returned in JSON format.
  */
 async function extractEpisodes(json) {
+    console.log('RUNNING EXTRACT EPISODES');
+
     try {
         if(json == null || json == '') {
             console.log("5. No data returned from Sora: " + json);
