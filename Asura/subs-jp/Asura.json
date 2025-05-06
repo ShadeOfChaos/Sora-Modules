@@ -1,0 +1,20 @@
+{
+    "sourceName": "Asura (JP SUB) [Multi-Source]",
+    "iconUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/Asura/logo.png",
+    "author": {
+        "name": "ShadeOfChaos",
+        "icon": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/Asura/ofchaos.jpg",
+        "url:": "https://asura.ofchaos.com"
+    },
+    "version": "0.9.0",
+    "language": "Japanese (SUB)",
+    "streamType": "HLS",
+    "quality": "1080p",
+	"type": "anime",
+    "baseUrl": "https://megacloud.club/",
+    "searchBaseUrl": "",
+    "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/Asura/subs-jp/Asura.js",
+    "asyncJS": true,
+    "streamAsyncJS": true,
+    "softsub": true
+ }
