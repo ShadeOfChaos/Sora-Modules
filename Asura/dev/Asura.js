@@ -377,12 +377,12 @@ async function getDetailsFromAnilist(anilistId) {
                 "Content-Type": "application/json",
                 "Accept": "application/json"
             },
-            body: JSON.stringify({
+            body: {
                 query: query,
                 variables: {
                     "id": anilistId
                 }
-            })
+            }
         });
         const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
