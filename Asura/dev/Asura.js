@@ -473,10 +473,10 @@ async function extractEpisodesFromAnimeParadise(json) {
 
         const episodes = data?.data.map(ep => {
             return {
-                href: JSON.stringify({
-                    url: `${ BASE_URL }${ ep.uid }?origin=${ ep.origin }`,
-                    anilistId: data.anilistId
-                }),
+                href: /*JSON.stringify({
+                    url: */`${ BASE_URL }${ ep.uid }?origin=${ ep.origin }`,
+                    /*anilistId: data.anilistId
+                }),*/
                 number: parseInt(ep.number)
             }
         });
@@ -509,10 +509,10 @@ async function extractEpisodesFromAniCrush(json) {
         for(let episodeList in data.result) {
             for(let episode of data.result[episodeList]) {
                 episodes.push({
-                    href: JSON.stringify({
-                        url: `${ SOURCE_API_URL }/episode/sources?_movieId=${ movieId }&ep=${ episode.number }&sv=${ serverId }&sc=${ format }`,
-                        anilistId: json.anilistId
-                    }),
+                    href: /*JSON.stringify({
+                        url: */`${ SOURCE_API_URL }/episode/sources?_movieId=${ movieId }&ep=${ episode.number }&sv=${ serverId }&sc=${ format }`,
+                        /*anilistId: json.anilistId
+                    }),*/
                     number: parseInt(episode.number)
                 });
             }
