@@ -34,7 +34,7 @@ function getAniCrushImage(path, type = "poster") {
  */
 async function searchResults(keyword) {
     const result = await multiSearch(keyword);
-    console.log('SEARCH RESULTS:', result);
+    console.log('[ASURA][searchResults] SEARCH RESULTS:' + result);
     return result;
 }
 
@@ -44,7 +44,7 @@ async function searchResults(keyword) {
  * @returns {Promise<string>} A promise that resolves with a JSON string containing the details in the format: `[{"description": "Description", "aliases": "Aliases", "airdate": "Airdate"}]`
  */
 async function extractDetails(json) {
-    console.log('RUNNING EXTRACT DETAILS');
+    console.log('[ASURA][extractDetails] RUNNING EXTRACT DETAILS');
 
     return JSON.stringify([{
         description: 'Description: DEBUGGING',
@@ -93,7 +93,7 @@ async function extractDetails(json) {
  * If an error occurs during the fetch operation, an empty array is returned in JSON format.
  */
 async function extractEpisodes(json) {
-    console.log('RUNNING EXTRACT EPISODES');
+    console.log('[ASURA][extractEpisodes] RUNNING EXTRACT EPISODES');
     return JSON.stringify([{"href": "TEST", number: 1}]);
     /*
     try {
@@ -130,7 +130,7 @@ async function extractEpisodes(json) {
 
     } catch(error) {
         console.log('[ASURA][extractEpisodes] Error');
-        console.log('Episodes error: ' + error?.message);
+        console.log('[ASURA][extractEpisodes] Episodes error: ' + error?.message);
         return JSON.stringify([]);
     }
     */
@@ -163,7 +163,7 @@ async function extractStreamUrl(json) {
         throw('Failed to extract stream URL from: ' + url);
 
     } catch(error) {
-        console.log('Stream URL error: ' + error?.message);
+        console.log('[ASURA][extractStreamUrl] Stream URL error: ' + error?.message);
         return JSON.stringify({ stream: null, subtitles: null });
     }
     */
@@ -176,7 +176,7 @@ function getNextData(html) {
     try {
         return JSON.parse(jsonString);
     } catch (e) {
-        console.log('Error parsing NEXT_DATA json');
+        console.log('[ASURA][getNextData] Error parsing NEXT_DATA json');
         return null;
     }
 }
@@ -313,7 +313,7 @@ async function animeParadiseSearch(keyword, asuraList = []) {
 
         return shows;
     } catch (error) {
-        console.log('Fetch error: ' + error?.message);
+        console.log('[ASURA][animeParadiseSearch] Fetch error: ' + error?.message);
         return [];
     }
 }
@@ -359,7 +359,7 @@ async function aniCrushSearch(keyword, asuraList = []) {
         return shows;
 
     } catch (error) {
-        console.log('Fetch error: ' + error?.message);
+        console.log('[ASURA][aniCrushSearch] Fetch error: ' + error?.message);
         return [];
     }
 }
@@ -447,7 +447,7 @@ async function getAniCrushAnilistId(movies) {
 //         }]);
 
 //     } catch(error) {
-//         console.log('Fetch error: ' + error?.message);
+//         console.log('[ASURA][getDetailsFromAnilist] Fetch error: ' + error?.message);
 //         return JSON.stringify([{
 //             description: 'Error loading description',
 //             aliases: 'Duration: Unknown',
@@ -472,7 +472,7 @@ async function getAniCrushAnilistId(movies) {
 //         }]);
 
 //     } catch (error) {
-//         console.log('Fetch error: ' + error?.message);
+//         console.log('[ASURA][getDetailsFromAniCrush] Fetch error: ' + error?.message);
 //         return JSON.stringify([{
 //             description: 'Error loading description',
 //             aliases: 'Duration: Unknown',
@@ -505,7 +505,7 @@ async function getAniCrushAnilistId(movies) {
 //         return JSON.stringify(episodes);
 
 //     } catch(error) {
-//         console.log('Fetch error: ' + error?.message);
+//         console.log('[ASURA][extractEpisodesFromAnimeParadise] Fetch error: ' + error?.message);
 //         return JSON.stringify([]);
 //     }
 // }
@@ -542,7 +542,7 @@ async function getAniCrushAnilistId(movies) {
 //         return JSON.stringify(episodes);
 
 //     } catch(error) {
-//         console.log('Fetch error: ' + error?.message);
+//         console.log('[ASURA][extractEpisodesFromAniCrush] Fetch error: ' + error?.message);
 //         return JSON.stringify([]);
 //     }
 // }
@@ -561,7 +561,7 @@ async function extractStreamUrlFromAnimeParadise(streamData) {
         return JSON.stringify({ stream: streamUrl, subtitles: subtitles });
 
     } catch (error) {
-        console.log('Error extracting stream url: ' + error?.message);
+        console.log('[ASURA][extractStreamUrlFromAnimeParadise] Error extracting stream url: ' + error?.message);
         return JSON.stringify({ stream: null, subtitles: null });
     }
 }
@@ -627,7 +627,7 @@ async function extractStreamUrlFromAniCrush(streamData) {
         return JSON.stringify({ stream: streamUrl, subtitles: subtitles });
 
     } catch (error) {
-        console.log('Fetch error: ' + error?.message);
+        console.log('[ASURA][extractStreamUrlFromAniCrush] Fetch error: ' + error?.message);
         return JSON.stringify({ stream: null, subtitles: null });
     }
 }
