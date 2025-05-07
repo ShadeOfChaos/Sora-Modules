@@ -2,9 +2,9 @@
 (async () => {
     const results = await searchResults('Cowboy Bebop');
     console.log('RESULTS:', results);
-    const details = await extractDetails(JSON.parse(results)[1].href);
+    const details = await extractDetails(JSON.parse(results)[2].href);
     console.log('DETAILS:', details);
-    const eps = await extractEpisodes(JSON.parse(results)[1].href);
+    const eps = await extractEpisodes(JSON.parse(results)[2].href);
     console.log('EPISODES:', eps);
     const streamUrl = await extractStreamUrl(JSON.parse(eps)[0].href);
     console.log('STREAMURL:', streamUrl);
@@ -104,6 +104,11 @@ async function extractEpisodes(json) {
             console.log("6. No episodes found json: " + json);
             throw('No episodes found');
         }
+
+        console.log("[ASURA] ====================================== [ASURA]");
+        console.log("[ASURA] DEBUG JSON: " + json);
+        console.log("[ASURA] DEBUG PARSEDJSON ORIGIN: " + parsedJson?.origin);
+        console.log("[ASURA] ====================================== [ASURA]");
 
         if(parsedJson?.origin == 'AnimeParadise') {
             console.log("7. AnimeParadise json: " + json);
