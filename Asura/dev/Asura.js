@@ -44,6 +44,12 @@ async function searchResults(keyword) {
 async function extractDetails(json) {
     console.log('RUNNING EXTRACT DETAILS');
 
+    return JSON.stringify([{
+        description: 'Description: DEBUGGING',
+        aliases: 'Duration: DEBUGGING',
+        airdate: 'Aired: DEBUGGING'
+    }]);
+
     try {
         if(json == null || json == '') {
             console.log("0. extractDetails: " + parsedJson.anilistId);
