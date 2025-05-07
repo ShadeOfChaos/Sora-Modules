@@ -301,13 +301,13 @@ async function animeParadiseSearch(keyword, asuraList = []) {
                 // title: 'AnimeParadise: ' + entry.title,
                 title: entry.title,
                 image: entry.posterImage.original,
-                href: /*JSON.stringify(*/{
+                href: JSON.stringify({
                     url: ANIME_URL + entry.link,
                     origin: 'AnimeParadise',
                     anilistId: entry.mappings.anilist,
                     detailsUrl: `https://graphql.anilist.co`,
                     episodesUrl: `https://api.animeparadise.moe/anime/${ entry._id }/episode`
-                }/*)*/
+                })
             });
         }
 
@@ -346,13 +346,13 @@ async function aniCrushSearch(keyword, asuraList = []) {
                 // title: 'AniCrush: ' + entry.name,
                 title: entry.name,
                 image: getAniCrushImage(entry.poster_path),
-                href: /*JSON.stringify(*/{
+                href: JSON.stringify({
                     url: href,
                     origin: 'AniCrush',
                     anilistId: entry.anilistId,
                     detailsUrl: `https://api.anicrush.to/shared/v2/movie/getById/${ entry.id }`,
                     episodesUrl: `https://api.anicrush.to/shared/v2/episode/list?_movieId=${ entry.id }`
-                }/*)*/
+                })
             });
         }
 
