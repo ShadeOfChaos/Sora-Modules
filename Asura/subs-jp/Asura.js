@@ -1,3 +1,9 @@
+/**
+ * Given an image path, returns the URL to the resized image on AniCrush's CDN.
+ * @param {string} path - The image path to transform.
+ * @param {string} [type="poster"] - The type of image requested (poster or banner).
+ * @returns {string} - The URL to the resized image.
+ */
 function getAniCrushImage(path, type = "poster") {
     const SOURCE_STATIC_URL = "https://static.gniyonna.com/media/poster";
     const pathToReverse = path.split('/')[2];
@@ -14,35 +20,60 @@ function getAniCrushImage(path, type = "poster") {
 }
 
 /**
- * Searches the website for anime with the given keyword and returns the results
- * @param {string} keyword The keyword to search for
- * @returns {Promise<string>} A promise that resolves with a JSON string containing the search results in the format: `[{"title": "Title", "image": "Image URL", "href": "URL"}, ...]`
+ * Searches for anime using the given keyword across multiple sources and returns the combined results.
+ * 
+ * @param {string} keyword - The keyword to search for.
+ * @returns {Promise<string>} A promise that resolves with a JSON string containing merged search results 
+ *                            from multiple sources, in the format: `[{"title": "Title", "image": "Image URL", "href": "URL"}, ...]`
  */
 async function searchResults(keyword) {
-    return await multiSearch(keyword);
+    let p = [];
+
+    const asuraList = await GetAnimes();
+
+    const anicrush = aniCrushSearch(keyword, asuraList);
+    const animeparadise = animeParadiseSearch(keyword, asuraList);
+
+    p.push(anicrush);
+    p.push(animeparadise);
+
+    return Promise.allSettled(p).then((results) => {
+        // Merge results
+        let mergedResults = [];
+        for (let result of results) {
+            if (result.status === 'fulfilled') {
+                mergedResults = mergedResults.concat(result.value);
+            }
+        }
+        
+
+        return JSON.stringify(mergedResults);
+    });
 }
 
 /**
  * Extracts the details (description, aliases, airdate) from the given url
- * @param {string} url The id required to fetch the details
+ * @param {string} objString - The id required to fetch the details
  * @returns {Promise<string>} A promise that resolves with a JSON string containing the details in the format: `[{"description": "Description", "aliases": "Aliases", "airdate": "Airdate"}]`
  */
-async function extractDetails(json) {
-    try {
-        if(json == null) {
-            throw('No data returned from Sora');
-        }
+async function extractDetails(objString) {
+    const encodedDelimiter = encodeURIComponent('|');
+    let json = {};
+    [json.url, json.origin, json.anilistId, json.detailsUrl, json.episodesUrl] = objString.split(encodedDelimiter);
 
+    try {
         if(json?.detailsUrl == 'https://graphql.anilist.co') {
-            return await getDetailsFromAnilist(json.anilistId);
+            const result = await getDetailsFromAnilist(json.anilistId);
+            return result;
         }
 
         if(json?.origin == 'AniCrush') {
-            return await getDetailsFromAniCrush(json.detailsUrl);
+            const result = await getDetailsFromAniCrush(json.detailsUrl);
+            return result;
         }
 
     } catch (error) {
-        console.log('Details error: ' + error?.message);
+        console.log('[ASURA][ExtractDetails] Details error: ' + error?.message);
         return JSON.stringify([{
             description: 'Error loading description',
             aliases: 'Duration: Unknown',
@@ -52,25 +83,33 @@ async function extractDetails(json) {
 }
 
 /**
- * Extracts the episodes from the given url.
- * @param {string} url - The id required to fetch the episodes
+ * Extracts the episodes from the given url
+ * @param {string} objString - The id required to fetch the episodes
  * @returns {Promise<string>} A promise that resolves with a JSON string containing the episodes in the format: `[{ "href": "Episode URL", "number": Episode Number }, ...]`.
  * If an error occurs during the fetch operation, an empty array is returned in JSON format.
  */
-async function extractEpisodes(json) {
-    if(json?.episodesUrl == null) {
+async function extractEpisodes(objString) {
+    const encodedDelimiter = encodeURIComponent('|');
+    let json = {};
+    [json.url, json.origin, json.anilistId, json.detailsUrl, json.episodesUrl] = objString.split(encodedDelimiter);
+
+    try {
+        if(json?.episodesUrl == null) {
+            throw('No episodes found');
+        }
+
+        if(json?.origin == 'AnimeParadise') {
+            return await extractEpisodesFromAnimeParadise(json);
+        }
+
+        if(json?.origin == 'AniCrush') {
+            return await extractEpisodesFromAniCrush(json);
+        }
+
+    } catch(error) {
+        console.log('[ASURA][extractEpisodes] Episodes error: ' + error?.message);
         return JSON.stringify([]);
     }
-
-    if(json?.origin == 'AnimeParadise') {
-        return await extractEpisodesFromAnimeParadise(json);
-    }
-
-    if(json?.origin == 'AniCrush') {
-        return await extractEpisodesFromAniCrush(json);
-    }
-
-    return JSON.stringify([]);
 }
 
 /**
@@ -78,26 +117,42 @@ async function extractEpisodes(json) {
  * @param {string} url - The url to extract the stream URL from.
  * @returns {Promise<string|null>} A promise that resolves with the stream URL if successful, or null if an error occurs during the fetch operation.
  */
-async function extractStreamUrl(json) {
-    const url = json.url;
+async function extractStreamUrl(objString) {
+    const delimiter = '|';
+    const [url, anilistId] = objString.split(delimiter);
 
     try {
+        if(url == null || anilistId == null) {
+            throw('No data returned from Sora in extractStreamUrl');
+        }
+
         if(url.startsWith('https://www.animeparadise.moe')) {
-            return await extractStreamUrlFromAnimeParadise(json);
+            return await extractStreamUrlFromAnimeParadise(url, anilistId);
         }
 
         if(url.startsWith('https://api.anicrush.to')) {
-            return await extractStreamUrlFromAniCrush(json);
+            return await extractStreamUrlFromAniCrush(url, anilistId);
         }
 
         throw('Failed to extract stream URL from: ' + url);
 
     } catch(error) {
-        console.log('Stream URL error: ' + error?.message);
+        console.log('[ASURA][extractStreamUrl] Stream URL error: ' + error?.message);
         return JSON.stringify({ stream: null, subtitles: null });
     }
 }
 
+/**
+ * Extracts and parses the JSON data from the given HTML string from AnimeParadise.moe.
+ * 
+ * The function searches for the JSON data within the HTML content
+ * that is wrapped between the '__NEXT_DATA__' and '</script>' tags,
+ * trims the HTML to extract the JSON string, and then parses it into
+ * an object.
+ * 
+ * @param {string} html - The HTML content containing the JSON data.
+ * @returns {Object|null} The parsed JSON object if successful, or null if an error occurs during parsing.
+ */
 function getNextData(html) {
     const trimmedHtml = trimHtml(html, '__NEXT_DATA__', '</script>');
     const jsonString = trimmedHtml.slice(39);
@@ -105,17 +160,36 @@ function getNextData(html) {
     try {
         return JSON.parse(jsonString);
     } catch (e) {
-        console.log('Error parsing NEXT_DATA json');
+        console.log('[ASURA][getNextData] Error parsing NEXT_DATA json');
         return null;
     }
 }
 
-// Trims around the content, leaving only the area between the start and end string
+/**
+ * Trims around the content, leaving only the area between the start and end string
+ * @param {string} html The text to trim
+ * @param {string} startString The string to start at (inclusive)
+ * @param {string} endString The string to end at (exclusive)
+ * @returns The trimmed text
+ */
 function trimHtml(html, startString, endString) {
     const startIndex = html.indexOf(startString);
     const endIndex = html.indexOf(endString, startIndex);
     return html.substring(startIndex, endIndex);
 }
+
+/**
+ * Fetches a list of anime from the Asura API.
+ * 
+ * @returns {Promise<Array>} A promise that resolves to an array of anime objects.
+ * If an error occurs during the fetch or parsing process, an empty array is returned.
+ * 
+ * @throws Will throw an error if the API response is invalid or cannot be parsed.
+ * 
+ * The function sends a request to the Asura API to retrieve a list of anime.
+ * It expects a successful response with a non-null result array.
+ * Any errors during the fetch or parsing are caught and logged, returning an empty array.
+ */
 
 async function GetAnimes() {
     const baseUrl = 'https://asura.ofchaos.com/api/anime';
@@ -136,6 +210,14 @@ async function GetAnimes() {
     }
 }
 
+
+/**
+ * Retrieves the episodes for the given Anilist ID
+ * @param {number} anilistId - The Anilist ID of the anime to retrieve episodes for
+ * @returns {Promise<Array<Object>>} A promise that resolves with an array of episode objects with the following properties:
+ * - `number`: The episode number
+ * - `href`: The URL to fetch the episode from
+ */
 async function GetEpisodes(anilistId) {
     if(anilistId == null || isNaN(parseInt(anilistId))) {
         return [];
@@ -160,6 +242,12 @@ async function GetEpisodes(anilistId) {
     }
 }
 
+/**
+ * Returns the URL to fetch subtitles for the given anime and episode number
+ * @param {number} anilistId - The Anilist ID of the anime
+ * @param {number} episodeNr - The episode number to fetch subtitles for
+ * @returns {string|null} The URL to fetch subtitles from, or null if an error occurred
+ */
 function GetSubtitles(anilistId, episodeNr) {
     if(
         anilistId == null ||
@@ -175,7 +263,19 @@ function GetSubtitles(anilistId, episodeNr) {
     return `${ baseUrl }/${ anilistId }/${ episodeNr }`;
 }
 
-// Uses Sora's fetchv2 on ipad, fallbacks to regular fetch on Windows
+
+/**
+ * Uses Sora's fetchv2 on ipad, fallbacks to regular fetch on Windows
+ *
+ * @param {string} url The URL to make the request to.
+ * @param {object} [options] The options to use for the request.
+ * @param {object} [options.headers] The headers to send with the request.
+ * @param {string} [options.method='GET'] The method to use for the request.
+ * @param {string} [options.body=null] The body of the request.
+ *
+ * @returns {Promise<Response|null>} The response from the server, or null if the
+ * request failed.
+ */
 async function soraFetch(url, options = { headers: {}, method: 'GET', body: null }) {
     try {
         return await fetchv2(url, options.headers ?? {}, options.method ?? 'GET', options.body ?? null);
@@ -188,30 +288,12 @@ async function soraFetch(url, options = { headers: {}, method: 'GET', body: null
     }
 }
 
-async function multiSearch(keyword) {
-    let p = [];
-
-    const asuraList = await GetAnimes();
-
-    const anicrush = aniCrushSearch(keyword, asuraList);
-    const animeparadise = animeParadiseSearch(keyword, asuraList);
-
-    p.push(anicrush);
-    p.push(animeparadise);
-
-    return Promise.allSettled(p).then((results) => {
-        // Merge results
-        let mergedResults = [];
-        for (let result of results) {
-            if (result.status === 'fulfilled') {
-                mergedResults = mergedResults.concat(result.value);
-            }
-        }
-
-        return JSON.stringify(mergedResults);
-    });
-}
-
+/**
+ * Searches AnimeParadise for anime with the given keyword and returns the results
+ * @param {string} keyword The keyword to search for
+ * @param {number[]} [asuraList] A list of Anilist IDs to filter the results by (optional)
+ * @returns {Promise<AnimeSearchResult[]>} A promise that resolves with a list of AnimeSearchResults
+ */
 async function animeParadiseSearch(keyword, asuraList = []) {
     const ANIME_URL = 'https://www.animeparadise.moe/anime/';
     const SEARCH_URL = 'https://api.animeparadise.moe/search?q='
@@ -226,26 +308,31 @@ async function animeParadiseSearch(keyword, asuraList = []) {
                 continue;
             }
 
+            // Href value:
+            // [url, origin, anilistId, detatilsUrl, episodesUrl]
             shows.push({
-                title: 'AnimeParadise: ' + entry.title,
+                title: entry.title + ' [AP]',
                 image: entry.posterImage.original,
-                href: {
-                    url: ANIME_URL + entry.link,
-                    origin: 'AnimeParadise',
-                    anilistId: entry.mappings.anilist,
-                    detailsUrl: `https://graphql.anilist.co`,
-                    episodesUrl: `https://api.animeparadise.moe/anime/${ entry._id }/episode`
-                }
+                href: `${ ANIME_URL }${ entry.link }|AnimeParadise|${ entry.mappings.anilist }|https://graphql.anilist.co|https://api.animeparadise.moe/anime/${ entry._id }/episode`
             });
         }
 
         return shows;
     } catch (error) {
-        console.log('Fetch error: ' + error?.message);
+        console.log('[ASURA][animeParadiseSearch] Fetch error: ' + error?.message);
         return [];
     }
 }
 
+/**
+ * Searches AniCrush for anime with the given keyword and returns matching results.
+ * Filters results based on the given list of Anilist IDs.
+ * 
+ * @param {string} keyword - The keyword to search for in AniCrush.
+ * @param {Array<number>} [asuraList=[]] - An optional array of Anilist IDs to filter the results.
+ * @returns {Promise<Array<Object>>} A promise that resolves with an array of show objects, each containing title, image, and href.
+ * If an error occurs during the fetch operation, an empty array is returned.
+ */
 async function aniCrushSearch(keyword, asuraList = []) {
     const BASE_URL = 'https://anicrush.to';
     const UTILITY_URL = 'https://api.anicrush.to/shared/v2';
@@ -270,29 +357,29 @@ async function aniCrushSearch(keyword, asuraList = []) {
 
             const href = `${ BASE_URL }/watch/${ entry.slug }.${ entry.id }`;
 
+            // Href value:
+            // [url, origin, anilistId, detatilsUrl, episodesUrl]
             shows.push({
-                title: 'AniCrush: ' + entry.name,
+                title: entry.name + ' [AC]',
                 image: getAniCrushImage(entry.poster_path),
-                href: {
-                    url: href,
-                    origin: 'AniCrush',
-                    anilistId: entry.anilistId,
-                    detailsUrl: `https://api.anicrush.to/shared/v2/movie/getById/${ entry.id }`,
-                    episodesUrl: `https://api.anicrush.to/shared/v2/episode/list?_movieId=${ entry.id }`
-                }
+                href: `${ href }|AniCrush|${ entry.anilistId }|https://api.anicrush.to/shared/v2/movie/getById/${ entry.id }|https://api.anicrush.to/shared/v2/episode/list?_movieId=${ entry.id }`
             });
         }
 
         return shows;
 
     } catch (error) {
-        console.log('Fetch error: ' + error?.message);
+        console.log('[ASURA][aniCrushSearch] Fetch error: ' + error?.message);
         return [];
     }
 }
 
+/**
+ * Given an array of movies, fetches the Anilist ID for each of them using the AniCrush API.
+ * @param {Array<Object>} movies - Array of movie objects, each containing an `id` property.
+ * @returns {Promise<Array<Object>>} A promise that resolves with an array of movie objects, each containing an `anilistId` property.
+ */
 async function getAniCrushAnilistId(movies) {
-    const BASE_URL = 'https://anicrush.to';
     const UTILITY_URL = 'https://api.anicrush.to/shared/v2/movie/getById/';
 
     return new Promise((resolve) => {
@@ -321,10 +408,14 @@ async function getAniCrushAnilistId(movies) {
     });
 }
 
+/**
+ * Retrieves the details of a show from Anilist given its id.
+ * @param {int} anilistId The id of the show to retrieve.
+ * @returns {Promise<string>} A promise that resolves with a JSON string containing the details in the format: `[{"description": "Description", "aliases": "Aliases", "airdate": "Airdate"}]`
+ */
 async function getDetailsFromAnilist(anilistId) {
     const BASE_URL = 'https://graphql.anilist.co';
-    const query = `
-    query ($id: Int!) {
+    const query = `query ($id: Int!) {
         Media (id: $id, type: ANIME) {
             id
             title {
@@ -350,15 +441,15 @@ async function getDetailsFromAnilist(anilistId) {
         const response = await soraFetch(BASE_URL, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
+                "Content-Type": "application/json",
+                "Accept": "application/json"
             },
-            body: JSON.stringify({
+            body: {
                 query: query,
                 variables: {
-                    id: anilistId
+                    "id": anilistId
                 }
-            })
+            }
         });
         const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
@@ -375,7 +466,7 @@ async function getDetailsFromAnilist(anilistId) {
         }]);
 
     } catch(error) {
-        console.log('Fetch error: ' + error?.message);
+        console.log('[ASURA][getDetailsFromAnilist] Fetch error: ' + error?.message);
         return JSON.stringify([{
             description: 'Error loading description',
             aliases: 'Duration: Unknown',
@@ -384,6 +475,13 @@ async function getDetailsFromAnilist(anilistId) {
     }
 }
 
+/**
+ * Retrieves detailed information about an anime from the AniCrush API.
+ * @param {string} detailsUrl - The URL to fetch the details from.
+ * @returns {Promise<string>} A promise that resolves with a JSON string containing 
+ * the anime details in the format: `[{"description": "Description", "aliases": "Aliases", "airdate": "Airdate"}]`.
+ * If an error occurs during the fetch operation, a default error object is returned in JSON format.
+ */
 async function getDetailsFromAniCrush(detailsUrl) {
     try {
         const response = await soraFetch(detailsUrl, { headers: GetAniCrushHeaders() });
@@ -394,13 +492,13 @@ async function getDetailsFromAniCrush(detailsUrl) {
         }
 
         return JSON.stringify([{
-            description: data.result.description,
-            aliases: buildAliasString(data?.name, data?.name_english, data?.name_japanese, data?.name_synonyms),
+            description: data.result.overview,
+            aliases: buildAliasString(data.result?.name, data.result?.name_english, data.result?.name_japanese, data.result?.name_synonyms),
             airdate: data.result?.aired_from + ' - ' + data.result?.aired_to
         }]);
 
     } catch (error) {
-        console.log('Fetch error: ' + error?.message);
+        console.log('[ASURA][getDetailsFromAniCrush] Fetch error: ' + error?.message);
         return JSON.stringify([{
             description: 'Error loading description',
             aliases: 'Duration: Unknown',
@@ -409,6 +507,12 @@ async function getDetailsFromAniCrush(detailsUrl) {
     }
 }
 
+/**
+ * Extracts episodes from the AnimeParadise API using the provided JSON object.
+ * @param {Object} json - An object containing the URL to fetch the episodes from and the Anilist ID of the anime.
+ * @returns {Promise<string>} A promise that resolves with a JSON string containing the episodes in the format: `[{ "href": "Episode URL", "number": Episode Number }, ...]`.
+ * If an error occurs during the fetch operation, an empty array is returned in JSON format.
+ */
 async function extractEpisodesFromAnimeParadise(json) {
     const BASE_URL = 'https://www.animeparadise.moe/watch/';
 
@@ -422,10 +526,7 @@ async function extractEpisodesFromAnimeParadise(json) {
 
         const episodes = data?.data.map(ep => {
             return {
-                href: {
-                    url: `${ BASE_URL }${ ep.uid }?origin=${ ep.origin }`,
-                    anilistId: data.anilistId
-                },
+                href: `${ BASE_URL }${ ep.uid }?origin=${ ep.origin }|${ json.anilistId }`,
                 number: parseInt(ep.number)
             }
         });
@@ -433,11 +534,17 @@ async function extractEpisodesFromAnimeParadise(json) {
         return JSON.stringify(episodes);
 
     } catch(error) {
-        console.log('Fetch error: ' + error?.message);
+        console.log('[ASURA][extractEpisodesFromAnimeParadise] Fetch error: ' + error?.message);
         return JSON.stringify([]);
     }
 }
 
+/**
+ * Extracts the episodes from the given url.
+ * @param {Object} json - Object containing the url to fetch the episodes from and the Anilist ID of the anime.
+ * @returns {Promise<string>} A promise that resolves with a JSON string containing the episodes in the format: `[{ "href": "Episode URL", "number": Episode Number }, ...]`.
+ * If an error occurs during the fetch operation, an empty array is returned in JSON format.
+ */
 async function extractEpisodesFromAniCrush(json) {
     const url = json.episodesUrl;
     const SOURCE_API_URL = 'https://api.anicrush.to/shared/v2';
@@ -458,11 +565,8 @@ async function extractEpisodesFromAniCrush(json) {
         for(let episodeList in data.result) {
             for(let episode of data.result[episodeList]) {
                 episodes.push({
-                    href: {
-                        url: `${ SOURCE_API_URL }/episode/sources?_movieId=${ movieId }&ep=${ episode.number }&sv=${ serverId }&sc=${ format }`,
-                        anilistId: json.anilistId
-                    },
-                    number: episode.number
+                    href: `${ SOURCE_API_URL }/episode/sources?_movieId=${ movieId }&ep=${ episode.number }&sv=${ serverId }&sc=${ format }|${ json.anilistId }`,
+                    number: parseInt(episode.number)
                 });
             }
         }
@@ -470,14 +574,20 @@ async function extractEpisodesFromAniCrush(json) {
         return JSON.stringify(episodes);
 
     } catch(error) {
-        console.log('Fetch error: ' + error?.message);
+        console.log('[ASURA][extractEpisodesFromAniCrush] Fetch error: ' + error?.message);
         return JSON.stringify([]);
     }
 }
 
-async function extractStreamUrlFromAnimeParadise(streamData) {
+/**
+ * Extracts the stream URL from the given url, using a utility function on ac-api.ofchaos.com.
+ * @param {string} url - The url to extract the stream URL from.
+ * @param {number} anilistId - The Anilist ID of the anime.
+ * @returns {Promise<string|null>} A promise that resolves with the stream URL if successful, or null if an error occurs during the fetch operation.
+ */
+async function extractStreamUrlFromAnimeParadise(url, anilistId) {
     try {
-        const response = await soraFetch(streamData.url);
+        const response = await soraFetch(url);
         const html = typeof response === 'object' ? await response.text() : await response;
 
         const json = getNextData(html);
@@ -489,13 +599,18 @@ async function extractStreamUrlFromAnimeParadise(streamData) {
         return JSON.stringify({ stream: streamUrl, subtitles: subtitles });
 
     } catch (error) {
-        console.log('Error extracting stream url: ' + error?.message);
+        console.log('[ASURA][extractStreamUrlFromAnimeParadise] Error extracting stream url: ' + error?.message);
         return JSON.stringify({ stream: null, subtitles: null });
     }
 }
 
-async function extractStreamUrlFromAniCrush(streamData) {
-    const url = streamData.url;
+/**
+ * Extracts the stream URL from the given url, using a utility function on ac-api.ofchaos.com.
+ * @param {string} url - The url to extract the stream URL from.
+ * @param {number} anilistId - The Anilist ID of the anime.
+ * @returns {Promise<string|null>} A promise that resolves with the stream URL if successful, or null if an error occurs during the fetch operation.
+ */
+async function extractStreamUrlFromAniCrush(url, anilistId) {
     const SOURCE_BASE_URL = "https://anicrush.to";
     const UTILITY_URL = "https://ac-api.ofchaos.com";
 
@@ -550,16 +665,20 @@ async function extractStreamUrlFromAniCrush(streamData) {
         }
 
         const streamUrl = streamSource?.file;
-        const subtitles = GetSubtitles(streamData.anilistId, ep);
+        const subtitles = GetSubtitles(anilistId, ep);
 
         return JSON.stringify({ stream: streamUrl, subtitles: subtitles });
 
     } catch (error) {
-        console.log('Fetch error: ' + error?.message);
+        console.log('[ASURA][extractStreamUrlFromAniCrush] Fetch error: ' + error?.message);
         return JSON.stringify({ stream: null, subtitles: null });
     }
 }
 
+/**
+ * Returns an object containing the headers required to make a request to the AniCrush API.
+ * @returns {Object} An object containing the headers
+ */
 function GetAniCrushHeaders() {
     return {
         'Accept': 'application/json, text/plain, */*',
@@ -573,6 +692,14 @@ function GetAniCrushHeaders() {
     }
 }
 
+/**
+ * Builds a string containing the title of an anime in various languages
+ * @param {string} romajiTitle - The title of the anime in romaji
+ * @param {string} englishTitle - The title of the anime in english
+ * @param {string} japaneseTitle - The title of the anime in japanese
+ * @param {string} synonyms - Other titles the anime is known by
+ * @returns {string} A comma-separated string containing the titles
+ */
 function buildAliasString(romajiTitle, englishTitle, japaneseTitle, synonyms) {
     let string = '';
 
@@ -599,6 +726,13 @@ function buildAliasString(romajiTitle, englishTitle, japaneseTitle, synonyms) {
     return string;
 }
 
+/**
+ * Constructs a formatted date range string from the given start and end dates.
+ * 
+ * @param {Object} startDate - The start date object with `year`, `month`, and `day` properties.
+ * @param {Object} endDate - The end date object with `year`, `month`, and `day` properties.
+ * @returns {string} A formatted string representing the date range in the format "YYYY-MM-DD - YYYY-MM-DD".
+ */
 function aniListDateBuilder(startDate, endDate) {
     let startMonth = startDate.month < 10 ? '0' + startDate.month : startDate.month;
     let startDay = startDate.day < 10 ? '0' + startDate.day : startDate.day;
