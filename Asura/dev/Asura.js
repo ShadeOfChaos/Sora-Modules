@@ -1,14 +1,14 @@
 // // //***** LOCAL TESTING
-(async () => {
-    const results = await searchResults('Cowboy Bebop');
-    console.log('RESULTS:', results);
-    const details = await extractDetails(JSON.parse(results)[1].href);
-    console.log('DETAILS:', details);
-    const eps = await extractEpisodes(JSON.parse(results)[1].href);
-    console.log('EPISODES:', eps);
-    const streamUrl = await extractStreamUrl(JSON.parse(eps)[0].href);
-    console.log('STREAMURL:', streamUrl);
-})();
+// (async () => {
+//     const results = await searchResults('Cowboy Bebop');
+//     console.log('RESULTS:', results);
+//     const details = await extractDetails(JSON.parse(results)[1].href);
+//     console.log('DETAILS:', details);
+//     const eps = await extractEpisodes(JSON.parse(results)[1].href);
+//     console.log('EPISODES:', eps);
+//     const streamUrl = await extractStreamUrl(JSON.parse(eps)[0].href);
+//     console.log('STREAMURL:', streamUrl);
+// })();
 //***** LOCAL TESTING
 
 
@@ -62,27 +62,22 @@ async function searchResults(keyword) {
  * @param {string} url The id required to fetch the details
  * @returns {Promise<string>} A promise that resolves with a JSON string containing the details in the format: `[{"description": "Description", "aliases": "Aliases", "airdate": "Airdate"}]`
  */
-async function extractDetails(json) {
+async function extractDetails(objString) {
     console.log('[ASURA][extractDetails] RUNNING EXTRACT DETAILS');
+    let json = {};
+    [json.url, json.origin, json.anilistId, json.detailsUrl, json.episodesUrl] = objString.split('|');
 
     try {
-        if(json == null || json == '') {
-            console.log("0. extractDetails: " + parsedJson.anilistId);
-            throw('No data returned from Sora');
-        }
-
-        const parsedJson = JSON.parse(json);
-
-        if(parsedJson?.detailsUrl == 'https://graphql.anilist.co') {
-            console.log("1. anilistId: " + parsedJson.anilistId);
-            const result = await getDetailsFromAnilist(parsedJson.anilistId);
+        if(json?.detailsUrl == 'https://graphql.anilist.co') {
+            console.log("1. anilistId: " + json.anilistId);
+            const result = await getDetailsFromAnilist(json.anilistId);
             console.log("2. result: " + result);
             return result;
         }
 
-        if(parsedJson?.origin == 'AniCrush') {
-            console.log("3. Anicrush url: " + parsedJson.detailsUrl);
-            const result = await getDetailsFromAniCrush(parsedJson.detailsUrl);
+        if(json?.origin == 'AniCrush') {
+            console.log("3. Anicrush url: " + json.detailsUrl);
+            const result = await getDetailsFromAniCrush(json.detailsUrl);
             console.log("4. result: " + result);
             return result;
         }
@@ -104,37 +99,32 @@ async function extractDetails(json) {
  * @returns {Promise<string>} A promise that resolves with a JSON string containing the episodes in the format: `[{ "href": "Episode URL", "number": Episode Number }, ...]`.
  * If an error occurs during the fetch operation, an empty array is returned in JSON format.
  */
-async function extractEpisodes(json) {
+async function extractEpisodes(objString) {
     console.log('[ASURA][extractEpisodes] RUNNING EXTRACT EPISODES');
+    let json = {};
+    [json.url, json.origin, json.anilistId, json.detailsUrl, json.episodesUrl] = objString.split('|');
 
     try {
-        if(json == null || json == '') {
-            console.log("5. No data returned from Sora: " + json);
-            throw('No data returned from Sora');
-        }
-
-        const parsedJson = JSON.parse(json);
-
-        if(parsedJson?.episodesUrl == null) {
+        if(json?.episodesUrl == null) {
             console.log("6. No episodes found json: " + json);
             throw('No episodes found');
         }
 
         console.log("[ASURA] ====================================== [ASURA]");
         console.log("[ASURA] DEBUG JSON: " + json);
-        console.log("[ASURA] DEBUG PARSEDJSON ORIGIN: " + parsedJson?.origin);
+        console.log("[ASURA] DEBUG PARSEDJSON ORIGIN: " + json?.origin);
         console.log("[ASURA] ====================================== [ASURA]");
 
-        if(parsedJson?.origin == 'AnimeParadise') {
+        if(json?.origin == 'AnimeParadise') {
             console.log("7. AnimeParadise json: " + json);
-            const result = await extractEpisodesFromAnimeParadise(parsedJson);
+            const result = await extractEpisodesFromAnimeParadise(json);
             console.log("8. AnimeParadise result: " + result);
             return result;
         }
 
-        if(parsedJson?.origin == 'AniCrush') {
+        if(json?.origin == 'AniCrush') {
             console.log("9. AniCrush json: " + json);
-            const result = await extractEpisodesFromAniCrush(parsedJson);
+            const result = await extractEpisodesFromAniCrush(json);
             console.log("10. AniCrush result: " + result);
             return result;
         }
@@ -151,8 +141,8 @@ async function extractEpisodes(json) {
  * @param {string} url - The url to extract the stream URL from.
  * @returns {Promise<string|null>} A promise that resolves with the stream URL if successful, or null if an error occurs during the fetch operation.
  */
-async function extractStreamUrl(obj) {
-    const [url, anilistId] = obj.split('|');
+async function extractStreamUrl(objString) {
+    const [url, anilistId] = objString.split('|');
     console.log('[ASURA][extractStreamUrl] RUNNING EXTRACT STREAM URL', url, anilistId);
 
     try {
@@ -280,16 +270,12 @@ async function animeParadiseSearch(keyword, asuraList = []) {
                 continue;
             }
 
+            // Href value:
+            // [url, origin, anilistId, detatilsUrl, episodesUrl]
             shows.push({
                 title: 'AnimeParadise: ' + entry.title,
                 image: entry.posterImage.original,
-                href: JSON.stringify({
-                    url: ANIME_URL + entry.link,
-                    origin: 'AnimeParadise',
-                    anilistId: entry.mappings.anilist,
-                    detailsUrl: `https://graphql.anilist.co`,
-                    episodesUrl: `https://api.animeparadise.moe/anime/${ entry._id }/episode`
-                })
+                href: `${ ANIME_URL }${ entry.link }|AnimeParadise|${ entry.mappings.anilist }|https://graphql.anilist.co|https://api.animeparadise.moe/anime/${ entry._id }/episode`
             });
         }
 
@@ -324,16 +310,12 @@ async function aniCrushSearch(keyword, asuraList = []) {
 
             const href = `${ BASE_URL }/watch/${ entry.slug }.${ entry.id }`;
 
+            // Href value:
+            // [url, origin, anilistId, detatilsUrl, episodesUrl]
             shows.push({
                 title: 'AniCrush: ' + entry.name,
                 image: getAniCrushImage(entry.poster_path),
-                href: JSON.stringify({
-                    url: href,
-                    origin: 'AniCrush',
-                    anilistId: entry.anilistId,
-                    detailsUrl: `https://api.anicrush.to/shared/v2/movie/getById/${ entry.id }`,
-                    episodesUrl: `https://api.anicrush.to/shared/v2/episode/list?_movieId=${ entry.id }`
-                })
+                href: `${ href }|AniCrush|${ entry.anilistId }|https://api.anicrush.to/shared/v2/movie/getById/${ entry.id }|https://api.anicrush.to/shared/v2/episode/list?_movieId=${ entry.id }`
             });
         }
 
