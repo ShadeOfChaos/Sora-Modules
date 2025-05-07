@@ -69,9 +69,9 @@ async function extractDetails(objString) {
     let json = {};
     [json.url, json.origin, json.anilistId, json.detailsUrl, json.episodesUrl] = objString.split(encodedDelimiter);
 
-    console.log('[ASURA][extractDetails] json: ' + JSON.stringify(json));
-
     try {
+        console.log('[ASURA][extractDetails] json: ' + JSON.stringify(json));
+
         if(json?.detailsUrl == 'https://graphql.anilist.co') {
             console.log("1. anilistId: " + json.anilistId);
             const result = await getDetailsFromAnilist(json.anilistId);
@@ -110,9 +110,9 @@ async function extractEpisodes(objString) {
     let json = {};
     [json.url, json.origin, json.anilistId, json.detailsUrl, json.episodesUrl] = objString.split(encodedDelimiter);
 
-    console.log('[ASURA][extractEpisodes] json: ' + JSON.stringify(json));
-
     try {
+        console.log('[ASURA][extractEpisodes] json: ' + JSON.stringify(json));
+
         if(json?.episodesUrl == null) {
             console.log("6. No episodes found json: " + json);
             throw('No episodes found');
@@ -152,8 +152,8 @@ async function extractEpisodes(objString) {
 async function extractStreamUrl(objString) {
     const encodedDelimiter = encodeURIComponent('|');
     const [url, anilistId] = objString.split(encodedDelimiter);
-    console.log('[ASURA][extractStreamUrl] RUNNING EXTRACT STREAM URL', url, anilistId);
-    console.log('[ASURA][extractStreamUrl] objString: ' + objString);
+    console.log('[ASURA][extractStreamUrl] RUNNING EXTRACT STREAM URL: ' + url + ' & Anilist ID:' + anilistId);
+    console.log('[ASURA][extractStreamUrl] objString: ' + objString);    
 
     try {
         if(url == null || anilistId == null) {
