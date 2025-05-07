@@ -153,6 +153,7 @@ async function extractStreamUrl(objString) {
     const encodedDelimiter = encodeURIComponent('|');
     const [url, anilistId] = objString.split(encodedDelimiter);
     console.log('[ASURA][extractStreamUrl] RUNNING EXTRACT STREAM URL', url, anilistId);
+    console.log('[ASURA][extractStreamUrl] objString: ' + objString);
 
     try {
         if(url == null || anilistId == null) {
