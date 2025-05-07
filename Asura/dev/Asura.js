@@ -33,7 +33,9 @@ function getAniCrushImage(path, type = "poster") {
  * @returns {Promise<string>} A promise that resolves with a JSON string containing the search results in the format: `[{"title": "Title", "image": "Image URL", "href": "URL"}, ...]`
  */
 async function searchResults(keyword) {
-    return await multiSearch(keyword);
+    const result = await multiSearch(keyword);
+    console.log('SEARCH RESULTS:', result);
+    return result;
 }
 
 /**
@@ -46,10 +48,10 @@ async function extractDetails(json) {
 
     return JSON.stringify([{
         description: 'Description: DEBUGGING',
-        aliases: 'Duration: DEBUGGING',
+        aliases: 'Aliases: DEBUGGING',
         airdate: 'Aired: DEBUGGING'
     }]);
-
+    /*
     try {
         if(json == null || json == '') {
             console.log("0. extractDetails: " + parsedJson.anilistId);
@@ -81,6 +83,7 @@ async function extractDetails(json) {
             airdate: 'Aired: Unknown'
         }]);
     }
+    */
 }
 
 /**
@@ -91,8 +94,8 @@ async function extractDetails(json) {
  */
 async function extractEpisodes(json) {
     console.log('RUNNING EXTRACT EPISODES');
-    return JSON.stringify([]);
-
+    return JSON.stringify([{"href": "TEST", number: 1}]);
+    /*
     try {
         if(json == null || json == '') {
             console.log("5. No data returned from Sora: " + json);
@@ -130,6 +133,7 @@ async function extractEpisodes(json) {
         console.log('Episodes error: ' + error?.message);
         return JSON.stringify([]);
     }
+    */
 }
 
 /**
@@ -139,7 +143,7 @@ async function extractEpisodes(json) {
  */
 async function extractStreamUrl(json) {
     return JSON.stringify({ stream: null, subtitles: null });
-
+    /*
     try {
         if(json == null || json == '') {
             throw('No data returned from Sora in extractStreamUrl');
@@ -162,6 +166,7 @@ async function extractStreamUrl(json) {
         console.log('Stream URL error: ' + error?.message);
         return JSON.stringify({ stream: null, subtitles: null });
     }
+    */
 }
 
 function getNextData(html) {
