@@ -368,8 +368,7 @@ async function getAniCrushAnilistId(movies) {
 
 async function getDetailsFromAnilist(anilistId) {
     const BASE_URL = 'https://graphql.anilist.co';
-    const query = `
-    query ($id: Int!) {
+    const query = `query ($id: Int!) {
         Media (id: $id, type: ANIME) {
             id
             title {
@@ -395,13 +394,13 @@ async function getDetailsFromAnilist(anilistId) {
         const response = await soraFetch(BASE_URL, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
+                "Content-Type": "application/json",
+                "Accept": "application/json"
             },
             body: JSON.stringify({
                 query: query,
                 variables: {
-                    id: anilistId
+                    "id": anilistId
                 }
             })
         });
