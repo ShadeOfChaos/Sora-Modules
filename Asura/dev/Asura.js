@@ -91,6 +91,7 @@ async function extractDetails(json) {
  */
 async function extractEpisodes(json) {
     console.log('RUNNING EXTRACT EPISODES');
+    return JSON.stringify([]);
 
     try {
         if(json == null || json == '') {
