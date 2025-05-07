@@ -2,9 +2,9 @@
 // (async () => {
 //     const results = await searchResults('Cowboy Bebop');
 //     console.log('RESULTS:', results);
-//     const details = await extractDetails(JSON.parse(results)[1].href);
+//     const details = await extractDetails(JSON.parse(results)[2].href);
 //     console.log('DETAILS:', details);
-//     const eps = await extractEpisodes(JSON.parse(results)[1].href);
+//     const eps = await extractEpisodes(JSON.parse(results)[2].href);
 //     console.log('EPISODES:', eps);
 //     const streamUrl = await extractStreamUrl(JSON.parse(eps)[0].href);
 //     console.log('STREAMURL:', streamUrl);
@@ -150,8 +150,8 @@ async function extractEpisodes(objString) {
  * @returns {Promise<string|null>} A promise that resolves with the stream URL if successful, or null if an error occurs during the fetch operation.
  */
 async function extractStreamUrl(objString) {
-    const encodedDelimiter = encodeURIComponent('|');
-    const [url, anilistId] = objString.split(encodedDelimiter);
+    const delimiter = '|';
+    const [url, anilistId] = objString.split(delimiter);
     console.log('[ASURA][extractStreamUrl] RUNNING EXTRACT STREAM URL: ' + url + ' & Anilist ID:' + anilistId);
     console.log('[ASURA][extractStreamUrl] objString: ' + objString);    
 
@@ -407,11 +407,15 @@ async function getDetailsFromAnilist(anilistId) {
         });
         const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
+        console.log('[ASURA][getDetailsFromAnilist] json response: ' + JSON.stringify(json));
+
         if(json?.data?.Media == null) {
             throw('Error retrieving Anilist data');
         }
 
         const media = json.data.Media;
+
+        console.log('[ASURA][getDetailsFromAnilist] media response: ' + JSON.stringify(media));
 
         return JSON.stringify([{
             description: json.data?.Media?.description,
