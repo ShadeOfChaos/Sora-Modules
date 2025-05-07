@@ -393,159 +393,159 @@ async function getAniCrushAnilistId(movies) {
     });
 }
 
-async function getDetailsFromAnilist(anilistId) {
-    const BASE_URL = 'https://graphql.anilist.co';
-    const query = `
-    query ($id: Int!) {
-        Media (id: $id, type: ANIME) {
-            id
-            title {
-                romaji
-                english
-                native
-            }
-            description
-            startDate {
-                year
-                month
-                day
-            }
-            endDate {
-                year
-                month
-                day
-            }
-        }
-    }`;
+// async function getDetailsFromAnilist(anilistId) {
+//     const BASE_URL = 'https://graphql.anilist.co';
+//     const query = `
+//     query ($id: Int!) {
+//         Media (id: $id, type: ANIME) {
+//             id
+//             title {
+//                 romaji
+//                 english
+//                 native
+//             }
+//             description
+//             startDate {
+//                 year
+//                 month
+//                 day
+//             }
+//             endDate {
+//                 year
+//                 month
+//                 day
+//             }
+//         }
+//     }`;
 
-    try {
-        const response = await soraFetch(BASE_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify({
-                query: query,
-                variables: {
-                    id: anilistId
-                }
-            })
-        });
-        const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
+//     try {
+//         const response = await soraFetch(BASE_URL, {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//                 'Accept': 'application/json'
+//             },
+//             body: JSON.stringify({
+//                 query: query,
+//                 variables: {
+//                     id: anilistId
+//                 }
+//             })
+//         });
+//         const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
-        if(json?.data?.Media == null) {
-            throw('Error retrieving Anilist data');
-        }
+//         if(json?.data?.Media == null) {
+//             throw('Error retrieving Anilist data');
+//         }
 
-        const media = json.data.Media;
+//         const media = json.data.Media;
 
-        return JSON.stringify([{
-            description: json.data?.Media?.description,
-            aliases: buildAliasString(media.title.romaji, media.title.english, media.title.native, null),
-            airdate: aniListDateBuilder(media.startDate, media.endDate)
-        }]);
+//         return JSON.stringify([{
+//             description: json.data?.Media?.description,
+//             aliases: buildAliasString(media.title.romaji, media.title.english, media.title.native, null),
+//             airdate: aniListDateBuilder(media.startDate, media.endDate)
+//         }]);
 
-    } catch(error) {
-        console.log('Fetch error: ' + error?.message);
-        return JSON.stringify([{
-            description: 'Error loading description',
-            aliases: 'Duration: Unknown',
-            airdate: 'Aired: Unknown'
-        }]);
-    }
-}
+//     } catch(error) {
+//         console.log('Fetch error: ' + error?.message);
+//         return JSON.stringify([{
+//             description: 'Error loading description',
+//             aliases: 'Duration: Unknown',
+//             airdate: 'Aired: Unknown'
+//         }]);
+//     }
+// }
 
-async function getDetailsFromAniCrush(detailsUrl) {
-    try {
-        const response = await soraFetch(detailsUrl, { headers: GetAniCrushHeaders() });
-        const data = typeof response === 'object' ? await response.json() : await JSON.parse(response);
+// async function getDetailsFromAniCrush(detailsUrl) {
+//     try {
+//         const response = await soraFetch(detailsUrl, { headers: GetAniCrushHeaders() });
+//         const data = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
-        if(data?.status == false || data?.result == null) {
-            throw('Error obtaining details from AniCrush API');
-        }
+//         if(data?.status == false || data?.result == null) {
+//             throw('Error obtaining details from AniCrush API');
+//         }
 
-        return JSON.stringify([{
-            description: data.result.overview,
-            aliases: buildAliasString(data.result?.name, data.result?.name_english, data.result?.name_japanese, data.result?.name_synonyms),
-            airdate: data.result?.aired_from + ' - ' + data.result?.aired_to
-        }]);
+//         return JSON.stringify([{
+//             description: data.result.overview,
+//             aliases: buildAliasString(data.result?.name, data.result?.name_english, data.result?.name_japanese, data.result?.name_synonyms),
+//             airdate: data.result?.aired_from + ' - ' + data.result?.aired_to
+//         }]);
 
-    } catch (error) {
-        console.log('Fetch error: ' + error?.message);
-        return JSON.stringify([{
-            description: 'Error loading description',
-            aliases: 'Duration: Unknown',
-            airdate: 'Aired: Unknown'
-        }]);
-    }
-}
+//     } catch (error) {
+//         console.log('Fetch error: ' + error?.message);
+//         return JSON.stringify([{
+//             description: 'Error loading description',
+//             aliases: 'Duration: Unknown',
+//             airdate: 'Aired: Unknown'
+//         }]);
+//     }
+// }
 
-async function extractEpisodesFromAnimeParadise(json) {
-    const BASE_URL = 'https://www.animeparadise.moe/watch/';
+// async function extractEpisodesFromAnimeParadise(json) {
+//     const BASE_URL = 'https://www.animeparadise.moe/watch/';
 
-    try {
-        const response = await soraFetch(json.episodesUrl);
-        const data = typeof response === 'object' ? await response.json() : await JSON.parse(response);
+//     try {
+//         const response = await soraFetch(json.episodesUrl);
+//         const data = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
-        if(data?.data == null) {
-            throw('Error retrieving AnimeParadise episodes json');
-        }
+//         if(data?.data == null) {
+//             throw('Error retrieving AnimeParadise episodes json');
+//         }
 
-        const episodes = data?.data.map(ep => {
-            return {
-                href: /*JSON.stringify({
-                    url: */`${ BASE_URL }${ ep.uid }?origin=${ ep.origin }`,
-                    /*anilistId: data.anilistId
-                }),*/
-                number: parseInt(ep.number)
-            }
-        });
+//         const episodes = data?.data.map(ep => {
+//             return {
+//                 href: /*JSON.stringify({
+//                     url: */`${ BASE_URL }${ ep.uid }?origin=${ ep.origin }`,
+//                     /*anilistId: data.anilistId
+//                 }),*/
+//                 number: parseInt(ep.number)
+//             }
+//         });
 
-        return JSON.stringify(episodes);
+//         return JSON.stringify(episodes);
 
-    } catch(error) {
-        console.log('Fetch error: ' + error?.message);
-        return JSON.stringify([]);
-    }
-}
+//     } catch(error) {
+//         console.log('Fetch error: ' + error?.message);
+//         return JSON.stringify([]);
+//     }
+// }
 
-async function extractEpisodesFromAniCrush(json) {
-    const url = json.episodesUrl;
-    const SOURCE_API_URL = 'https://api.anicrush.to/shared/v2';
-    const movieId = url.split('=')[1];
+// async function extractEpisodesFromAniCrush(json) {
+//     const url = json.episodesUrl;
+//     const SOURCE_API_URL = 'https://api.anicrush.to/shared/v2';
+//     const movieId = url.split('=')[1];
 
-    try {
-        const serverId = 4;
-        const format = 'sub';
-        var episodes = [];
+//     try {
+//         const serverId = 4;
+//         const format = 'sub';
+//         var episodes = [];
 
-        const response = await soraFetch(url, { headers: GetAniCrushHeaders() });
-        const data = typeof response === 'object' ? await response.json() : await JSON.parse(response);
+//         const response = await soraFetch(url, { headers: GetAniCrushHeaders() });
+//         const data = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
-        if(data?.status == false || data?.result == null) {
-            throw('No results found');
-        }
+//         if(data?.status == false || data?.result == null) {
+//             throw('No results found');
+//         }
 
-        for(let episodeList in data.result) {
-            for(let episode of data.result[episodeList]) {
-                episodes.push({
-                    href: /*JSON.stringify({
-                        url: */`${ SOURCE_API_URL }/episode/sources?_movieId=${ movieId }&ep=${ episode.number }&sv=${ serverId }&sc=${ format }`,
-                        /*anilistId: json.anilistId
-                    }),*/
-                    number: parseInt(episode.number)
-                });
-            }
-        }
+//         for(let episodeList in data.result) {
+//             for(let episode of data.result[episodeList]) {
+//                 episodes.push({
+//                     href: /*JSON.stringify({
+//                         url: */`${ SOURCE_API_URL }/episode/sources?_movieId=${ movieId }&ep=${ episode.number }&sv=${ serverId }&sc=${ format }`,
+//                         /*anilistId: json.anilistId
+//                     }),*/
+//                     number: parseInt(episode.number)
+//                 });
+//             }
+//         }
 
-        return JSON.stringify(episodes);
+//         return JSON.stringify(episodes);
 
-    } catch(error) {
-        console.log('Fetch error: ' + error?.message);
-        return JSON.stringify([]);
-    }
-}
+//     } catch(error) {
+//         console.log('Fetch error: ' + error?.message);
+//         return JSON.stringify([]);
+//     }
+// }
 
 async function extractStreamUrlFromAnimeParadise(streamData) {
     try {
