@@ -87,7 +87,6 @@ async function extractDetails(objString) {
         }
 
     } catch (error) {
-        console.log('[ASURA][ExtractDetails] Error');
         console.log('[ASURA][ExtractDetails] Details error: ' + error?.message);
         return JSON.stringify([{
             description: 'Error loading description',
@@ -104,41 +103,24 @@ async function extractDetails(objString) {
  * If an error occurs during the fetch operation, an empty array is returned in JSON format.
  */
 async function extractEpisodes(objString) {
-    console.log('[ASURA][extractEpisodes] RUNNING EXTRACT EPISODES');
-    console.log('[ASURA][extractEpisodes] objString: ' + objString);
     const encodedDelimiter = encodeURIComponent('|');
     let json = {};
     [json.url, json.origin, json.anilistId, json.detailsUrl, json.episodesUrl] = objString.split(encodedDelimiter);
 
     try {
-        console.log('[ASURA][extractEpisodes] json: ' + JSON.stringify(json));
-
         if(json?.episodesUrl == null) {
-            console.log("6. No episodes found json: " + json);
             throw('No episodes found');
         }
 
-        console.log("[ASURA] ====================================== [ASURA]");
-        console.log("[ASURA] DEBUG JSON: " + json);
-        console.log("[ASURA] DEBUG PARSEDJSON ORIGIN: " + json?.origin);
-        console.log("[ASURA] ====================================== [ASURA]");
-
         if(json?.origin == 'AnimeParadise') {
-            console.log("7. AnimeParadise json: " + json);
-            const result = await extractEpisodesFromAnimeParadise(json);
-            console.log("8. AnimeParadise result: " + result);
-            return result;
+            return await extractEpisodesFromAnimeParadise(json);
         }
 
         if(json?.origin == 'AniCrush') {
-            console.log("9. AniCrush json: " + json);
-            const result = await extractEpisodesFromAniCrush(json);
-            console.log("10. AniCrush result: " + result);
-            return result;
+            return await extractEpisodesFromAniCrush(json);
         }
 
     } catch(error) {
-        console.log('[ASURA][extractEpisodes] Error');
         console.log('[ASURA][extractEpisodes] Episodes error: ' + error?.message);
         return JSON.stringify([]);
     }
@@ -152,8 +134,6 @@ async function extractEpisodes(objString) {
 async function extractStreamUrl(objString) {
     const delimiter = '|';
     const [url, anilistId] = objString.split(delimiter);
-    console.log('[ASURA][extractStreamUrl] RUNNING EXTRACT STREAM URL: ' + url + ' & Anilist ID:' + anilistId);
-    console.log('[ASURA][extractStreamUrl] objString: ' + objString);    
 
     try {
         if(url == null || anilistId == null) {
@@ -283,7 +263,7 @@ async function animeParadiseSearch(keyword, asuraList = []) {
             // Href value:
             // [url, origin, anilistId, detatilsUrl, episodesUrl]
             shows.push({
-                title: 'AnimeParadise: ' + entry.title,
+                title: entry.title + ' [AP]',
                 image: entry.posterImage.original,
                 href: `${ ANIME_URL }${ entry.link }|AnimeParadise|${ entry.mappings.anilist }|https://graphql.anilist.co|https://api.animeparadise.moe/anime/${ entry._id }/episode`
             });
@@ -323,7 +303,7 @@ async function aniCrushSearch(keyword, asuraList = []) {
             // Href value:
             // [url, origin, anilistId, detatilsUrl, episodesUrl]
             shows.push({
-                title: 'AniCrush: ' + entry.name,
+                title: entry.name + ' [AC]',
                 image: getAniCrushImage(entry.poster_path),
                 href: `${ href }|AniCrush|${ entry.anilistId }|https://api.anicrush.to/shared/v2/movie/getById/${ entry.id }|https://api.anicrush.to/shared/v2/episode/list?_movieId=${ entry.id }`
             });
