@@ -1,14 +1,14 @@
 // // //***** LOCAL TESTING
-(async () => {
-    const results = await searchResults('Cowboy Bebop');
-    console.log('RESULTS:', results);
-    const details = await extractDetails(JSON.parse(results)[2].href);
-    console.log('DETAILS:', details);
-    const eps = await extractEpisodes(JSON.parse(results)[2].href);
-    console.log('EPISODES:', eps);
-    const streamUrl = await extractStreamUrl(JSON.parse(eps)[0].href);
-    console.log('STREAMURL:', streamUrl);
-})();
+// (async () => {
+//     const results = await searchResults('Cowboy Bebop');
+//     console.log('RESULTS:', results);
+//     const details = await extractDetails(JSON.parse(results)[1].href);
+//     console.log('DETAILS:', details);
+//     const eps = await extractEpisodes(JSON.parse(results)[1].href);
+//     console.log('EPISODES:', eps);
+//     const streamUrl = await extractStreamUrl(JSON.parse(eps)[0].href);
+//     console.log('STREAMURL:', streamUrl);
+// })();
 //***** LOCAL TESTING
 
 
