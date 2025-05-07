@@ -64,8 +64,11 @@ async function searchResults(keyword) {
  */
 async function extractDetails(objString) {
     console.log('[ASURA][extractDetails] RUNNING EXTRACT DETAILS');
+    console.log('[ASURA][extractDetails] objString: ' + objString);
     let json = {};
     [json.url, json.origin, json.anilistId, json.detailsUrl, json.episodesUrl] = objString.split('|');
+
+    console.log('[ASURA][extractDetails] json: ' + JSON.stringify(json));
 
     try {
         if(json?.detailsUrl == 'https://graphql.anilist.co') {
@@ -101,8 +104,11 @@ async function extractDetails(objString) {
  */
 async function extractEpisodes(objString) {
     console.log('[ASURA][extractEpisodes] RUNNING EXTRACT EPISODES');
+    console.log('[ASURA][extractEpisodes] objString: ' + objString);
     let json = {};
     [json.url, json.origin, json.anilistId, json.detailsUrl, json.episodesUrl] = objString.split('|');
+
+    console.log('[ASURA][extractEpisodes] json: ' + JSON.stringify(json));
 
     try {
         if(json?.episodesUrl == null) {
