@@ -33,28 +33,30 @@ function getAniCrushImage(path, type = "poster") {
  * @returns {Promise<string>} A promise that resolves with a JSON string containing the search results in the format: `[{"title": "Title", "image": "Image URL", "href": "URL"}, ...]`
  */
 async function searchResults(keyword) {
-    let p = [];
+    return JSON.stringify([{"title":"Cowboy Bebop: Tengoku no Tobira","image":"https://static.gniyonna.com/media/poster/300x400/100/264adb9a8499b57ced3d5a3a42b4288d.jpg","href":"https://anicrush.to/watch/cowboy-bebop-the-movie.KCEeG4"},{"title":"Cowboy Bebop","image":"https://static.gniyonna.com/media/poster/300x400/100/1cebf74a66cf12613424e36fa935e5ec.jpg","href":"https://anicrush.to/watch/cowboy-bebop.JwEcEt"}]);
 
-    const asuraList = await GetAnimes();
+    // let p = [];
 
-    const anicrush = aniCrushSearch(keyword, asuraList);
-    const animeparadise = animeParadiseSearch(keyword, asuraList);
+    // const asuraList = await GetAnimes();
 
-    p.push(anicrush);
-    p.push(animeparadise);
+    // const anicrush = aniCrushSearch(keyword, asuraList);
+    // const animeparadise = animeParadiseSearch(keyword, asuraList);
 
-    return Promise.allSettled(p).then((results) => {
-        // Merge results
-        let mergedResults = [];
-        for (let result of results) {
-            if (result.status === 'fulfilled') {
-                return JSON.stringify(result.value); // Return the first result for testing purposes
-                // mergedResults = mergedResults.concat(result.value);
-            }
-        }
+    // p.push(anicrush);
+    // p.push(animeparadise);
 
-        // return JSON.stringify(mergedResults);
-    });
+    // return Promise.allSettled(p).then((results) => {
+    //     // Merge results
+    //     let mergedResults = [];
+    //     for (let result of results) {
+    //         if (result.status === 'fulfilled') {
+    //             mergedResults = mergedResults.concat(result.value);
+    //         }
+    //     }
+        
+
+    //     return JSON.stringify(mergedResults);
+    // });
     // const result = await multiSearch(keyword);
     // console.log('[ASURA][searchResults] SEARCH RESULTS:' + result);
     // return result;
