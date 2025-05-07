@@ -65,8 +65,9 @@ async function searchResults(keyword) {
 async function extractDetails(objString) {
     console.log('[ASURA][extractDetails] RUNNING EXTRACT DETAILS');
     console.log('[ASURA][extractDetails] objString: ' + objString);
+    const encodedDelimiter = encodeURIComponent('|');
     let json = {};
-    [json.url, json.origin, json.anilistId, json.detailsUrl, json.episodesUrl] = objString.split('|');
+    [json.url, json.origin, json.anilistId, json.detailsUrl, json.episodesUrl] = objString.split(encodedDelimiter);
 
     console.log('[ASURA][extractDetails] json: ' + JSON.stringify(json));
 
@@ -105,8 +106,9 @@ async function extractDetails(objString) {
 async function extractEpisodes(objString) {
     console.log('[ASURA][extractEpisodes] RUNNING EXTRACT EPISODES');
     console.log('[ASURA][extractEpisodes] objString: ' + objString);
+    const encodedDelimiter = encodeURIComponent('|');
     let json = {};
-    [json.url, json.origin, json.anilistId, json.detailsUrl, json.episodesUrl] = objString.split('|');
+    [json.url, json.origin, json.anilistId, json.detailsUrl, json.episodesUrl] = objString.split(encodedDelimiter);
 
     console.log('[ASURA][extractEpisodes] json: ' + JSON.stringify(json));
 
@@ -148,7 +150,8 @@ async function extractEpisodes(objString) {
  * @returns {Promise<string|null>} A promise that resolves with the stream URL if successful, or null if an error occurs during the fetch operation.
  */
 async function extractStreamUrl(objString) {
-    const [url, anilistId] = objString.split('|');
+    const encodedDelimiter = encodeURIComponent('|');
+    const [url, anilistId] = objString.split(encodedDelimiter);
     console.log('[ASURA][extractStreamUrl] RUNNING EXTRACT STREAM URL', url, anilistId);
 
     try {
