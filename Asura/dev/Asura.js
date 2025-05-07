@@ -445,8 +445,8 @@ async function getDetailsFromAniCrush(detailsUrl) {
         }
 
         return JSON.stringify([{
-            description: data.result.description,
-            aliases: buildAliasString(data?.name, data?.name_english, data?.name_japanese, data?.name_synonyms),
+            description: data.result.overview,
+            aliases: buildAliasString(data.result?.name, data.result?.name_english, data.result?.name_japanese, data.result?.name_synonyms),
             airdate: data.result?.aired_from + ' - ' + data.result?.aired_to
         }]);
 
