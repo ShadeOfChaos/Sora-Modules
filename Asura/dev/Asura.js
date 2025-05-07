@@ -132,6 +132,8 @@ async function extractEpisodes(json) {
  * @returns {Promise<string|null>} A promise that resolves with the stream URL if successful, or null if an error occurs during the fetch operation.
  */
 async function extractStreamUrl(json) {
+    return JSON.stringify({ stream: null, subtitles: null });
+
     try {
         if(json == null || json == '') {
             throw('No data returned from Sora in extractStreamUrl');
