@@ -1,14 +1,14 @@
 // // //***** LOCAL TESTING
-// (async () => {
-//     const results = await searchResults('Cowboy Bebop');
-//     console.log('RESULTS:', results);
-//     const details = await extractDetails(JSON.parse(results)[1].href);
-//     console.log('DETAILS:', details);
-//     const eps = await extractEpisodes(JSON.parse(results)[1].href);
-//     console.log('EPISODES:', eps);
-//     const streamUrl = await extractStreamUrl(JSON.parse(eps)[0].href);
-//     console.log('STREAMURL:', streamUrl);
-// })();
+(async () => {
+    const results = await searchResults('Cowboy Bebop');
+    console.log('RESULTS:', results);
+    const details = await extractDetails(JSON.parse(results)[1].href);
+    console.log('DETAILS:', details);
+    const eps = await extractEpisodes(JSON.parse(results)[1].href);
+    console.log('EPISODES:', eps);
+    const streamUrl = await extractStreamUrl(JSON.parse(eps)[0].href);
+    console.log('STREAMURL:', streamUrl);
+})();
 //***** LOCAL TESTING
 
 
@@ -33,9 +33,31 @@ function getAniCrushImage(path, type = "poster") {
  * @returns {Promise<string>} A promise that resolves with a JSON string containing the search results in the format: `[{"title": "Title", "image": "Image URL", "href": "URL"}, ...]`
  */
 async function searchResults(keyword) {
-    const result = await multiSearch(keyword);
-    console.log('[ASURA][searchResults] SEARCH RESULTS:' + result);
-    return result;
+    let p = [];
+
+    const asuraList = await GetAnimes();
+
+    const anicrush = aniCrushSearch(keyword, asuraList);
+    const animeparadise = animeParadiseSearch(keyword, asuraList);
+
+    p.push(anicrush);
+    p.push(animeparadise);
+
+    return Promise.allSettled(p).then((results) => {
+        // Merge results
+        let mergedResults = [];
+        for (let result of results) {
+            if (result.status === 'fulfilled') {
+                return JSON.stringify(result.value); // Return the first result for testing purposes
+                // mergedResults = mergedResults.concat(result.value);
+            }
+        }
+
+        // return JSON.stringify(mergedResults);
+    });
+    // const result = await multiSearch(keyword);
+    // console.log('[ASURA][searchResults] SEARCH RESULTS:' + result);
+    // return result;
 }
 
 /**
@@ -259,29 +281,31 @@ async function soraFetch(url, options = { headers: {}, method: 'GET', body: null
     }
 }
 
-async function multiSearch(keyword) {
-    let p = [];
+// TODO - Remove this function when the multiSearch is working
+// async function multiSearch(keyword) {
+//     let p = [];
 
-    const asuraList = await GetAnimes();
+//     const asuraList = await GetAnimes();
 
-    const anicrush = aniCrushSearch(keyword, asuraList);
-    const animeparadise = animeParadiseSearch(keyword, asuraList);
+//     const anicrush = aniCrushSearch(keyword, asuraList);
+//     const animeparadise = animeParadiseSearch(keyword, asuraList);
 
-    p.push(anicrush);
-    p.push(animeparadise);
+//     p.push(anicrush);
+//     p.push(animeparadise);
 
-    return Promise.allSettled(p).then((results) => {
-        // Merge results
-        let mergedResults = [];
-        for (let result of results) {
-            if (result.status === 'fulfilled') {
-                mergedResults = mergedResults.concat(result.value);
-            }
-        }
+//     return Promise.allSettled(p).then((results) => {
+//         // Merge results
+//         let mergedResults = [];
+//         for (let result of results) {
+//             if (result.status === 'fulfilled') {
+//                 mergedResults = mergedResults.concat(result.value);
+//             }
+//         }
 
-        return JSON.stringify(mergedResults);
-    });
-}
+//         // return JSON.stringify(mergedResults);
+//         return JSON.stringify(result.value); // Return the first result for testing purposes
+//     });
+// }
 
 async function animeParadiseSearch(keyword, asuraList = []) {
     const ANIME_URL = 'https://www.animeparadise.moe/anime/';
