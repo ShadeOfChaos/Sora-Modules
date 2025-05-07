@@ -311,7 +311,7 @@ async function animeParadiseSearch(keyword, asuraList = []) {
             // Href value:
             // [url, origin, anilistId, detatilsUrl, episodesUrl]
             shows.push({
-                title: entry.title + ' [AP]',
+                title: '[AP] ' + entry.title,
                 image: entry.posterImage.original,
                 href: `${ ANIME_URL }${ entry.link }|AnimeParadise|${ entry.mappings.anilist }|https://graphql.anilist.co|https://api.animeparadise.moe/anime/${ entry._id }/episode`
             });
@@ -360,7 +360,7 @@ async function aniCrushSearch(keyword, asuraList = []) {
             // Href value:
             // [url, origin, anilistId, detatilsUrl, episodesUrl]
             shows.push({
-                title: entry.name + ' [AC]',
+                title: '[AC] ' + entry.name,
                 image: getAniCrushImage(entry.poster_path),
                 href: `${ href }|AniCrush|${ entry.anilistId }|https://api.anicrush.to/shared/v2/movie/getById/${ entry.id }|https://api.anicrush.to/shared/v2/episode/list?_movieId=${ entry.id }`
             });
