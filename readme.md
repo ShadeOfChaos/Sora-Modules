@@ -92,7 +92,7 @@
 **Language:** English (HARDSUB)<br>
 **Minimum Sora version required:** 0.2.2<br>
 <span></span>
-[<kbd> <br> Add to Sora <br> </kbd>](https://intradeus.github.io/http-protocol-redirector?r=sora://module?url=https://github.com/ShadeOfChaos/Sora-Modules/blob/main/hikaritv/subs-eng/HikariTv.json)
+[<kbd> <br> Add to Sora <br> </kbd>](https://intradeus.github.io/http-protocol-redirector?r=sora://module?url=https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/hikaritv/subs-eng/HikariTv.json)
 </span>
 <br><br>
 <span><img src="https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/hikaritv/logo_readme.png" width="125px" align="left"><br>
@@ -100,7 +100,7 @@
 **Language:** English (DUB)<br>
 **Minimum Sora version required:** 0.2.2<br>
 <span></span>
-[<kbd> <br> Add to Sora <br> </kbd>](https://intradeus.github.io/http-protocol-redirector?r=sora://module?url=https://github.com/ShadeOfChaos/Sora-Modules/blob/main/hikaritv/dubs-eng/HikariTv.json)
+[<kbd> <br> Add to Sora <br> </kbd>](https://intradeus.github.io/http-protocol-redirector?r=sora://module?url=https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/hikaritv/dubs-eng/HikariTv.json)
 </span>
 <br><br>
 
@@ -109,7 +109,7 @@
 **Language:** Japanese (SUB)<br>
 **Minimum Sora version required:** 0.2.2<br>
 <span></span>
-[<kbd> <br> Add to Sora <br> </kbd>](https://intradeus.github.io/http-protocol-redirector?r=sora://module?url=https://github.com/ShadeOfChaos/Sora-Modules/blob/main/Asura/subs-jp/Asura.json)
+[<kbd> <br> Add to Sora <br> </kbd>](https://intradeus.github.io/http-protocol-redirector?r=sora://module?url=https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/Asura/subs-jp/Asura.json)
 </span>
 <br><br>
 
