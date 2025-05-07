@@ -292,7 +292,8 @@ async function animeParadiseSearch(keyword, asuraList = []) {
             }
 
             shows.push({
-                title: 'AnimeParadise: ' + entry.title,
+                // title: 'AnimeParadise: ' + entry.title,
+                title: entry.title,
                 image: entry.posterImage.original,
                 href: JSON.stringify({
                     url: ANIME_URL + entry.link,
@@ -336,7 +337,8 @@ async function aniCrushSearch(keyword, asuraList = []) {
             const href = `${ BASE_URL }/watch/${ entry.slug }.${ entry.id }`;
 
             shows.push({
-                title: 'AniCrush: ' + entry.name,
+                // title: 'AniCrush: ' + entry.name,
+                title: entry.name,
                 image: getAniCrushImage(entry.poster_path),
                 href: JSON.stringify({
                     url: href,
