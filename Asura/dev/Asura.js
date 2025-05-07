@@ -169,24 +169,24 @@ async function extractStreamUrl(json) {
     */
 }
 
-function getNextData(html) {
-    const trimmedHtml = trimHtml(html, '__NEXT_DATA__', '</script>');
-    const jsonString = trimmedHtml.slice(39);
+// function getNextData(html) {
+//     const trimmedHtml = trimHtml(html, '__NEXT_DATA__', '</script>');
+//     const jsonString = trimmedHtml.slice(39);
 
-    try {
-        return JSON.parse(jsonString);
-    } catch (e) {
-        console.log('[ASURA][getNextData] Error parsing NEXT_DATA json');
-        return null;
-    }
-}
+//     try {
+//         return JSON.parse(jsonString);
+//     } catch (e) {
+//         console.log('[ASURA][getNextData] Error parsing NEXT_DATA json');
+//         return null;
+//     }
+// }
 
 // Trims around the content, leaving only the area between the start and end string
-function trimHtml(html, startString, endString) {
-    const startIndex = html.indexOf(startString);
-    const endIndex = html.indexOf(endString, startIndex);
-    return html.substring(startIndex, endIndex);
-}
+// function trimHtml(html, startString, endString) {
+//     const startIndex = html.indexOf(startString);
+//     const endIndex = html.indexOf(endString, startIndex);
+//     return html.substring(startIndex, endIndex);
+// }
 
 async function GetAnimes() {
     const baseUrl = 'https://asura.ofchaos.com/api/anime';
@@ -231,20 +231,20 @@ async function GetEpisodes(anilistId) {
     }
 }
 
-function GetSubtitles(anilistId, episodeNr) {
-    if(
-        anilistId == null ||
-        isNaN(parseInt(anilistId)) ||
-        episodeNr == null ||
-        isNaN(parseInt(episodeNr))
-    ) {
-        return null;
-    }
+// function GetSubtitles(anilistId, episodeNr) {
+//     if(
+//         anilistId == null ||
+//         isNaN(parseInt(anilistId)) ||
+//         episodeNr == null ||
+//         isNaN(parseInt(episodeNr))
+//     ) {
+//         return null;
+//     }
 
-    const baseUrl = 'https://asura.ofchaos.com/api/anime';
+//     const baseUrl = 'https://asura.ofchaos.com/api/anime';
 
-    return `${ baseUrl }/${ anilistId }/${ episodeNr }`;
-}
+//     return `${ baseUrl }/${ anilistId }/${ episodeNr }`;
+// }
 
 // Uses Sora's fetchv2 on ipad, fallbacks to regular fetch on Windows
 async function soraFetch(url, options = { headers: {}, method: 'GET', body: null }) {
@@ -547,90 +547,90 @@ async function getAniCrushAnilistId(movies) {
 //     }
 // }
 
-async function extractStreamUrlFromAnimeParadise(streamData) {
-    try {
-        const response = await soraFetch(streamData.url);
-        const html = typeof response === 'object' ? await response.text() : await response;
+// async function extractStreamUrlFromAnimeParadise(streamData) {
+//     try {
+//         const response = await soraFetch(streamData.url);
+//         const html = typeof response === 'object' ? await response.text() : await response;
 
-        const json = getNextData(html);
-        if (json == null) throw ('Error parsing NEXT_DATA json');
+//         const json = getNextData(html);
+//         if (json == null) throw ('Error parsing NEXT_DATA json');
 
-        const streamUrl = json?.props?.pageProps?.episode?.streamLink;
-        const subtitles = GetSubtitles(json.props.pageProps?.animeData?.mappings?.anilist, json.props.pageProps.episode?.number);
+//         const streamUrl = json?.props?.pageProps?.episode?.streamLink;
+//         const subtitles = GetSubtitles(json.props.pageProps?.animeData?.mappings?.anilist, json.props.pageProps.episode?.number);
 
-        return JSON.stringify({ stream: streamUrl, subtitles: subtitles });
+//         return JSON.stringify({ stream: streamUrl, subtitles: subtitles });
 
-    } catch (error) {
-        console.log('[ASURA][extractStreamUrlFromAnimeParadise] Error extracting stream url: ' + error?.message);
-        return JSON.stringify({ stream: null, subtitles: null });
-    }
-}
+//     } catch (error) {
+//         console.log('[ASURA][extractStreamUrlFromAnimeParadise] Error extracting stream url: ' + error?.message);
+//         return JSON.stringify({ stream: null, subtitles: null });
+//     }
+// }
 
-async function extractStreamUrlFromAniCrush(streamData) {
-    const url = streamData.url;
-    const SOURCE_BASE_URL = "https://anicrush.to";
-    const UTILITY_URL = "https://ac-api.ofchaos.com";
+// async function extractStreamUrlFromAniCrush(streamData) {
+//     const url = streamData.url;
+//     const SOURCE_BASE_URL = "https://anicrush.to";
+//     const UTILITY_URL = "https://ac-api.ofchaos.com";
 
-    try {
-        const epIndex = url.indexOf('ep=') + 3;
-        const ep = url.substring(epIndex, url.indexOf('&', epIndex));
+//     try {
+//         const epIndex = url.indexOf('ep=') + 3;
+//         const ep = url.substring(epIndex, url.indexOf('&', epIndex));
 
-        const sourceResponse = await soraFetch(url, { headers: GetAniCrushHeaders() });
-        const sourceData = typeof sourceResponse === 'object' ? await sourceResponse.json() : await JSON.parse(sourceResponse);
+//         const sourceResponse = await soraFetch(url, { headers: GetAniCrushHeaders() });
+//         const sourceData = typeof sourceResponse === 'object' ? await sourceResponse.json() : await JSON.parse(sourceResponse);
 
-        if(
-            sourceData.status == false || 
-            sourceData.result == null || 
-            sourceData.result.link == "" ||
-            sourceData.result.link == null
-        ) {
-            throw('No source found');
-        }
+//         if(
+//             sourceData.status == false || 
+//             sourceData.result == null || 
+//             sourceData.result.link == "" ||
+//             sourceData.result.link == null
+//         ) {
+//             throw('No source found');
+//         }
 
-        const source = sourceData.result.link;
+//         const source = sourceData.result.link;
 
-        const hlsUrl = `${ UTILITY_URL }/api/anime/embed/convert?embedUrl=${ encodeURIComponent(source) }&host=${ encodeURIComponent(SOURCE_BASE_URL) }`;
-        const hlsResponse = await soraFetch(hlsUrl);
-        const hlsData = typeof hlsResponse === 'object' ? await hlsResponse.json() : await JSON.parse(hlsResponse);
+//         const hlsUrl = `${ UTILITY_URL }/api/anime/embed/convert?embedUrl=${ encodeURIComponent(source) }&host=${ encodeURIComponent(SOURCE_BASE_URL) }`;
+//         const hlsResponse = await soraFetch(hlsUrl);
+//         const hlsData = typeof hlsResponse === 'object' ? await hlsResponse.json() : await JSON.parse(hlsResponse);
 
-        if(hlsData?.status == false || hlsData?.result == null || hlsData?.error != null) {
-            throw('No stream found');
-        }
+//         if(hlsData?.status == false || hlsData?.result == null || hlsData?.error != null) {
+//             throw('No stream found');
+//         }
 
-        if(hlsData.result?.sources?.length <= 0) {
-            throw('No source found');
-        }
+//         if(hlsData.result?.sources?.length <= 0) {
+//             throw('No source found');
+//         }
 
-        let streamSource = null;
-        let mp4Source = null;
+//         let streamSource = null;
+//         let mp4Source = null;
 
-        for(let source of hlsData.result.sources) {
-            if(source.type === 'hls') {
-                streamSource = source;
-                break;
-            }
-            if(source.type === 'mp4') {
-                mp4Source = source;
-            }
-        }
+//         for(let source of hlsData.result.sources) {
+//             if(source.type === 'hls') {
+//                 streamSource = source;
+//                 break;
+//             }
+//             if(source.type === 'mp4') {
+//                 mp4Source = source;
+//             }
+//         }
 
-        if(streamSource == null) {
-            if(mp4Source == null) {
-                throw('No valid stream found');
-            }
-            streamSource = mp4Source;
-        }
+//         if(streamSource == null) {
+//             if(mp4Source == null) {
+//                 throw('No valid stream found');
+//             }
+//             streamSource = mp4Source;
+//         }
 
-        const streamUrl = streamSource?.file;
-        const subtitles = GetSubtitles(streamData.anilistId, ep);
+//         const streamUrl = streamSource?.file;
+//         const subtitles = GetSubtitles(streamData.anilistId, ep);
 
-        return JSON.stringify({ stream: streamUrl, subtitles: subtitles });
+//         return JSON.stringify({ stream: streamUrl, subtitles: subtitles });
 
-    } catch (error) {
-        console.log('[ASURA][extractStreamUrlFromAniCrush] Fetch error: ' + error?.message);
-        return JSON.stringify({ stream: null, subtitles: null });
-    }
-}
+//     } catch (error) {
+//         console.log('[ASURA][extractStreamUrlFromAniCrush] Fetch error: ' + error?.message);
+//         return JSON.stringify({ stream: null, subtitles: null });
+//     }
+// }
 
 function GetAniCrushHeaders() {
     return {
@@ -645,38 +645,38 @@ function GetAniCrushHeaders() {
     }
 }
 
-function buildAliasString(romajiTitle, englishTitle, japaneseTitle, synonyms) {
-    let string = '';
+// function buildAliasString(romajiTitle, englishTitle, japaneseTitle, synonyms) {
+//     let string = '';
 
-    if (romajiTitle) {
-        string += romajiTitle;
-    }
+//     if (romajiTitle) {
+//         string += romajiTitle;
+//     }
 
-    if (englishTitle) {
+//     if (englishTitle) {
         
-        if (string != '') string += ', ';
-        string += englishTitle;
-    }
+//         if (string != '') string += ', ';
+//         string += englishTitle;
+//     }
 
-    if (japaneseTitle) {
-        if (string != '') string += ', ';
-        string += japaneseTitle;
-    }
+//     if (japaneseTitle) {
+//         if (string != '') string += ', ';
+//         string += japaneseTitle;
+//     }
 
-    if (synonyms) {
-        if (string != '') string += ', ';
-        string += synonyms;
-    }
+//     if (synonyms) {
+//         if (string != '') string += ', ';
+//         string += synonyms;
+//     }
 
-    return string;
-}
+//     return string;
+// }
 
-function aniListDateBuilder(startDate, endDate) {
-    let startMonth = startDate.month < 10 ? '0' + startDate.month : startDate.month;
-    let startDay = startDate.day < 10 ? '0' + startDate.day : startDate.day;
-    let endMonth = endDate.month < 10 ? '0' + endDate.month : endDate.month;
-    let endDay = endDate.day < 10 ? '0' + endDate.day : endDate.day;
+// function aniListDateBuilder(startDate, endDate) {
+//     let startMonth = startDate.month < 10 ? '0' + startDate.month : startDate.month;
+//     let startDay = startDate.day < 10 ? '0' + startDate.day : startDate.day;
+//     let endMonth = endDate.month < 10 ? '0' + endDate.month : endDate.month;
+//     let endDay = endDate.day < 10 ? '0' + endDate.day : endDate.day;
 
 
-    return `${ startDate.year }-${ startMonth }-${ startDay } - ${ endDate.year }-${ endMonth }-${ endDay }`;
-}
+//     return `${ startDate.year }-${ startMonth }-${ startDay } - ${ endDate.year }-${ endMonth }-${ endDay }`;
+// }
