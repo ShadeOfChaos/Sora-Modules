@@ -223,38 +223,6 @@ async function GetAnimes() {
     }
 }
 
-
-/**
- * Retrieves the episodes for the given Anilist ID
- * @param {number} anilistId - The Anilist ID of the anime to retrieve episodes for
- * @returns {Promise<Array<Object>>} A promise that resolves with an array of episode objects with the following properties:
- * - `number`: The episode number
- * - `href`: The URL to fetch the episode from
- */
-async function GetEpisodes(anilistId) {
-    if(anilistId == null || isNaN(parseInt(anilistId))) {
-        return [];
-    }
-
-    const baseUrl = 'https://asura.ofchaos.com/api/anime';
-    const referer = 'SoraApp';
-
-    try {
-        const response = await soraFetch(`${ baseUrl }/${ anilistId }`, { headers: { 'Referer': referer } });
-        const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
-
-        if(json == null)                 throw('Error parsing Asura json');
-        if(json?.success !== true)       throw(json?.error);
-        if(json?.result?.length == null) throw('Error obtaining data from Asura API');
-
-        return json?.result;
-
-    } catch(error) {
-        console.log('[ASURA][GetEpisodes] Error: ' + error?.message);
-        return [];
-    }
-}
-
 /**
  * Returns the URL to fetch subtitles for the given anime and episode number
  * @param {number} anilistId - The Anilist ID of the anime
