@@ -204,7 +204,6 @@ function trimHtml(html, startString, endString) {
  * It expects a successful response with a non-null result array.
  * Any errors during the fetch or parsing are caught and logged, returning an empty array.
  */
-
 async function GetAnimes() {
     const baseUrl = 'https://asura.ofchaos.com/api/anime';
     const referer = 'SoraApp';
