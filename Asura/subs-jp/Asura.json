@@ -12,7 +12,7 @@
     "quality": "1080p",
 	"type": "anime",
     "baseUrl": "https://megacloud.club/",
-    "searchBaseUrl": "",
+    "searchBaseUrl": "https://asura.ofchaos.com/api/anime",
     "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/Asura/subs-jp/Asura.js",
     "asyncJS": true,
     "streamAsyncJS": true,
