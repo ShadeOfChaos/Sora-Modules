@@ -4,7 +4,8 @@
     "author": {
         "name": "ShadeOfChaos",
         "icon": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeParadise.moe/ofchaos.jpg",
-        "url:": "https://asura.ofchaos.com"
+        "url": "https://github.com/ShadeOfChaos/Sora-Modules",
+        "subtitlesUrl": "https://asura.ofchaos.com"
     },
     "version": "1.0.0",
     "language": "Japanese (SUB)",
