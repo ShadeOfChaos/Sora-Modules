@@ -305,6 +305,27 @@ async function GetAnimes() {
 }
 
 /**
+ * Returns the URL to fetch subtitles for the given anime and episode number
+ * @param {number} anilistId - The Anilist ID of the anime
+ * @param {number} episodeNr - The episode number to fetch subtitles for
+ * @returns {string|null} The URL to fetch subtitles from, or null if an error occurred
+ */
+function GetSubtitles(anilistId, episodeNr) {
+    if(
+        anilistId == null ||
+        isNaN(parseInt(anilistId)) ||
+        episodeNr == null ||
+        isNaN(parseInt(episodeNr))
+    ) {
+        return null;
+    }
+
+    const baseUrl = 'https://asura.ofchaos.com/api/anime';
+
+    return `${ baseUrl }/${ anilistId }/${ episodeNr }`;
+}
+
+/**
  * Returns an object containing the headers required to make a request to the AniCrush API.
  * @returns {Object} An object containing the headers
  */
