@@ -54,8 +54,8 @@ async function searchResults(keyword) {
             // Href value:
             // [url, origin, anilistId, detatilsUrl, episodesUrl]
             shows.push({
-                title: '[AC] ' + entry.name,
-                image: getAniCrushImage(entry.poster_path),
+                title: entry.name,
+                image: getImage(entry.poster_path),
                 href: `${ href }|AniCrush|${ entry.anilistId }|https://api.anicrush.to/shared/v2/movie/getById/${ entry.id }|https://api.anicrush.to/shared/v2/episode/list?_movieId=${ entry.id }`
             });
         }
