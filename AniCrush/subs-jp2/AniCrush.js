@@ -27,6 +27,7 @@ function getImage(path, type = "poster") {
 async function searchResults(keyword) {
     const BASE_URL = 'https://anicrush.to';
     const UTILITY_URL = 'https://api.anicrush.to/shared/v2';
+    // const UTILITY_URL = 'https://api.anicrush.to/shared/v2/movie/getById/';
     let shows = [];
 
     try {
@@ -222,6 +223,40 @@ async function extractStreamUrl(objString) {
         console.log('[ASURA][extractStreamUrl] Stream URL error: ' + error?.message);
         return JSON.stringify({ stream: null, subtitles: null });
     }
+}
+
+/**
+ * Given an array of movies, fetches the Anilist ID for each of them using the AniCrush API.
+ * @param {Array<Object>} movies - Array of movie objects, each containing an `id` property.
+ * @returns {Promise<Array<Object>>} A promise that resolves with an array of movie objects, each containing an `anilistId` property.
+ */
+async function getAniCrushAnilistId(movies) {
+    const UTILITY_URL = 'https://api.anicrush.to/shared/v2/movie/getById/';
+
+    return new Promise((resolve) => {
+        let promises = [];
+
+        for(let movie of movies) {
+            let result = new Promise(async (resolve, reject) => {
+                let res = await soraFetch(`${ UTILITY_URL }${ movie.id }`, { headers: GetAniCrushHeaders() });
+                let data = typeof res === 'object' ? await res.json() : await JSON.parse(res);
+
+                if(data?.result == null || data.result?.al_id == null) {
+                    reject(null);
+                }
+
+                movie.anilistId = data.result.al_id;
+
+                resolve(movie);
+            });
+
+            promises.push(result);
+        }
+
+        Promise.allSettled(promises).then((results) => {
+            resolve(results.filter((entry) => entry.status === 'fulfilled').map((entry) => entry.value));
+        })
+    });
 }
 
 async function soraFetch(url, options = { headers: {}, method: 'GET', body: null }) {
