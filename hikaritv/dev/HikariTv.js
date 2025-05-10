@@ -108,7 +108,8 @@ async function extractEpisodes(slug) {
 async function extractStreamUrl(url) {
     const typeMap = { 'SOFTSUB': 2, 'DUB': 3, 'MULTI': 4, 'HARDSUB': 8 };
     const moduleTypes = ['SOFTSUB', 'HARDSUB'];
-    const acceptabledProviders = ['Streamwish', 'Hiki'];
+    // const acceptabledProviders = ['Streamwish', 'Hiki']; // TODO - Make Hiki work in Sora, probably baseUrl issue
+    const acceptabledProviders = ['Streamwish'];
 
     try {
         const response = await soraFetch(url);
@@ -147,30 +148,43 @@ async function extractStreamUrl(url) {
         }
 
         return Promise.allSettled(streamPromises).then((results) => {
-            let streamOptions = [];
-            let streams = []; // temp for testing
-            let subtitles = null; // temp for testing
+            // TODO - Multi-source at some point, but Sora is not willing to work with me
+
+            // let streamOptions = []; // v1 (Ideal)
+            // let streams = []; // temp for testing // v2 (Sucks)
+            // let subtitles = null; // temp for testing // v2 (Sucks)
+            let stream = { stream: null, subtitles: null }; // v3 (Less than ideal)
 
             for(let result of results) {
                 if(result.status === 'fulfilled') {
-                    streamOptions.push(result.value);
-                    if(result.value.subtitles == null) {
-                        streams.push('Hardsub');
-                    } else {
-                        streams.push('Softsub');
-                    }
-                    
-                    streams.push(result.value.stream);
-                    
+                    // (Less than ideal)
+                    stream.stream = result.value.stream;
                     if(result.value.subtitles != null) {
-                        subtitles = result.value.subtitles;
+                        stream.subtitles = result.value.subtitles;
                     }
+
+                    // streamOptions.push(result.value); // (Ideal)
+
+                    /* (Sucks)
+                    // if(result.value.subtitles == null) {
+                    //     streams.push('Hardsub');
+                    // } else {
+                    //     streams.push('Softsub');
+                    // }
+                    
+                    // streams.push(result.value.stream);
+                    
+                    // if(result.value.subtitles != null) {
+                    //     subtitles = result.value.subtitles;
+                    // }
+                    */
                 }
             }
-            if(streamOptions.length <= 0) throw('No valid streams found');
+            // if(streamOptions.length <= 0) throw('No valid streams found'); // (Ideal)
 
-            return JSON.stringify({ streams: streams, subtitles: subtitles });
-            // return JSON.stringify(streamOptions);
+            // return JSON.stringify(streamOptions); // (Ideal)
+            // return JSON.stringify({ streams: streams, subtitles: subtitles }); // (Sucks)
+            return JSON.stringify(stream); // (Less than ideal)
 
         }).catch(error => {
             console.error('Stream promise handler error: ' + error.message);
