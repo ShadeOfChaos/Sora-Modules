@@ -123,33 +123,34 @@ async function extractStreamUrl(url) {
             if(entry.embed_name == 'Streamwish') {
                 let streamOption = extractStreamwish(entry);
                 streamPromises.push(streamOption);
-                // if(streamOption != null) streamOptions.push(streamOption);
             }
         }
         
         return Promise.allSettled(streamPromises).then((results) => {
-            let stream = { stream: null, subtitles: null }; // v3 (Less than ideal)
+             let streamOptions = []; 
 
             for(let result of results) {
                 if(result.status === 'fulfilled') {
-                    // (Less than ideal)
-                    stream.stream = result.value.stream;
-                    if(result.value.subtitles != null) {
-                        stream.subtitles = result.value.subtitles;
-                    }
+                    streamOptions.push(result.value);
                 }
             }
-            
-            return JSON.stringify(stream); // (Less than ideal)
+            if(streamOptions.length <= 0) throw('No valid streams found');
+            let hardsub = streamOptions.find(s => s.type == 'HARD');
+            if(hardsub != null) return JSON.stringify({ stream: hardsub.stream, subtitles: null });
+
+            let softsub = streamOptions.find(s => s.type == 'SOFT');
+            if(softsub != null) return JSON.stringify({ stream: softsub.stream, subtitles: softsub.subtitles });
+
+            throw("No hard or softsubs found");
 
         }).catch(error => {
             console.error('Stream promise handler error: ' + error.message);
-            return { stream: null, subtitles: null };
+            return JSON.stringify({ stream: null, subtitles: null });
         });
 
     } catch(error) {
         console.error('soraFetch error: ' + error.message);
-        return null;
+        return JSON.stringify({ stream: null, subtitles: null });
     }
 }
 
@@ -174,6 +175,7 @@ async function extractStreamwish(streamData) {
             }
 
             let subtitles = null;
+            let type = 'HARD';
 
             const tracks = streamwishUnpacked.match(streamwishCaptionsRegex);
             if(tracks[1]) {
@@ -184,15 +186,16 @@ async function extractStreamwish(streamData) {
                 
                 if(englishSubs.length > 0) {
                     subtitles = englishSubs[0].file;
+                    type = 'SOFT';
                 }
             }
 
             const filesJson = JSON.parse(files[1]);
             
             if(filesJson.hls2) {
-                return { stream: filesJson.hls2, subtitles: subtitles };
+                return { stream: filesJson.hls2, subtitles: subtitles, type: type };
             } else if(filesJson.hls4) {
-                return { stream: filesJson.hls4, subtitles: subtitles };
+                return { stream: filesJson.hls4, subtitles: subtitles, type: type };
             } else {
                 throw('No streams found');
             }
