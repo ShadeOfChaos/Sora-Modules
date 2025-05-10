@@ -5,7 +5,6 @@ async function searchResults(keyword) {
         const encodedKeyword = encodeURIComponent(keyword);
         const response = await soraFetch(searchUrl + encodedKeyword);
         const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
-        console.log('JSON: ' + JSON.stringify(json));
 
         const jsonResults = json.results || [];
 
@@ -94,52 +93,112 @@ async function extractEpisodes(slug) {
 }
 
 async function extractStreamUrl(url) {
-    const typeMap = { 'SUB': 2, 'DUB': 3, 'MULTI': 4 };
-    const moduleType = 'SUB';
+    const typeMap = { 'SOFTSUB': 2, 'DUB': 3, 'MULTI': 4, 'HARDSUB': 8 };
+    const moduleTypes = ['SOFTSUB', 'HARDSUB'];
     const acceptabledProviders = ['Streamwish'];
 
     try {
         const response = await soraFetch(url);
         const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
-        const acceptableStreams = json.filter(stream => acceptabledProviders.includes(stream.embed_name) && stream.embed_type == typeMap[moduleType]);
+        const acceptableStreams = json.filter(stream => {
+            if(!acceptabledProviders.includes(stream.embed_name)) {
+                return false;
+            }
+
+            for(let moduleType of moduleTypes) {
+                if(stream.embed_type == typeMap[moduleType]) {
+                    return true;
+                }
+            }
+
+            return false;
+        });
+
         if(acceptableStreams.length <= 0) throw('No valid streams found');
+
+        let streamPromises = [];
+
+        for(let entry of acceptableStreams) {
+            if(entry.embed_name == 'Streamwish') {
+                let streamOption = extractStreamwish(entry);
+                streamPromises.push(streamOption);
+                // if(streamOption != null) streamOptions.push(streamOption);
+            }
+        }
         
-        const frameUrl = acceptableStreams[0].embed_frame;
+        return Promise.allSettled(streamPromises).then((results) => {
+            let stream = { stream: null, subtitles: null }; // v3 (Less than ideal)
+
+            for(let result of results) {
+                if(result.status === 'fulfilled') {
+                    // (Less than ideal)
+                    stream.stream = result.value.stream;
+                    if(result.value.subtitles != null) {
+                        stream.subtitles = result.value.subtitles;
+                    }
+                }
+            }
+            
+            return JSON.stringify(stream); // (Less than ideal)
+
+        }).catch(error => {
+            console.error('Stream promise handler error: ' + error.message);
+            return { stream: null, subtitles: null };
+        });
+
+    } catch(error) {
+        console.error('soraFetch error: ' + error.message);
+        return null;
+    }
+}
+
+async function extractStreamwish(streamData) {
+    try {
+        const frameUrl = streamData.embed_frame;
 
         const streamResponse = await soraFetch(frameUrl);
         const streamHtml = await streamResponse.text();
 
-        let streamUrl = '';
-
-        if(acceptableStreams[0].embed_name == 'Streamwish') {
+        if(streamData.embed_name == 'Streamwish') {
             const streamwishRegex = /links=({[\s\S]+?})/;
+            const streamwishCaptionsRegex = /tracks:([\s\S]+?])/;
 
             const streamwishPackerRegex = /<script type='text\/javascript'>(eval\(function\(p,a,c,k,e,d\)[\s\S]+?)<\/script>/;
             const streamwishPacker = streamHtml.match(streamwishPackerRegex);
             const streamwishUnpacked = unpack(streamwishPacker[1]);
-            
 
             const files = streamwishUnpacked.match(streamwishRegex);
             if(!files[1]) {
                 throw('No streams found');
             }
 
+            let subtitles = null;
+
+            const tracks = streamwishUnpacked.match(streamwishCaptionsRegex);
+            if(tracks[1]) {
+                let validJsonString = tracks[1].replaceAll('file:', '"file":').replaceAll('label:', '"label":').replaceAll('kind:', '"kind":');
+                let tracksJson = JSON.parse(validJsonString);
+
+                const englishSubs = tracksJson.filter(track => track.label == 'English' && track.kind == 'captions');
+                
+                if(englishSubs.length > 0) {
+                    subtitles = englishSubs[0].file;
+                }
+            }
+
             const filesJson = JSON.parse(files[1]);
             
             if(filesJson.hls2) {
-                return filesJson.hls2;
+                return { stream: filesJson.hls2, subtitles: subtitles };
             } else if(filesJson.hls4) {
-                return filesJson.hls4;
+                return { stream: filesJson.hls4, subtitles: subtitles };
             } else {
                 throw('No streams found');
             }
         }
-
-        return streamUrl;
-
     } catch(error) {
-        console.error('soraFetch error: ' + error.message);
+        console.error('Failed to extract Streamwish: ' + error.message);
         return null;
     }
 }
