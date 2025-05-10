@@ -1,11 +1,11 @@
 // // //***** LOCAL TESTING
 (async () => {
     const results = await searchResults('Solo leveling');
-    console.log('RESULTS:', results);
+    // console.log('RESULTS:', results);
     const details = await extractDetails(JSON.parse(results)[0].href);
-    console.log('DETAILS:', details);
+    // console.log('DETAILS:', details);
     const eps = await extractEpisodes(JSON.parse(results)[0].href);
-    console.log('EPISODES:', eps);
+    // console.log('EPISODES:', eps);
     const streamUrl = await extractStreamUrl(JSON.parse(eps)[0].href);
     console.log('STREAMURL:', streamUrl);
 })();
@@ -18,7 +18,6 @@ async function searchResults(keyword) {
         const encodedKeyword = encodeURIComponent(keyword);
         const response = await soraFetch(searchUrl + encodedKeyword);
         const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
-        console.log('JSON: ' + JSON.stringify(json));
 
         const jsonResults = json.results || [];
 
@@ -107,25 +106,99 @@ async function extractEpisodes(slug) {
 }
 
 async function extractStreamUrl(url) {
-    const typeMap = { 'SUB': 2, 'DUB': 3, 'MULTI': 4 };
-    const moduleType = 'SUB';
-    const acceptabledProviders = ['Streamwish'];
+    const typeMap = { 'SOFTSUB': 2, 'DUB': 3, 'MULTI': 4, 'HARDSUB': 8 };
+    const moduleTypes = ['SOFTSUB', 'HARDSUB'];
+    const acceptabledProviders = ['Streamwish', 'Hiki'];
 
     try {
         const response = await soraFetch(url);
         const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
-        const acceptableStreams = json.filter(stream => acceptabledProviders.includes(stream.embed_name) && stream.embed_type == typeMap[moduleType]);
+        const acceptableStreams = json.filter(stream => {
+            if(!acceptabledProviders.includes(stream.embed_name)) {
+                return false;
+            }
+
+            for(let moduleType of moduleTypes) {
+                if(stream.embed_type == typeMap[moduleType]) {
+                    return true;
+                }
+            }
+
+            return false;
+        });
+
         if(acceptableStreams.length <= 0) throw('No valid streams found');
+
+        let streamPromises = [];
+
+        for(let entry of acceptableStreams) {
+            if(entry.embed_name == 'Streamwish') {
+                let streamOption = extractStreamwish(entry);
+                streamPromises.push(streamOption);
+                // if(streamOption != null) streamOptions.push(streamOption);
+            }
+            if(entry.embed_name == 'Hiki') {
+                let streamOption = extractHiki(entry);
+                streamPromises.push(streamOption);
+                // if(streamOption != null) streamOptions.push(streamOption);
+            }
+        }
+
+        return Promise.allSettled(streamPromises).then((results) => {
+            let streamOptions = [];
+
+            for(let result of results) {
+                if(result.status === 'fulfilled') {
+                    streamOptions.push({ stream: result.value, subtitles: null });
+                }
+            }
+            if(streamOptions.length <= 0) throw('No valid streams found');
+
+            console.log(streamOptions);
+            return streamOptions;
+
+        }).catch(error => {
+            console.error('Stream promise handler error: ' + error.message);
+            return { stream: null, subtitles: null };
+        });
+
+    } catch(error) {
+        console.error('soraFetch error: ' + error.message);
+        return null;
+    }
+}
+
+async function extractHiki(streamData) {
+    const proxyUrl = 'https://hikari.gg/hiki-proxy/extract/';
+    
+    try {
+        // Get stream slug 0ee231wl251n
+        const frameUrl = streamData.embed_frame;
+        let frameSlug = frameUrl.split('/')[3];
+
+        const response = await soraFetch(proxyUrl + frameSlug);
+        const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
         
-        const frameUrl = acceptableStreams[0].embed_frame;
+        if(json.error != null) throw(json.error);
+        if(json.url == null) throw('No stream found for Hiki');
+
+        return json.url;
+
+    } catch (error) {
+        console.error('Failed to extract Hiki: ' + error.message);
+        return null;
+    }
+}
+
+async function extractStreamwish(streamData) {
+    try {
+        const frameUrl = streamData.embed_frame;
 
         const streamResponse = await soraFetch(frameUrl);
         const streamHtml = await streamResponse.text();
 
-        let streamUrl = '';
-
-        if(acceptableStreams[0].embed_name == 'Streamwish') {
+        if(streamData.embed_name == 'Streamwish') {
             const streamwishRegex = /links=({[\s\S]+?})/;
 
             const streamwishPackerRegex = /<script type='text\/javascript'>(eval\(function\(p,a,c,k,e,d\)[\s\S]+?)<\/script>/;
@@ -148,11 +221,8 @@ async function extractStreamUrl(url) {
                 throw('No streams found');
             }
         }
-
-        return streamUrl;
-
     } catch(error) {
-        console.error('soraFetch error: ' + error.message);
+        console.error('Failed to extract Streamwish: ' + error.message);
         return null;
     }
 }
