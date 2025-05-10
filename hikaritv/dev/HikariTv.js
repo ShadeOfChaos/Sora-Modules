@@ -1,14 +1,14 @@
 // // //***** LOCAL TESTING
-(async () => {
-    const results = await searchResults('Beyblade X');
-    // console.log('RESULTS:', results);
-    const details = await extractDetails(JSON.parse(results)[0].href);
-    // console.log('DETAILS:', details);
-    const eps = await extractEpisodes(JSON.parse(results)[0].href);
-    // console.log('EPISODES:', JSON.parse(eps));
-    const streamUrl = await extractStreamUrl(JSON.parse(eps)[78].href);
-    console.log('STREAMURL:', streamUrl);
-})();
+// (async () => {
+//     const results = await searchResults('Beyblade X');
+//     // console.log('RESULTS:', results);
+//     const details = await extractDetails(JSON.parse(results)[0].href);
+//     // console.log('DETAILS:', details);
+//     const eps = await extractEpisodes(JSON.parse(results)[0].href);
+//     // console.log('EPISODES:', JSON.parse(eps));
+//     const streamUrl = await extractStreamUrl(JSON.parse(eps)[78].href);
+//     console.log('STREAMURL:', streamUrl);
+// })();
 //***** LOCAL TESTING
 
 async function searchResults(keyword) {
@@ -150,20 +150,14 @@ async function extractStreamUrl(url) {
         return Promise.allSettled(streamPromises).then((results) => {
             // TODO - Multi-source at some point, but Sora is not willing to work with me
 
-            // let streamOptions = []; // v1 (Ideal)
+            let streamOptions = []; // v1 (Ideal) // v3 (Less than ideal)
             // let streams = []; // temp for testing // v2 (Sucks)
             // let subtitles = null; // temp for testing // v2 (Sucks)
-            let stream = { stream: null, subtitles: null }; // v3 (Less than ideal)
+            // let streamOptions = { stream: null, subtitles: null }; // v3 (Less than ideal)
 
             for(let result of results) {
                 if(result.status === 'fulfilled') {
-                    // (Less than ideal)
-                    stream.stream = result.value.stream;
-                    if(result.value.subtitles != null) {
-                        stream.subtitles = result.value.subtitles;
-                    }
-
-                    // streamOptions.push(result.value); // (Ideal)
+                    streamOptions.push(result.value); // (Ideal) // (Less than ideal same solution)
 
                     /* (Sucks)
                     // if(result.value.subtitles == null) {
@@ -180,20 +174,28 @@ async function extractStreamUrl(url) {
                     */
                 }
             }
-            // if(streamOptions.length <= 0) throw('No valid streams found'); // (Ideal)
+            if(streamOptions.length <= 0) throw('No valid streams found'); // (Ideal) // (Less than ideal same solution)
+
+            let hardsub = streamOptions.find(s => s.type == 'HARD');
+            if(hardsub != null) return JSON.stringify({ stream: hardsub.stream, subtitles: null });
+
+            let softsub = streamOptions.find(s => s.type == 'SOFT');
+            if(softsub != null) return JSON.stringify({ stream: softsub.stream, subtitles: softsub.subtitles });
+
+            throw("No hard or softsubs found");
 
             // return JSON.stringify(streamOptions); // (Ideal)
             // return JSON.stringify({ streams: streams, subtitles: subtitles }); // (Sucks)
-            return JSON.stringify(stream); // (Less than ideal)
+            // return JSON.stringify(stream); // (Less than ideal)
 
         }).catch(error => {
             console.error('Stream promise handler error: ' + error.message);
-            return { stream: null, subtitles: null };
+            return JSON.stringify({ stream: null, subtitles: null });
         });
 
     } catch(error) {
         console.error('soraFetch error: ' + error.message);
-        return null;
+        return JSON.stringify({ stream: null, subtitles: null });
     }
 }
 
@@ -210,7 +212,7 @@ async function extractHiki(streamData) {
         if(json.error != null) throw(json.error);
         if(json.url == null) throw('No stream found for Hiki');
 
-        return { stream: json.url, subtitles: null };
+        return { stream: json.url, subtitles: null, type: 'HARD' };
 
     } catch (error) {
         console.error('Failed to extract Hiki: ' + error.message);
@@ -239,6 +241,7 @@ async function extractStreamwish(streamData) {
             }
 
             let subtitles = null;
+            let type = 'HARD';
 
             const tracks = streamwishUnpacked.match(streamwishCaptionsRegex);
             if(tracks[1]) {
@@ -249,15 +252,16 @@ async function extractStreamwish(streamData) {
                 
                 if(englishSubs.length > 0) {
                     subtitles = englishSubs[0].file;
+                    type = 'SOFT';
                 }
             }
 
             const filesJson = JSON.parse(files[1]);
             
             if(filesJson.hls2) {
-                return { stream: filesJson.hls2, subtitles: subtitles };
+                return { stream: filesJson.hls2, subtitles: subtitles, type: type };
             } else if(filesJson.hls4) {
-                return { stream: filesJson.hls4, subtitles: subtitles };
+                return { stream: filesJson.hls4, subtitles: subtitles, type: type };
             } else {
                 throw('No streams found');
             }
