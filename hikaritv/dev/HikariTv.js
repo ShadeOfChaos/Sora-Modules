@@ -1,12 +1,12 @@
 // // //***** LOCAL TESTING
 (async () => {
-    const results = await searchResults('Solo leveling');
+    const results = await searchResults('Beyblade X');
     // console.log('RESULTS:', results);
     const details = await extractDetails(JSON.parse(results)[0].href);
     // console.log('DETAILS:', details);
     const eps = await extractEpisodes(JSON.parse(results)[0].href);
-    // console.log('EPISODES:', eps);
-    const streamUrl = await extractStreamUrl(JSON.parse(eps)[0].href);
+    // console.log('EPISODES:', JSON.parse(eps));
+    const streamUrl = await extractStreamUrl(JSON.parse(eps)[78].href);
     console.log('STREAMURL:', streamUrl);
 })();
 //***** LOCAL TESTING
@@ -129,6 +129,7 @@ async function extractStreamUrl(url) {
         });
 
         if(acceptableStreams.length <= 0) throw('No valid streams found');
+        console.log('Acceptable streams:', acceptableStreams);
 
         let streamPromises = [];
 
@@ -150,12 +151,11 @@ async function extractStreamUrl(url) {
 
             for(let result of results) {
                 if(result.status === 'fulfilled') {
-                    streamOptions.push({ stream: result.value, subtitles: null });
+                    streamOptions.push(result.value);
                 }
             }
             if(streamOptions.length <= 0) throw('No valid streams found');
 
-            console.log(streamOptions);
             return streamOptions;
 
         }).catch(error => {
@@ -173,7 +173,6 @@ async function extractHiki(streamData) {
     const proxyUrl = 'https://hikari.gg/hiki-proxy/extract/';
     
     try {
-        // Get stream slug 0ee231wl251n
         const frameUrl = streamData.embed_frame;
         let frameSlug = frameUrl.split('/')[3];
 
@@ -183,7 +182,7 @@ async function extractHiki(streamData) {
         if(json.error != null) throw(json.error);
         if(json.url == null) throw('No stream found for Hiki');
 
-        return json.url;
+        return { stream: json.url, subtitles: null };
 
     } catch (error) {
         console.error('Failed to extract Hiki: ' + error.message);
@@ -200,23 +199,37 @@ async function extractStreamwish(streamData) {
 
         if(streamData.embed_name == 'Streamwish') {
             const streamwishRegex = /links=({[\s\S]+?})/;
+            const streamwishCaptionsRegex = /tracks:([\s\S]+?])/;
 
             const streamwishPackerRegex = /<script type='text\/javascript'>(eval\(function\(p,a,c,k,e,d\)[\s\S]+?)<\/script>/;
             const streamwishPacker = streamHtml.match(streamwishPackerRegex);
             const streamwishUnpacked = unpack(streamwishPacker[1]);
-            
 
             const files = streamwishUnpacked.match(streamwishRegex);
             if(!files[1]) {
                 throw('No streams found');
             }
 
+            let subtitles = null;
+
+            const tracks = streamwishUnpacked.match(streamwishCaptionsRegex);
+            if(tracks[1]) {
+                let validJsonString = tracks[1].replaceAll('file:', '"file":').replaceAll('label:', '"label":').replaceAll('kind:', '"kind":');
+                let tracksJson = JSON.parse(validJsonString);
+
+                const englishSubs = tracksJson.filter(track => track.label == 'English' && track.kind == 'captions');
+                
+                if(englishSubs.length > 0) {
+                    subtitles = englishSubs[0].file;
+                }
+            }
+
             const filesJson = JSON.parse(files[1]);
             
             if(filesJson.hls2) {
-                return filesJson.hls2;
+                return { stream: filesJson.hls2, subtitles: subtitles };
             } else if(filesJson.hls4) {
-                return filesJson.hls4;
+                return { stream: filesJson.hls4, subtitles: subtitles };
             } else {
                 throw('No streams found');
             }
