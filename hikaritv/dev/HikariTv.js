@@ -149,7 +149,7 @@ async function extractStreamUrl(url) {
         return Promise.allSettled(streamPromises).then((results) => {
             let streamOptions = [];
             let streams = []; // temp for testing
-            let subtitles = []; // temp for testing
+            let subtitles = null; // temp for testing
 
             for(let result of results) {
                 if(result.status === 'fulfilled') {
@@ -159,8 +159,12 @@ async function extractStreamUrl(url) {
                     } else {
                         streams.push('Softsub');
                     }
+                    
                     streams.push(result.value.stream);
-                    subtitles.push(result.value.subtitles);
+                    
+                    if(result.value.subtitles != null) {
+                        subtitles = result.value.subtitles;
+                    }
                 }
             }
             if(streamOptions.length <= 0) throw('No valid streams found');
