@@ -148,15 +148,20 @@ async function extractStreamUrl(url) {
 
         return Promise.allSettled(streamPromises).then((results) => {
             let streamOptions = [];
+            let streams = []; // temp for testing
+            let subtitles = []; // temp for testing
 
             for(let result of results) {
                 if(result.status === 'fulfilled') {
                     streamOptions.push(result.value);
+                    streams.push(result.value.stream);
+                    subtitles.push(result.value.subtitles);
                 }
             }
             if(streamOptions.length <= 0) throw('No valid streams found');
 
-            return streamOptions;
+            return { streams: streams, subtitles: subtitles };
+            // return streamOptions;
 
         }).catch(error => {
             console.error('Stream promise handler error: ' + error.message);
