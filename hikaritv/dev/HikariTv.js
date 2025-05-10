@@ -169,8 +169,8 @@ async function extractStreamUrl(url) {
             }
             if(streamOptions.length <= 0) throw('No valid streams found');
 
-            return { streams: streams, subtitles: subtitles };
-            // return streamOptions;
+            return JSON.stringify({ streams: streams, subtitles: subtitles });
+            // return JSON.stringify(streamOptions);
 
         }).catch(error => {
             console.error('Stream promise handler error: ' + error.message);
