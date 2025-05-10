@@ -154,6 +154,11 @@ async function extractStreamUrl(url) {
             for(let result of results) {
                 if(result.status === 'fulfilled') {
                     streamOptions.push(result.value);
+                    if(result.value.subtitles == null) {
+                        streams.push('Hardsub');
+                    } else {
+                        streams.push('Softsub');
+                    }
                     streams.push(result.value.stream);
                     subtitles.push(result.value.subtitles);
                 }
