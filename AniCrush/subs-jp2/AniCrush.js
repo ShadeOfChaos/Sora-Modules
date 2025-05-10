@@ -271,8 +271,6 @@ async function soraFetch(url, options = { headers: {}, method: 'GET', body: null
     }
 }
 
-
-
 /**
  * Fetches a list of anime from the Asura API.
  * 
@@ -374,21 +372,4 @@ function buildAliasString(romajiTitle, englishTitle, japaneseTitle, synonyms) {
     }
 
     return string;
-}
-
-/**
- * Constructs a formatted date range string from the given start and end dates.
- * 
- * @param {Object} startDate - The start date object with `year`, `month`, and `day` properties.
- * @param {Object} endDate - The end date object with `year`, `month`, and `day` properties.
- * @returns {string} A formatted string representing the date range in the format "YYYY-MM-DD - YYYY-MM-DD".
- */
-function aniListDateBuilder(startDate, endDate) {
-    let startMonth = startDate.month < 10 ? '0' + startDate.month : startDate.month;
-    let startDay = startDate.day < 10 ? '0' + startDate.day : startDate.day;
-    let endMonth = endDate.month < 10 ? '0' + endDate.month : endDate.month;
-    let endDay = endDate.day < 10 ? '0' + endDate.day : endDate.day;
-
-
-    return `${ startDate.year }-${ startMonth }-${ startDay } - ${ endDate.year }-${ endMonth }-${ endDay }`;
 }
