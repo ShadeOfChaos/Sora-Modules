@@ -1,17 +1,20 @@
 // // //***** LOCAL TESTING
-(async () => {
-    const results = await searchResults('Beyblade X');
-    // console.log('RESULTS:', results);
-    const details = await extractDetails(JSON.parse(results)[0].href);
-    // console.log('DETAILS:', details);
-    const eps = await extractEpisodes(JSON.parse(results)[0].href);
-    // console.log('EPISODES:', JSON.parse(eps));
-    const streamUrl = await extractStreamUrl(JSON.parse(eps)[78].href);
-    console.log('STREAMURL:', streamUrl);
-})();
+// (async () => {
+//     const results = await searchResults('Beyblade X');
+//     // console.log('RESULTS:', results);
+//     const details = await extractDetails(JSON.parse(results)[0].href);
+//     // console.log('DETAILS:', details);
+//     const eps = await extractEpisodes(JSON.parse(results)[0].href);
+//     // console.log('EPISODES:', JSON.parse(eps));
+//     const streamUrl = await extractStreamUrl(JSON.parse(eps)[78].href);
+//     console.log('STREAMURL:', streamUrl);
+// })();
 //***** LOCAL TESTING
 
 async function searchResults(keyword) {
+    console.log("================ WTF IS 'THIS' in search ================");
+    console.log(this);
+    console.log("================ WTF IS 'THIS' in search ================");
     const searchUrl = "https://api.hikari.gg/api/anime/?sort=created_at&order=asc&page=1&search=";
 
     try {
@@ -39,6 +42,9 @@ async function searchResults(keyword) {
 }
 
 async function extractDetails(slug) {
+    console.log("================ WTF IS 'THIS' in details ================");
+    console.log(this);
+    console.log("================ WTF IS 'THIS' in details ================");
     const detailsUrl = "https://api.hikari.gg/api/anime/uid/";
 
     try {
@@ -83,6 +89,9 @@ async function extractDetails(slug) {
 }
 
 async function extractEpisodes(slug) {
+    console.log("================ WTF IS 'THIS' in episodes ================");
+    console.log(this);
+    console.log("================ WTF IS 'THIS' in episodes ================");
     const episodesUrl = "https://api.hikari.gg/api/episode/uid/";
     const embedUrl = "https://api.hikari.gg/api/embed/";
 
@@ -106,6 +115,9 @@ async function extractEpisodes(slug) {
 }
 
 async function extractStreamUrl(url) {
+    console.log("================ WTF IS 'THIS' in stream ================");
+    console.log(this);
+    console.log("================ WTF IS 'THIS' in stream ================");
     const typeMap = { 'SOFTSUB': 2, 'DUB': 3, 'MULTI': 4, 'HARDSUB': 8 };
     const moduleTypes = ['SOFTSUB', 'HARDSUB'];
     // const acceptabledProviders = ['Streamwish', 'Hiki']; // TODO - Make Hiki work in Sora, probably baseUrl issue
