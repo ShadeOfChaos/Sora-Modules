@@ -27,7 +27,6 @@ function getImage(path, type = "poster") {
 async function searchResults(keyword) {
     const BASE_URL = 'https://anicrush.to';
     const UTILITY_URL = 'https://api.anicrush.to/shared/v2';
-    // const UTILITY_URL = 'https://api.anicrush.to/shared/v2/movie/getById/';
     let shows = [];
 
     try {
