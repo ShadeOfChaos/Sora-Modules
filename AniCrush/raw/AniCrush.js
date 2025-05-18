@@ -212,7 +212,7 @@ async function extractStreamUrl(url) {
         }
 
         const serverObjects = serversData.result[format];
-        const serverObject = serverObjects.find(s => s.server == server);
+        let serverObject = serverObjects.find(s => s.server == server);
 
         if(serverObject != null) {
             server = serverObject.server;

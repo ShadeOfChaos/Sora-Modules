@@ -1,13 +1,13 @@
 // //***** LOCAL TESTING
-// const results = await searchResults('Solo Leveling');
+// const results = await searchResults('One Piece');
 // // console.log(results);
-// const details = await extractDetails(JSON.parse(results)[1].href);
+// const details = await extractDetails(JSON.parse(results)[6].href);
 // // console.log('DETAILS:', details);
-// const episodes = await extractEpisodes(JSON.parse(results)[1].href);
-// // console.log('OUTSIDE EPISODES:', episodes);
+// const episodes = await extractEpisodes(JSON.parse(results)[6].href);
+// // console.log('OUTSIDE EPISODES:', JSON.parse(episodes));
 // var epis = JSON.parse(episodes);
 // // console.log('Episodes', epis);
-// const streamUrl = await extractStreamUrl(epis[1].href);
+// const streamUrl = await extractStreamUrl(epis[1128].href);
 // console.log('STREAMURL:', streamUrl);
 // //***** LOCAL TESTING
 
@@ -225,7 +225,7 @@ async function extractStreamUrl(url) {
         }
 
         const serverObjects = serversData.result[format];
-        const serverObject = serverObjects.find(s => s.server == server);
+        let serverObject = serverObjects.find(s => s.server == server);
 
         if(serverObject != null) {
             server = serverObject.server;
