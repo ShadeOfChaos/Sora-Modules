@@ -1,12 +1,12 @@
 // // //***** LOCAL TESTING
 // const results = await searchResults('Solo leveling');
-// console.log('RESULTS:', results);
+// console.log('RESULTS: ', results);
 // const details = await extractDetails(JSON.parse(results)[0].href);
-// console.log('DETAILS:', details);
+// console.log('DETAILS: ', details);
 // const episodesa = await extractEpisodes(JSON.parse(results)[0].href);
-// console.log('EPISODES:', episodesa);
+// console.log('EPISODES: ', episodesa);
 // const streamUrl = await extractStreamUrl(JSON.parse(episodesa)[0].href);
-// console.log('STREAMURL:', streamUrl);
+// console.log('STREAMURL: ', streamUrl);
 //***** LOCAL TESTING
 
 /**
@@ -37,7 +37,7 @@ async function searchResults(keyword) {
 
         return JSON.stringify(shows);
     } catch (error) {
-        console.log('Fetch error:', error);
+        console.log('Fetch error: ' + error.message);
         return JSON.stringify([]);
     }
 }
@@ -75,7 +75,7 @@ async function extractDetails(url) {
         return JSON.stringify([details]);
 
     } catch (error) {
-        console.log('Details error:', error);
+        console.log('Details error: ' + error.message);
         return JSON.stringify([{
             description: 'Error loading description',
             aliases: 'Duration: Unknown',
@@ -117,7 +117,7 @@ async function extractEpisodes(url) {
 
         return JSON.stringify(episodes);
     } catch (error) {
-        console.log('Fetch error:', error);
+        console.log('Fetch error: ' + error.message);
         return JSON.stringify([]);
     }
 }
@@ -141,7 +141,7 @@ async function extractStreamUrl(url) {
         return JSON.stringify({ stream: streamUrl, subtitles: subtitles?.src });
 
     } catch (e) {
-        console.log('Error:', e);
+        console.log('Error extracting stream: ' + e.message);
         return JSON.stringify({ stream: null, subtitles: null });
     }
 }

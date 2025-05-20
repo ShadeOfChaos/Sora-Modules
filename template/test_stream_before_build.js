@@ -3,7 +3,7 @@
 // const details = await extractDetails();
 // const episodes = await extractEpisodes();
 // const streamUrl = await extractStreamUrl();
-// console.log('STREAMURL:', streamUrl);
+// console.log('STREAMURL: ', streamUrl);
 //***** LOCAL TESTING
 
 /**
@@ -54,7 +54,7 @@ async function extractStreamUrl(url) {
         return streamUrl;
 
     } catch(e) {
-        console.log('Error:', e);
+        console.log('Error extracting stream: ' + e.message);
         return null;
     }
 }

@@ -49,7 +49,7 @@ function voeDecoder(MKGMa_String) {
     try {
         decodedJson = JSON.parse(base64DecodedStringAgain);
     } catch (error) {
-        console.log('JSON parse error:', error);
+        console.log('JSON parse error: ' + error.message);
         decodedJson = {};
     }
     return decodedJson;

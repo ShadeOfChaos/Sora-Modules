@@ -1,13 +1,13 @@
 // // //***** LOCAL TESTING
 (async () => {
     const results = await searchResults('Beyblade X');
-    // console.log('RESULTS:', results);
+    // console.log('RESULTS: ', results);
     const details = await extractDetails(JSON.parse(results)[0].href);
-    // console.log('DETAILS:', details);
+    // console.log('DETAILS: ', details);
     const eps = await extractEpisodes(JSON.parse(results)[0].href);
-    // console.log('EPISODES:', JSON.parse(eps));
+    // console.log('EPISODES: ', JSON.parse(eps));
     const streamUrl = await extractStreamUrl(JSON.parse(eps)[78].href);
-    console.log('STREAMURL:', streamUrl);
+    console.log('STREAMURL: ', streamUrl);
 })();
 //***** LOCAL TESTING
 
@@ -100,7 +100,7 @@ async function extractEpisodes(slug) {
 
         return JSON.stringify(episodes);        
     } catch (error) {
-        console.error('soraFetch error: ' + error.message);
+        console.log('soraFetch error: ' + error.message);
         return JSON.stringify([]);
     }
 }
@@ -130,7 +130,7 @@ async function extractStreamUrl(url) {
         });
 
         if(acceptableStreams.length <= 0) throw('No valid streams found');
-        console.log('Acceptable streams:', acceptableStreams);
+        console.log('Acceptable streams: ', acceptableStreams);
 
         let streamPromises = [];
 
@@ -194,12 +194,12 @@ async function extractStreamUrl(url) {
             // return JSON.stringify(stream); // (Less than ideal)
 
         }).catch(error => {
-            console.error('Stream promise handler error: ' + error.message);
+            console.log('Stream promise handler error: ' + error.message);
             return JSON.stringify({ stream: null, subtitles: null });
         });
 
     } catch(error) {
-        console.error('soraFetch error: ' + error.message);
+        console.log('soraFetch error: ' + error.message);
         return JSON.stringify({ stream: null, subtitles: null });
     }
 }
@@ -219,7 +219,7 @@ async function extractPlayerX(streamData) {
         return { stream: json.url, subtitles: null, type: 'HARD' };
 
     } catch (error) {
-        console.error('Failed to extract PlayerX: ', error);
+        console.log('Failed to extract PlayerX: ' + error.message);
         return null;
     }
 }
@@ -240,7 +240,7 @@ async function extractHiki(streamData) {
         return { stream: json.url, subtitles: null, type: 'HARD' };
 
     } catch (error) {
-        console.error('Failed to extract Hiki: ' + error.message);
+        console.log('Failed to extract Hiki: ' + error.message);
         return null;
     }
 }
@@ -292,7 +292,7 @@ async function extractStreamwish(streamData) {
             }
         }
     } catch(error) {
-        console.error('Failed to extract Streamwish: ' + error.message);
+        console.log('Failed to extract Streamwish: ' + error.message);
         return null;
     }
 }

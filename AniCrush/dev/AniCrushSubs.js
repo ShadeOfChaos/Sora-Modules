@@ -1,14 +1,14 @@
 // //***** LOCAL TESTING
 // const results = await searchResults('One Piece');
-// // console.log('RESULTS:', results);
+// // console.log('RESULTS: ', results);
 // const details = await extractDetails(JSON.parse(results)[6].href);
-// // console.log('DETAILS:', details);
+// // console.log('DETAILS: ', details);
 // const episodes = await extractEpisodes(JSON.parse(results)[6].href);
-// // console.log('OUTSIDE EPISODES:', JSON.parse(episodes));
+// // console.log('OUTSIDE EPISODES: ', JSON.parse(episodes));
 // var epis = JSON.parse(episodes);
 // // console.log('Episodes', epis);
 // const streamUrl = await extractStreamUrl(epis[1128].href);
-// console.log('STREAMURL:', streamUrl);
+// console.log('STREAMURL: ', streamUrl);
 // //***** LOCAL TESTING
 
 /**
@@ -59,7 +59,7 @@ async function searchResults(keyword) {
 
         return JSON.stringify(results);
     } catch (error) {
-        console.log('Fetch error:', error);
+        console.log('Fetch error: ' + error.message);
         return JSON.stringify([]);
     }
 }
@@ -90,7 +90,7 @@ async function extractDetails(url) {
         return JSON.stringify([details]);
 
     } catch (error) {
-        console.log('Details error:', error);
+        console.log('Details error: ' + error.message);
         return JSON.stringify([{
             description: 'Error loading description',
             aliases: 'Duration: Unknown',
@@ -160,7 +160,7 @@ async function extractEpisodes(url) {
 
         return JSON.stringify(episodes);
     } catch (error) {
-        console.log('Fetch error:', error);
+        console.log('Fetch error: ' + error.message);
         return JSON.stringify([]);
     }
 }
@@ -318,7 +318,7 @@ async function extractStreamUrl(url) {
         return JSON.stringify(streamUrl);
 
     } catch (error) {
-        console.log('Fetch error:', error);
+        console.log('Fetch error: ' + error.message);
         return JSON.stringify({ stream: null, subtitles: null });
     }
 }

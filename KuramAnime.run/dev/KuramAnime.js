@@ -3,7 +3,7 @@ const results = await searchResults('Solo leveling');
 const details = await extractDetails(JSON.parse(results)[1].href);
 const episodes = await extractEpisodes(JSON.parse(results)[1].href);
 const streamUrl = await extractStreamUrl(JSON.parse(episodes)[0].href);
-console.log('STREAMURL:', streamUrl);
+console.log('STREAMURL: ', streamUrl);
 //***** LOCAL TESTING
 
 /**
@@ -34,7 +34,7 @@ async function searchResults(keyword) {
 
         return JSON.stringify(shows);
     } catch (error) {
-        console.log('Fetch error:' + error.message);
+        console.log('Fetch error: ' + error.message);
         return JSON.stringify([]);
     }
 }
@@ -64,7 +64,7 @@ async function extractDetails(url) {
         return JSON.stringify([details]);
 
     } catch (error) {
-        console.log('Details error:', error);
+        console.log('Details error: ' + error.message);
         return JSON.stringify([{
             description: 'Error loading description',
             aliases: 'Duration: Unknown',
@@ -98,7 +98,7 @@ async function extractEpisodes(url) {
         return JSON.stringify(episodes);
 
     } catch (error) {
-        console.log('Fetch error:' + error.message);
+        console.log('Fetch error: ' + error.message);
         return JSON.stringify([]);
     }
 }
@@ -163,7 +163,7 @@ async function extractStreamUrl(url) {
         });
         const accessToken = typeof accessTokenResponse === 'object' ? await accessTokenResponse.text() : await accessTokenResponse;
 
-        console.log('DEBUG, STAGE 7, accessToken:' + accessToken);
+        console.log('DEBUG, STAGE 7, accessToken: ' + accessToken);
 
         const streamUrlResponse = await fetch(`${ url }?${ env.MIX_PAGE_TOKEN_KEY }=${ accessToken }&${ env.MIX_STREAM_SERVER_KEY }=kuramadrive&page=1`, {
             method: 'GET',
@@ -194,7 +194,7 @@ async function extractStreamUrl(url) {
         return streamMatches[0].file;
     } catch(e) {
         console.log('DEBUG, STAGE 11, ERROR');
-        console.log('Error:' + e.message);
+        console.log('Error: ' + e.message);
         return null;
     }
 }

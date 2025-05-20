@@ -65,7 +65,7 @@ function readFile(filename) {
     return new Promise((resolve, reject) => {
         fs.readFile('debug/' + filename, 'utf8', (err, data) => {
             if (err) {
-                console.log('Readfile error:', err);
+                console.log('Readfile error: ', err);
                 return reject(err);
             }
             return resolve(data);

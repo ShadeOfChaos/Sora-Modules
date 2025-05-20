@@ -7,11 +7,11 @@ const FORMAT = 'SUB'; // SUB | DUB
 (async() => {
     const results = await searchResults('naruto');
     const details = await extractDetails(JSON.parse(results)[0].href);
-    console.log('DETAILS:', details);
+    console.log('DETAILS: ', details);
     const episodes = await extractEpisodes(JSON.parse(results)[0].href);
-    // console.log('EPISODES:', episodes);
+    // console.log('EPISODES: ', episodes);
     const streamUrl = await extractStreamUrl(JSON.parse(episodes)[0].href);
-    console.log('STREAMURL:', streamUrl);
+    console.log('STREAMURL: ', streamUrl);
 })();
 //***** LOCAL TESTING
 
@@ -40,7 +40,7 @@ async function searchResults(keyword) {
         return JSON.stringify(matchesArray);
 
     } catch (error) {
-        console.log('Fetch error:', error.message);
+        console.log('Fetch error: ' + error.message);
         return JSON.stringify([]);
     }
 }
@@ -69,7 +69,7 @@ async function extractDetails(url) {
 
         return JSON.stringify([details]);
     } catch(error) {
-        console.log('Details error:', error.message);
+        console.log('Details error: ' + error.message);
         return JSON.stringify([{
             description: 'Error loading description',
             aliases: '',
@@ -113,7 +113,7 @@ async function extractEpisodes(url) {
         return JSON.stringify(dubbed_episodes.reverse());
 
     } catch (error) {
-        console.log('Fetch error:', error.message);
+        console.log('Fetch error: ' + error.message);
         return JSON.stringify([]);
     }
 }
@@ -161,7 +161,7 @@ async function extractStreamUrl(url) {
         return source.file;
 
     } catch(e) {
-        console.log('Error:', e.message);
+        console.log('Error extracting stream: ' + e.message);
         return null;
     }
 }
@@ -185,7 +185,7 @@ function atob(input) {
     let output = '';
 
     if (str.length % 4 == 1) {
-        throw new Error("atob failed: The input is not correctly encoded.");
+        throw Error("atob failed: The input is not correctly encoded.");
     }
 
     for (let bc = 0, bs, buffer, i = 0;
