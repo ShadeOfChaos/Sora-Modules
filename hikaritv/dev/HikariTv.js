@@ -236,11 +236,15 @@ async function extractHiki(streamData) {
 
         const response = await soraFetch(proxyUrl + frameSlug);
         const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
+
+        console.log(json);
         
         if(json.error != null) throw new Error(json.error);
         if(json.url == null) throw new Error('No stream found for Hiki');
 
-        return { stream: json.url, subtitles: null, type: 'HARD' };
+        const soraAcceptableUrl = decodeURIComponent(json.url) + '.mp4';
+
+        return { stream: soraAcceptableUrl, subtitles: null, type: 'HARD' };
 
     } catch (error) {
         console.log('Failed to extract Hiki: ' + error.message);
