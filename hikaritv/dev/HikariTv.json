@@ -6,9 +6,9 @@
        "icon": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/hikaritv/ofchaos.jpg",
         "url": "https://github.com/ShadeOfChaos/Sora-Modules"
    },
-   "version": "1.2.9",
+   "version": "1.2.10",
    "language": "English (SUB)",
-   "streamType": "HLS",
+   "streamType": "MP4",
    "quality": "1080p",
 	"type": "anime",
    "baseUrl": "https://hikaritv.gg/",
