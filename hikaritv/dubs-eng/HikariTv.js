@@ -88,7 +88,7 @@ async function extractEpisodes(slug) {
 
         return JSON.stringify(episodes);        
     } catch (error) {
-        console.error('soraFetch error: ' + error.message);
+        console.log('soraFetch error: ' + error.message);
         return JSON.stringify([]);
     }
 }
@@ -139,7 +139,7 @@ async function extractStreamUrl(url) {
         return streamUrl;
 
     } catch(error) {
-        console.error('soraFetch error: ' + error.message);
+        console.log('soraFetch error: ' + error.message);
         return null;
     }
 }

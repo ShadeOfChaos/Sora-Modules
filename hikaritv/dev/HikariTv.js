@@ -100,7 +100,7 @@ async function extractEpisodes(slug) {
 
         return JSON.stringify(episodes);        
     } catch (error) {
-        console.error('soraFetch error: ' + error.message);
+        console.log('soraFetch error: ' + error.message);
         return JSON.stringify([]);
     }
 }
@@ -109,7 +109,7 @@ async function extractStreamUrl(url) {
     const typeMap = { 'SOFTSUB': 2, 'DUB': 3, 'MULTI': 4, 'HARDSUB': 8 };
     const moduleTypes = ['SOFTSUB', 'HARDSUB'];
     // const acceptabledProviders = ['Streamwish', 'Hiki']; // TODO - Make Hiki work in Sora, probably baseUrl issue
-    const acceptabledProviders = ['Streamwish'];
+    const acceptabledProviders = ['PlayerX'];
 
     try {
         const response = await soraFetch(url);
@@ -142,6 +142,11 @@ async function extractStreamUrl(url) {
             }
             if(entry.embed_name == 'Hiki') {
                 let streamOption = extractHiki(entry);
+                streamPromises.push(streamOption);
+                // if(streamOption != null) streamOptions.push(streamOption);
+            }
+            if(entry.embed_name == 'PlayerX') {
+                let streamOption = extractPlayerX(entry);
                 streamPromises.push(streamOption);
                 // if(streamOption != null) streamOptions.push(streamOption);
             }
@@ -189,13 +194,33 @@ async function extractStreamUrl(url) {
             // return JSON.stringify(stream); // (Less than ideal)
 
         }).catch(error => {
-            console.error('Stream promise handler error: ' + error.message);
+            console.log('Stream promise handler error: ' + error.message);
             return JSON.stringify({ stream: null, subtitles: null });
         });
 
     } catch(error) {
-        console.error('soraFetch error: ' + error.message);
+        console.log('soraFetch error: ' + error.message);
         return JSON.stringify({ stream: null, subtitles: null });
+    }
+}
+
+async function extractPlayerX(streamData) {
+    try {
+        // const frameUrl = streamData.embed_frame;
+        const frameUrl = 'https://newer.stream/v/wp8DlmvWKiYf/';
+        const response = await soraFetch(frameUrl);
+
+        const html = typeof response === 'object' ? await response.text() : await response;
+        console.log(html);
+        
+        if(json.error != null) throw(json.error);
+        if(json.url == null) throw('No stream found for Hiki');
+
+        return { stream: json.url, subtitles: null, type: 'HARD' };
+
+    } catch (error) {
+        console.log('Failed to extract PlayerX: ', error);
+        return null;
     }
 }
 
@@ -215,7 +240,7 @@ async function extractHiki(streamData) {
         return { stream: json.url, subtitles: null, type: 'HARD' };
 
     } catch (error) {
-        console.error('Failed to extract Hiki: ' + error.message);
+        console.log('Failed to extract Hiki: ' + error.message);
         return null;
     }
 }
@@ -267,7 +292,7 @@ async function extractStreamwish(streamData) {
             }
         }
     } catch(error) {
-        console.error('Failed to extract Streamwish: ' + error.message);
+        console.log('Failed to extract Streamwish: ' + error.message);
         return null;
     }
 }

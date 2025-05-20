@@ -87,7 +87,7 @@ async function extractEpisodes(slug) {
 
         return JSON.stringify(episodes);        
     } catch (error) {
-        console.error('soraFetch error: ' + error.message);
+        console.log('soraFetch error: ' + error.message);
         return JSON.stringify([]);
     }
 }
@@ -144,12 +144,12 @@ async function extractStreamUrl(url) {
             throw("No hard or softsubs found");
 
         }).catch(error => {
-            console.error('Stream promise handler error: ' + error.message);
+            console.log('Stream promise handler error: ' + error.message);
             return JSON.stringify({ stream: null, subtitles: null });
         });
 
     } catch(error) {
-        console.error('soraFetch error: ' + error.message);
+        console.log('soraFetch error: ' + error.message);
         return JSON.stringify({ stream: null, subtitles: null });
     }
 }
@@ -201,7 +201,7 @@ async function extractStreamwish(streamData) {
             }
         }
     } catch(error) {
-        console.error('Failed to extract Streamwish: ' + error.message);
+        console.log('Failed to extract Streamwish: ' + error.message);
         return null;
     }
 }
