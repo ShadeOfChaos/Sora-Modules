@@ -109,7 +109,8 @@ async function extractStreamUrl(url) {
     const typeMap = { 'SOFTSUB': 2, 'DUB': 3, 'MULTI': 4, 'HARDSUB': 8 };
     const moduleTypes = ['SOFTSUB', 'HARDSUB'];
     // const acceptabledProviders = ['Streamwish', 'Hiki']; // TODO - Make Hiki work in Sora, probably baseUrl issue
-    const acceptabledProviders = ['PlayerX'];
+    const acceptabledProviders = ['Hiki']; // TODO - Make Hiki work in Sora, probably baseUrl issue
+    // const acceptabledProviders = ['PlayerX'];
 
     try {
         const response = await soraFetch(url);
@@ -212,6 +213,8 @@ async function extractPlayerX(streamData) {
 
         const html = typeof response === 'object' ? await response.text() : await response;
         console.log(html);
+
+        // TODO - Decrypt playerx encrypted stream config object and extract stream URL and tracks
         
         if(json.error != null) throw new Error(json.error);
         if(json.url == null) throw new Error('No stream found for Hiki');
