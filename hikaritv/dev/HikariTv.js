@@ -153,7 +153,7 @@ async function extractEpisodes(slug) {
 async function extractStreamUrl(url) {
     const typeMap = { 'SOFTSUB': 2, 'DUB': 3, 'MULTI': 4, 'HARDSUB': 8 };
     const moduleTypes = ['SOFTSUB', 'HARDSUB'];
-    const acceptabledProviders = ['Streamwish'];
+    const acceptabledProviders = ['Streamwish', 'SV'];
 
     try {
         const response = await soraFetch(url);
@@ -180,6 +180,10 @@ async function extractStreamUrl(url) {
         for(let entry of acceptableStreams) {
             if(entry.embed_name == 'Streamwish') {
                 let streamOption = extractStreamwish(entry);
+                streamPromises.push(streamOption);
+            }
+            if(entry.embed_name == 'SV') {
+                let streamOption = extractSV(entry);
                 streamPromises.push(streamOption);
             }
         }
@@ -260,6 +264,30 @@ async function extractStreamwish(streamData) {
         }
     } catch(error) {
         console.log('Failed to extract Streamwish: ' + error.message);
+        return null;
+    }
+}
+
+async function extractSV(streamData) {
+    const frameUrl = streamData.embed_frame;
+    const pattern = /sources: \[\{file:"([\s\S]+?)"[\s\S]+?tracks: \[\{(file: ".+?)"/;
+
+    try {
+        const response = await soraFetch(frameUrl);
+        const html = typeof response === 'object' ? await response.text() : await response;
+
+        const match = html.match(pattern);
+        if(!match) {
+            throw new Error('No source found in SV embed');
+        }
+
+        const source = match[1];
+        const subtitles = match[2];
+
+        return { stream: source, subtitles: subtitles, type: 'SOFT' };
+
+    } catch(error) {
+        console.log('Failed to extract SV: ' + error.message);
         return null;
     }
 }
