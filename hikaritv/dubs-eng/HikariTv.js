@@ -5,12 +5,17 @@ async function searchResults(keyword) {
         const encodedKeyword = encodeURIComponent(keyword);
         const response = await soraFetch(searchUrl + encodedKeyword);
         const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
-        console.log('JSON: ' + JSON.stringify(json));
 
-        const jsonResults = json.results || [];
+        let jsonResults = json.results || [];
 
         // uid = Hikari internal slug
         if(jsonResults.length <= 0) throw new Error('No results found');
+
+        if(json.next != null) {
+            const followupResults = await getFollowupSearches(json);
+            jsonResults = jsonResults.concat(followupResults);
+        }
+
         const results = jsonResults.map(result => {
             return {
                 title: result.ani_name,
@@ -24,6 +29,45 @@ async function searchResults(keyword) {
         console.log('soraFetch error: ' + error.message);
         return JSON.stringify([]);
     }
+}
+
+async function getFollowupSearches(json) {
+    const searchUrl = json.next;
+    const pages = Math.floor(json.count / json.results.length);
+
+    const p = [];
+
+    // Pages + 1 since the first page has already been fetched
+    for(let i = 2; i <= pages + 1; i++) {
+        p.push(
+            new Promise(async (resolve) => {
+                let url = searchUrl.replace('page=2', 'page=' + i);
+
+                try {
+                    const response = await soraFetch(url);
+                    const responseJson = typeof response === 'object' ? await response.json() : await JSON.parse(response);
+
+                    return resolve(responseJson.results);
+
+                } catch(error) {
+                    console.error(error);
+                    return resolve([]);
+                }
+            })
+        );
+    }
+
+    return Promise.allSettled(p).then((results) => {
+        let mergedResults = [];
+
+        for(let result of results) {
+            if(result.status === 'fulfilled') {
+                mergedResults = mergedResults.concat(result.value);
+            }
+        }
+
+        return mergedResults;
+    });
 }
 
 async function extractDetails(slug) {
@@ -84,7 +128,7 @@ async function extractEpisodes(slug) {
                 number: parseInt(ep.ep_id_name),
                 title: ep.ep_name,
             }
-        });
+        }).sort((a, b) => a.number - b.number);
 
         return JSON.stringify(episodes);        
     } catch (error) {
@@ -94,7 +138,7 @@ async function extractEpisodes(slug) {
 }
 
 async function extractStreamUrl(url) {
-    const typeMap = { 'SUB': 2, 'DUB': 3, 'MULTI': 4 };
+    const typeMap = { 'SOFTSUB': 2, 'DUB': 3, 'MULTI': 4, 'HARDSUB': 8 };
     const moduleType = 'DUB';
     const acceptabledProviders = ['Streamwish'];
 
@@ -139,7 +183,7 @@ async function extractStreamUrl(url) {
         return streamUrl;
 
     } catch(error) {
-        console.log('soraFetch error: ' + error.message);
+        console.log('Failed to extract StreamUrl: ' + error.message);
         return null;
     }
 }
