@@ -1,14 +1,14 @@
-// // //***** LOCAL TESTING
-(async () => {
-    const results = await searchResults('Beyblade X');
-    console.log('RESULTS: ', results);
-    const details = await extractDetails(JSON.parse(results)[0].href);
-    // console.log('DETAILS: ', details);
-    const eps = await extractEpisodes(JSON.parse(results)[0].href);
-    // console.log('EPISODES: ', JSON.parse(eps));
-    const streamUrl = await extractStreamUrl(JSON.parse(eps)[78].href);
-    console.log('STREAMURL: ', streamUrl);
-})();
+// // // //***** LOCAL TESTING
+// (async () => {
+//     const results = await searchResults('Beyblade X');
+//     console.log('RESULTS: ', results);
+//     const details = await extractDetails(JSON.parse(results)[0].href);
+//     // console.log('DETAILS: ', details);
+//     const eps = await extractEpisodes(JSON.parse(results)[0].href);
+//     // console.log('EPISODES: ', JSON.parse(eps));
+//     const streamUrl = await extractStreamUrl(JSON.parse(eps)[78].href);
+//     console.log('STREAMURL: ', streamUrl);
+// })();
 //***** LOCAL TESTING
 
 async function searchResults(keyword) {
