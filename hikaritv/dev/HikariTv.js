@@ -1,15 +1,15 @@
-// // //***** LOCAL TESTING
-(async () => {
-    const results = await searchResults('Beyblade X');
-    // console.log('RESULTS: ', results);
-    const details = await extractDetails(JSON.parse(results)[0].href);
-    // console.log('DETAILS: ', details);
-    const eps = await extractEpisodes(JSON.parse(results)[0].href);
-    // console.log('EPISODES: ', JSON.parse(eps));
-    const streamUrl = await extractStreamUrl(JSON.parse(eps)[78].href);
-    console.log('STREAMURL: ', streamUrl);
-})();
-//***** LOCAL TESTING
+// // // //***** LOCAL TESTING
+// (async () => {
+//     const results = await searchResults('conan');
+//     console.log('RESULTS: ', results);
+//     const details = await extractDetails(JSON.parse(results)[0].href);
+//     // console.log('DETAILS: ', details);
+//     const eps = await extractEpisodes(JSON.parse(results)[0].href);
+//     // console.log('EPISODES: ', JSON.parse(eps));
+//     const streamUrl = await extractStreamUrl(JSON.parse(eps)[0].href);
+//     console.log('STREAMURL: ', streamUrl);
+// })();
+// //***** LOCAL TESTING
 
 async function searchResults(keyword) {
     const searchUrl = "https://api.hikari.gg/api/anime/?sort=created_at&order=asc&page=1&search=";
@@ -19,10 +19,16 @@ async function searchResults(keyword) {
         const response = await soraFetch(searchUrl + encodedKeyword);
         const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
-        const jsonResults = json.results || [];
+        let jsonResults = json.results || [];
 
         // uid = Hikari internal slug
         if(jsonResults.length <= 0) throw new Error('No results found');
+
+        if(json.next != null) {
+            const followupResults = await getFollowupSearches(json);
+            jsonResults = jsonResults.concat(followupResults);
+        }
+
         const results = jsonResults.map(result => {
             return {
                 title: result.ani_name,
@@ -36,6 +42,45 @@ async function searchResults(keyword) {
         console.log('soraFetch error: ' + error.message);
         return JSON.stringify([]);
     }
+}
+
+async function getFollowupSearches(json) {
+    const searchUrl = json.next;
+    const pages = Math.floor(json.count / json.results.length);
+
+    const p = [];
+
+    // Pages + 1 since the first page has already been fetched
+    for(let i = 2; i <= pages + 1; i++) {
+        p.push(
+            new Promise(async (resolve) => {
+                let url = searchUrl.replace('page=2', 'page=' + i);
+
+                try {
+                    const response = await soraFetch(url);
+                    const responseJson = typeof response === 'object' ? await response.json() : await JSON.parse(response);
+
+                    return resolve(responseJson.results);
+
+                } catch(error) {
+                    console.error(error);
+                    return resolve([]);
+                }
+            })
+        );
+    }
+
+    return Promise.allSettled(p).then((results) => {
+        let mergedResults = [];
+
+        for(let result of results) {
+            if(result.status === 'fulfilled') {
+                mergedResults = mergedResults.concat(result.value);
+            }
+        }
+
+        return mergedResults;
+    });
 }
 
 async function extractDetails(slug) {
@@ -96,7 +141,7 @@ async function extractEpisodes(slug) {
                 number: parseInt(ep.ep_id_name),
                 title: ep.ep_name,
             }
-        });
+        }).sort((a, b) => a.number - b.number);
 
         return JSON.stringify(episodes);        
     } catch (error) {
@@ -108,9 +153,7 @@ async function extractEpisodes(slug) {
 async function extractStreamUrl(url) {
     const typeMap = { 'SOFTSUB': 2, 'DUB': 3, 'MULTI': 4, 'HARDSUB': 8 };
     const moduleTypes = ['SOFTSUB', 'HARDSUB'];
-    // const acceptabledProviders = ['Streamwish', 'Hiki']; // TODO - Make Hiki work in Sora, probably baseUrl issue
-    const acceptabledProviders = ['Hiki']; // TODO - Make Hiki work in Sora, probably baseUrl issue
-    // const acceptabledProviders = ['PlayerX'];
+    const acceptabledProviders = ['Streamwish'];
 
     try {
         const response = await soraFetch(url);
@@ -131,7 +174,6 @@ async function extractStreamUrl(url) {
         });
 
         if(acceptableStreams.length <= 0) throw new Error('No valid streams found');
-        console.log('Acceptable streams: ', acceptableStreams);
 
         let streamPromises = [];
 
@@ -139,49 +181,18 @@ async function extractStreamUrl(url) {
             if(entry.embed_name == 'Streamwish') {
                 let streamOption = extractStreamwish(entry);
                 streamPromises.push(streamOption);
-                // if(streamOption != null) streamOptions.push(streamOption);
-            }
-            if(entry.embed_name == 'Hiki') {
-                let streamOption = extractHiki(entry);
-                streamPromises.push(streamOption);
-                // if(streamOption != null) streamOptions.push(streamOption);
-            }
-            if(entry.embed_name == 'PlayerX') {
-                let streamOption = extractPlayerX(entry);
-                streamPromises.push(streamOption);
-                // if(streamOption != null) streamOptions.push(streamOption);
             }
         }
-
+        
         return Promise.allSettled(streamPromises).then((results) => {
-            // TODO - Multi-source at some point, but Sora is not willing to work with me
-
-            let streamOptions = []; // v1 (Ideal) // v3 (Less than ideal)
-            // let streams = []; // temp for testing // v2 (Sucks)
-            // let subtitles = null; // temp for testing // v2 (Sucks)
-            // let streamOptions = { stream: null, subtitles: null }; // v3 (Less than ideal)
+             let streamOptions = []; 
 
             for(let result of results) {
                 if(result.status === 'fulfilled') {
-                    streamOptions.push(result.value); // (Ideal) // (Less than ideal same solution)
-
-                    /* (Sucks)
-                    // if(result.value.subtitles == null) {
-                    //     streams.push('Hardsub');
-                    // } else {
-                    //     streams.push('Softsub');
-                    // }
-                    
-                    // streams.push(result.value.stream);
-                    
-                    // if(result.value.subtitles != null) {
-                    //     subtitles = result.value.subtitles;
-                    // }
-                    */
+                    streamOptions.push(result.value);
                 }
             }
-            if(streamOptions.length <= 0) throw new Error('No valid streams found'); // (Ideal) // (Less than ideal same solution)
-
+            if(streamOptions.length <= 0) throw new Error('No valid streams found');
             let hardsub = streamOptions.find(s => s.type == 'HARD');
             if(hardsub != null) return JSON.stringify({ stream: hardsub.stream, subtitles: null });
 
@@ -189,10 +200,6 @@ async function extractStreamUrl(url) {
             if(softsub != null) return JSON.stringify({ stream: softsub.stream, subtitles: softsub.subtitles });
 
             throw new Error('No hard or softsubs found');
-
-            // return JSON.stringify(streamOptions); // (Ideal)
-            // return JSON.stringify({ streams: streams, subtitles: subtitles }); // (Sucks)
-            // return JSON.stringify(stream); // (Less than ideal)
 
         }).catch(error => {
             console.log('Stream promise handler error: ' + error.message);
@@ -202,53 +209,6 @@ async function extractStreamUrl(url) {
     } catch(error) {
         console.log('soraFetch error: ' + error.message);
         return JSON.stringify({ stream: null, subtitles: null });
-    }
-}
-
-async function extractPlayerX(streamData) {
-    try {
-        // const frameUrl = streamData.embed_frame;
-        const frameUrl = 'https://newer.stream/v/wp8DlmvWKiYf/';
-        const response = await soraFetch(frameUrl);
-
-        const html = typeof response === 'object' ? await response.text() : await response;
-        console.log(html);
-
-        // TODO - Decrypt playerx encrypted stream config object and extract stream URL and tracks
-        
-        if(json.error != null) throw new Error(json.error);
-        if(json.url == null) throw new Error('No stream found for Hiki');
-
-        return { stream: json.url, subtitles: null, type: 'HARD' };
-
-    } catch (error) {
-        console.log('Failed to extract PlayerX: ' + error.message);
-        return null;
-    }
-}
-
-async function extractHiki(streamData) {
-    const proxyUrl = 'https://hikari.gg/hiki-proxy/extract/';
-    
-    try {
-        const frameUrl = streamData.embed_frame;
-        let frameSlug = frameUrl.split('/')[3];
-
-        const response = await soraFetch(proxyUrl + frameSlug);
-        const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
-
-        console.log(json);
-        
-        if(json.error != null) throw new Error(json.error);
-        if(json.url == null) throw new Error('No stream found for Hiki');
-
-        const soraAcceptableUrl = decodeURIComponent(json.url) + '.mp4';
-
-        return { stream: soraAcceptableUrl, subtitles: null, type: 'HARD' };
-
-    } catch (error) {
-        console.log('Failed to extract Hiki: ' + error.message);
-        return null;
     }
 }
 
@@ -330,8 +290,8 @@ function unpack(str) {
     var chunks = get_chunks(str),
     chunk;
     for (var i = 0; i < chunks.length; i++) {
-    chunk = chunks[i].replace(/\n$/, '');
-    str = str.split(chunk).join(unpack_chunk(chunk));
+        chunk = chunks[i].replace(/\n$/, '');
+        str = str.split(chunk).join(unpack_chunk(chunk));
     }
     return str;
 }
@@ -340,18 +300,18 @@ function unpack_chunk(str) {
     var unpacked_source = '';
     var __eval = eval;
     if (detect(str)) {
-    try {
-        eval = function (s) {
-        unpacked_source += s;
-        return unpacked_source;
-        };
-        __eval(str);
-        if (typeof unpacked_source === 'string' && unpacked_source) {
-        str = unpacked_source;
+        try {
+            eval = function (s) {
+            unpacked_source += s;
+            return unpacked_source;
+            };
+            __eval(str);
+            if (typeof unpacked_source === 'string' && unpacked_source) {
+            str = unpacked_source;
+            }
+        } catch (e) {
+            // well, it failed. we'll just return the original, instead of crashing on user.
         }
-    } catch (e) {
-        // well, it failed. we'll just return the original, instead of crashing on user.
-    }
     }
     eval = __eval;
     return str;

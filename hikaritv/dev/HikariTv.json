@@ -1,20 +1,19 @@
 {
-   "sourceName": "TESTING ONLY - HikariTV",
+   "sourceName": "HikariTV (ENG SUB)",
    "iconUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/hikaritv/logo.png",
    "author": {
-       "name": "ShadeOfChaos",
-       "icon": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/hikaritv/ofchaos.jpg",
-        "url": "https://github.com/ShadeOfChaos/Sora-Modules"
+      "name": "ShadeOfChaos",
+      "icon": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/hikaritv/ofchaos.jpg",
+      "url": "https://github.com/ShadeOfChaos/Sora-Modules"
    },
-   "version": "1.2.11",
+   "version": "1.2.3",
    "language": "English (SUB)",
-   "streamType": "MP4",
+   "streamType": "HLS",
    "quality": "1080p",
 	"type": "anime",
-   "baseUrl": "https://hikari.gg/",
+   "baseUrl": "https://hikaritv.gg/",
    "searchBaseUrl": "https://api.hikari.gg/api/anime/?sort=created_at&order=asc&page=1&search=%s",
-   "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/hikaritv/dev/HikariTv.js",
+   "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/hikaritv/subs-eng/HikariTv.js",
    "asyncJS": true,
-   "streamAsyncJS": true,
-   "softsub": true
+   "streamAsyncJS": true
 }
