@@ -95,7 +95,7 @@ async function extractEpisodes(objString) {
 
     try {
         if(json?.episodesUrl == null) {
-            throw('No episodes found');
+            throw new Error('No episodes found');
         }
 
         if(json?.origin == 'AnimeParadise') {
@@ -123,7 +123,7 @@ async function extractStreamUrl(objString) {
 
     try {
         if(url == null || anilistId == null) {
-            throw('No data returned from Sora in extractStreamUrl');
+            throw new Error('No data returned from Sora in extractStreamUrl');
         }
 
         if(url.startsWith('https://www.animeparadise.moe')) {
@@ -134,7 +134,7 @@ async function extractStreamUrl(objString) {
             return await extractStreamUrlFromAniCrush(url, anilistId);
         }
 
-        throw('Failed to extract stream URL from: ' + url);
+        throw new Error('Failed to extract stream URL from: ' + url);
 
     } catch(error) {
         console.log('[ASURA][extractStreamUrl] Stream URL error: ' + error?.message);
@@ -198,9 +198,9 @@ async function GetAnimes() {
         const response = await soraFetch(baseUrl, { headers: { 'Referer': referer } });
         const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
-        if(json == null)                 throw('Error parsing Asura json');
-        if(json?.success !== true)       throw(json?.error);
-        if(json?.result?.length == null) throw('Error obtaining data from Asura API');
+        if(json == null)                 throw new Error('Error parsing Asura json');
+        if(json?.success !== true)       throw new Error(json?.error);
+        if(json?.result?.length == null) throw new Error('Error obtaining data from Asura API');
 
         return json?.result;
 
@@ -230,9 +230,9 @@ async function GetEpisodes(anilistId) {
         const response = await soraFetch(`${ baseUrl }/${ anilistId }`, { headers: { 'Referer': referer } });
         const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
-        if(json == null)                 throw('Error parsing Asura json');
-        if(json?.success !== true)       throw(json?.error);
-        if(json?.result?.length == null) throw('Error obtaining data from Asura API');
+        if(json == null)                 throw new Error('Error parsing Asura json');
+        if(json?.success !== true)       throw new Error(json?.error);
+        if(json?.result?.length == null) throw new Error('Error obtaining data from Asura API');
 
         return json?.result;
 
@@ -345,7 +345,7 @@ async function aniCrushSearch(keyword, asuraList = []) {
         const data = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
         if(data?.status == false || data?.result?.movies?.length <= 0) {
-            throw('No results found');
+            throw new Error('No results found');
         }
 
         const moviesData = await getAniCrushAnilistId(data.result.movies);
@@ -454,7 +454,7 @@ async function getDetailsFromAnilist(anilistId) {
         const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
         if(json?.data?.Media == null) {
-            throw('Error retrieving Anilist data');
+            throw new Error('Error retrieving Anilist data');
         }
 
         const media = json.data.Media;
@@ -488,7 +488,7 @@ async function getDetailsFromAniCrush(detailsUrl) {
         const data = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
         if(data?.status == false || data?.result == null) {
-            throw('Error obtaining details from AniCrush API');
+            throw new Error('Error obtaining details from AniCrush API');
         }
 
         return JSON.stringify([{
@@ -521,7 +521,7 @@ async function extractEpisodesFromAnimeParadise(json) {
         const data = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
         if(data?.data == null) {
-            throw('Error retrieving AnimeParadise episodes json');
+            throw new Error('Error retrieving AnimeParadise episodes json');
         }
 
         const episodes = data?.data.map(ep => {
@@ -559,7 +559,7 @@ async function extractEpisodesFromAniCrush(json) {
         const data = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
         if(data?.status == false || data?.result == null) {
-            throw('No results found');
+            throw new Error('No results found');
         }
 
         for(let episodeList in data.result) {
@@ -591,7 +591,7 @@ async function extractStreamUrlFromAnimeParadise(url, anilistId) {
         const html = typeof response === 'object' ? await response.text() : await response;
 
         const json = getNextData(html);
-        if (json == null) throw ('Error parsing NEXT_DATA json');
+        if (json == null) throw new Error('Error parsing NEXT_DATA json');
 
         const streamUrl = json?.props?.pageProps?.episode?.streamLink;
         const subtitles = GetSubtitles(json.props.pageProps?.animeData?.mappings?.anilist, json.props.pageProps.episode?.number);
@@ -627,7 +627,7 @@ async function extractStreamUrlFromAniCrush(url, anilistId) {
             sourceData.result.link == "" ||
             sourceData.result.link == null
         ) {
-            throw('No source found');
+            throw new Error('No source found');
         }
 
         const source = sourceData.result.link;
@@ -637,11 +637,11 @@ async function extractStreamUrlFromAniCrush(url, anilistId) {
         const hlsData = typeof hlsResponse === 'object' ? await hlsResponse.json() : await JSON.parse(hlsResponse);
 
         if(hlsData?.status == false || hlsData?.result == null || hlsData?.error != null) {
-            throw('No stream found');
+            throw new Error('No stream found');
         }
 
         if(hlsData.result?.sources?.length <= 0) {
-            throw('No source found');
+            throw new Error('No source found');
         }
 
         let streamSource = null;
@@ -659,7 +659,7 @@ async function extractStreamUrlFromAniCrush(url, anilistId) {
 
         if(streamSource == null) {
             if(mp4Source == null) {
-                throw('No valid stream found');
+                throw new Error('No valid stream found');
             }
             streamSource = mp4Source;
         }

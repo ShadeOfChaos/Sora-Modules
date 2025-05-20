@@ -185,7 +185,7 @@ function atob(input) {
     let output = '';
 
     if (str.length % 4 == 1) {
-        throw Error("atob failed: The input is not correctly encoded.");
+        throw new Error('atob failed: The input is not correctly encoded.');
     }
 
     for (let bc = 0, bs, buffer, i = 0;

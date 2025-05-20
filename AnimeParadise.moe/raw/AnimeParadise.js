@@ -43,10 +43,10 @@ async function extractDetails(url) {
         const html = typeof response === 'object' ? await response.text() : await response;
 
         const json = getNextData(html);
-        if (json == null) throw('Error parsing NEXT_DATA json');
+        if (json == null) throw new Error('Error parsing NEXT_DATA json');
 
         const data = json?.props?.pageProps?.data;
-        if(data == null) throw('Error obtaining data');
+        if(data == null) throw new Error('Error obtaining data');
 
         let aliasArray = data?.synonyms;
         if(aliasArray != null && aliasArray.length > 5) {
@@ -87,12 +87,12 @@ async function extractEpisodes(url) {
         var episodes = [];
 
         const json = getNextData(html);
-        if (json == null) throw ('Error parsing NEXT_DATA json');
+        if (json == null) throw new Error('Error parsing NEXT_DATA json');
 
         const origin = json?.props?.pageProps?.data?._id;
 
         const episodesList = json?.props?.pageProps?.data?.ep;
-        if(episodesList == null) throw('Error obtaining episodes');
+        if(episodesList == null) throw new Error('Error obtaining episodes');
 
         for(let i=0,len=episodesList.length; i<len; i++) {
             let url = `${ BASE_URL }${ episodesList[i] }?origin=${ origin }`;
@@ -121,7 +121,7 @@ async function extractStreamUrl(url) {
         const html = typeof response === 'object' ? await response.text() : await response;
 
         const json = getNextData(html);
-        if (json == null) throw ('Error parsing NEXT_DATA json');
+        if (json == null) throw new Error('Error parsing NEXT_DATA json');
 
         const streamUrl = json?.props?.pageProps?.episode?.streamLink;
 

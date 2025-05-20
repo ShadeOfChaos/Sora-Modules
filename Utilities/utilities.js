@@ -147,7 +147,7 @@ class Unbaser {
                 });
             }
             catch (er) {
-                throw Error("Unsupported base encoding.");
+                throw new Error('Unsupported base encoding.');
             }
             this.unbase = this._dictunbaser;
         }
@@ -179,14 +179,14 @@ function detect(source) {
 function unpack(source) {
     let { payload, symtab, radix, count } = _filterargs(source);
     if (count != symtab.length) {
-        throw Error("Malformed p.a.c.k.e.r. symtab.");
+        throw new Error('Malformed p.a.c.k.e.r. symtab.');
     }
     let unbase;
     try {
         unbase = new Unbaser(radix);
     }
     catch (e) {
-        throw Error("Unknown p.a.c.k.e.r. encoding.");
+        throw new Error('Unknown p.a.c.k.e.r. encoding.');
     }
     function lookup(match) {
         const word = match;
@@ -221,11 +221,11 @@ function unpack(source) {
                     };
                 }
                 catch (ValueError) {
-                    throw Error("Corrupted p.a.c.k.e.r. data.");
+                    throw new Error('Corrupted p.a.c.k.e.r. data.');
                 }
             }
         }
-        throw Error("Could not make sense of p.a.c.k.e.r data (unexpected code structure)");
+        throw new Error('Could not make sense of p.a.c.k.e.r data (unexpected code structure)');
     }
     function _replacestrings(source) {
         return source;

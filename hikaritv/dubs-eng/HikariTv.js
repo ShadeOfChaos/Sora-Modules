@@ -10,7 +10,7 @@ async function searchResults(keyword) {
         const jsonResults = json.results || [];
 
         // uid = Hikari internal slug
-        if(jsonResults.length <= 0) throw("No results found");
+        if(jsonResults.length <= 0) throw new Error('No results found');
         const results = jsonResults.map(result => {
             return {
                 title: result.ani_name,
@@ -103,7 +103,7 @@ async function extractStreamUrl(url) {
         const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
         const acceptableStreams = json.filter(stream => acceptabledProviders.includes(stream.embed_name) && stream.embed_type == typeMap[moduleType]);
-        if(acceptableStreams.length <= 0) throw('No valid streams found');
+        if(acceptableStreams.length <= 0) throw new Error('No valid streams found');
         
         const frameUrl = acceptableStreams[0].embed_frame;
 
@@ -122,7 +122,7 @@ async function extractStreamUrl(url) {
 
             const files = streamwishUnpacked.match(streamwishRegex);
             if(!files[1]) {
-                throw('No streams found');
+                throw new Error('No streams found');
             }
 
             const filesJson = JSON.parse(files[1]);
@@ -132,7 +132,7 @@ async function extractStreamUrl(url) {
             } else if(filesJson.hls4) {
                 return filesJson.hls4;
             } else {
-                throw('No streams found');
+                throw new Error('No streams found');
             }
         }
 

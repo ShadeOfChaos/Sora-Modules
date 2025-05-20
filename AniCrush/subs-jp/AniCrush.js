@@ -38,7 +38,7 @@ async function searchResults(keyword) {
         const data = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
         if(data?.status == false || data?.result?.movies?.length <= 0) {
-            throw('No results found');
+            throw new Error('No results found');
         }
 
         const moviesData = await getAniCrushAnilistId(data.result.movies);
@@ -82,7 +82,7 @@ async function extractDetails(objString) {
         const data = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
         if(data?.status == false || data?.result == null) {
-            throw('Error obtaining details from AniCrush API');
+            throw new Error('Error obtaining details from AniCrush API');
         }
 
         return JSON.stringify([{
@@ -114,7 +114,7 @@ async function extractEpisodes(objString) {
 
     try {
         if(json?.episodesUrl == null) {
-            throw('No episodes found');
+            throw new Error('No episodes found');
         }
 
         const url = json.episodesUrl;
@@ -128,7 +128,7 @@ async function extractEpisodes(objString) {
         const data = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
         if(data?.status == false || data?.result == null) {
-            throw('No results found');
+            throw new Error('No results found');
         }
 
         for(let episodeList in data.result) {
@@ -161,7 +161,7 @@ async function extractStreamUrl(objString) {
 
     try {
         if(url == null || anilistId == null) {
-            throw('No data returned from Sora in extractStreamUrl');
+            throw new Error('No data returned from Sora in extractStreamUrl');
         }
 
         const epIndex = url.indexOf('ep=') + 3;
@@ -176,7 +176,7 @@ async function extractStreamUrl(objString) {
             sourceData.result.link == "" ||
             sourceData.result.link == null
         ) {
-            throw('No source found');
+            throw new Error('No source found');
         }
 
         const source = sourceData.result.link;
@@ -186,11 +186,11 @@ async function extractStreamUrl(objString) {
         const hlsData = typeof hlsResponse === 'object' ? await hlsResponse.json() : await JSON.parse(hlsResponse);
 
         if(hlsData?.status == false || hlsData?.result == null || hlsData?.error != null) {
-            throw('No stream found');
+            throw new Error('No stream found');
         }
 
         if(hlsData.result?.sources?.length <= 0) {
-            throw('No source found');
+            throw new Error('No source found');
         }
 
         let streamSource = null;
@@ -208,7 +208,7 @@ async function extractStreamUrl(objString) {
 
         if(streamSource == null) {
             if(mp4Source == null) {
-                throw('No valid stream found');
+                throw new Error('No valid stream found');
             }
             streamSource = mp4Source;
         }
@@ -289,9 +289,9 @@ async function GetAnimes() {
         const response = await soraFetch(baseUrl, { headers: { 'Referer': referer } });
         const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
-        if(json == null)                 throw('Error parsing Asura json');
-        if(json?.success !== true)       throw(json?.error);
-        if(json?.result?.length == null) throw('Error obtaining data from Asura API');
+        if(json == null)                 throw new Error('Error parsing Asura json');
+        if(json?.success !== true)       throw new Error(json?.error);
+        if(json?.result?.length == null) throw new Error('Error obtaining data from Asura API');
 
         return json?.result;
 

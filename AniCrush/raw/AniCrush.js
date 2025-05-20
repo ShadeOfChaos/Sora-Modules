@@ -35,7 +35,7 @@ async function searchResults(keyword) {
         const data = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
         if(data?.status == false || data?.result?.movies?.length <= 0) {
-            throw('No results found');
+            throw new Error('No results found');
         }
 
         const results = data.result.movies.map(movie => {
@@ -65,7 +65,7 @@ async function extractDetails(url) {
         const data = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
         if(data?.status == false || data?.result == null) {
-            throw('No results found');
+            throw new Error('No results found');
         }
 
         const details = {
@@ -133,7 +133,7 @@ async function extractEpisodes(url) {
         const data = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
         if(data?.status == false || data?.result == null) {
-            throw('No results found');
+            throw new Error('No results found');
         }
 
         for(let episodeList in data.result) {
@@ -163,7 +163,7 @@ async function extractStreamUrl(url) {
 
     try {
         if(url.indexOf('?') <= 0) {
-            throw('Invalid url provided');
+            throw new Error('Invalid url provided');
         }
 
         const paramString = url.split('?')[1];
@@ -192,14 +192,14 @@ async function extractStreamUrl(url) {
         }
 
         if(id == '') {
-            throw('Invalid _movieId provided');
+            throw new Error('Invalid _movieId provided');
         }
 
         const serversResponse = await soraFetch(`${ UTILITY_URL }/api/anime/servers/${ id }?episode=${ episode }`);
         const serversData = typeof serversResponse === 'object' ? await serversResponse.json() : await JSON.parse(serversResponse);
 
         if(serversData.status == false || serversData.result == null) {
-            throw('No servers found');
+            throw new Error('No servers found');
         }
 
         if (
@@ -208,7 +208,7 @@ async function extractStreamUrl(url) {
             serversData.result[format] == null ||
             serversData.result[format].length <= 0
         ) {
-            throw('No server found');
+            throw new Error('No server found');
         }
 
         const serverObjects = serversData.result[format];
@@ -229,7 +229,7 @@ async function extractStreamUrl(url) {
             sourceData.result.link == "" ||
             sourceData.result.link == null
         ) {
-            throw('No source found');
+            throw new Error('No source found');
         }
 
         const source = sourceData.result.link;
@@ -244,11 +244,11 @@ async function extractStreamUrl(url) {
         const hlsData = typeof hlsResponse === 'object' ? await hlsResponse.json() : await JSON.parse(hlsResponse);
 
         if(hlsData?.status == false || hlsData?.result == null || hlsData?.error != null) {
-            throw('No stream found');
+            throw new Error('No stream found');
         }
 
         if(hlsData.result?.sources?.length <= 0) {
-            throw('No source found');
+            throw new Error('No source found');
         }
 
         let streamSource = null;
@@ -266,7 +266,7 @@ async function extractStreamUrl(url) {
 
         if(streamSource == null) {
             if(mp4Source == null) {
-                throw('No valid stream found');
+                throw new Error('No valid stream found');
             }
             streamSource = mp4Source;
         }

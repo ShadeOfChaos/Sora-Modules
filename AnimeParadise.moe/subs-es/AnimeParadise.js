@@ -43,10 +43,10 @@ async function extractDetails(url) {
         const html = typeof response === 'object' ? await response.text() : await response;
 
         const json = getNextData(html);
-        if (json == null) throw('Error parsing NEXT_DATA json');
+        if (json == null) throw new Error('Error parsing NEXT_DATA json');
 
         const data = json?.props?.pageProps?.data;
-        if(data == null) throw('Error obtaining data');
+        if(data == null) throw new Error('Error obtaining data');
 
         let aliasArray = data?.synonyms;
         if(aliasArray != null && aliasArray.length > 5) {
@@ -87,16 +87,16 @@ async function extractEpisodes(url) {
         var episodes = [];
 
         const json = getNextData(html);
-        if (json == null) throw ('Error parsing NEXT_DATA json');
+        if (json == null) throw new Error('Error parsing NEXT_DATA json');
 
         const origin = json?.props?.pageProps?.data?._id;
 
         const episodesList = json?.props?.pageProps?.data?.ep;
-        if(episodesList == null) throw('Error obtaining episodes');
+        if(episodesList == null) throw new Error('Error obtaining episodes');
         
         // We use this to fetch all the data from the JSON from episode 1, rather than fetching the data for each episode
         episodes = await getEpisodesWithLanguageSubs(`${ BASE_URL }${ episodesList[0] }?origin=${ origin }`, 'Spanish', 'vtt');
-        if(episodes.length <= 0) throw('No episodes with Spanish subtitles found.');
+        if(episodes.length <= 0) throw new Error('No episodes with Spanish subtitles found.');
 
         return JSON.stringify(episodes);
     } catch (error) {
@@ -116,11 +116,11 @@ async function extractStreamUrl(url) {
         const html = typeof response === 'object' ? await response.text() : await response;
 
         const json = getNextData(html);
-        if (json == null) throw ('Error parsing NEXT_DATA json');
+        if (json == null) throw new Error('Error parsing NEXT_DATA json');
 
         const streamUrl = json?.props?.pageProps?.episode?.streamLink;
         const subtitles = json?.props?.pageProps?.episode?.subData.find(sub => sub.type === 'vtt' && sub.label === 'Spanish');
-        if(subtitles == null) throw('No Spanish subtitles found');
+        if(subtitles == null) throw new Error('No Spanish subtitles found');
 
         return JSON.stringify({ stream: streamUrl, subtitles: subtitles?.src });
 
@@ -139,7 +139,7 @@ async function getEpisodesWithLanguageSubs(episodeUrl, language = 'English', typ
         var episodes = [];
 
         const json = getNextData(html);
-        if (json == null) throw ('Error parsing NEXT_DATA json');
+        if (json == null) throw new Error('Error parsing NEXT_DATA json');
 
         const origin = json?.props?.pageProps?.animeData?._id;
         const episodesList = json?.props?.pageProps?.episodeList;

@@ -22,7 +22,7 @@ async function searchResults(keyword) {
         const jsonResults = json.results || [];
 
         // uid = Hikari internal slug
-        if(jsonResults.length <= 0) throw("No results found");
+        if(jsonResults.length <= 0) throw new Error('No results found');
         const results = jsonResults.map(result => {
             return {
                 title: result.ani_name,
@@ -129,7 +129,7 @@ async function extractStreamUrl(url) {
             return false;
         });
 
-        if(acceptableStreams.length <= 0) throw('No valid streams found');
+        if(acceptableStreams.length <= 0) throw new Error('No valid streams found');
         console.log('Acceptable streams: ', acceptableStreams);
 
         let streamPromises = [];
@@ -179,7 +179,7 @@ async function extractStreamUrl(url) {
                     */
                 }
             }
-            if(streamOptions.length <= 0) throw('No valid streams found'); // (Ideal) // (Less than ideal same solution)
+            if(streamOptions.length <= 0) throw new Error('No valid streams found'); // (Ideal) // (Less than ideal same solution)
 
             let hardsub = streamOptions.find(s => s.type == 'HARD');
             if(hardsub != null) return JSON.stringify({ stream: hardsub.stream, subtitles: null });
@@ -187,7 +187,7 @@ async function extractStreamUrl(url) {
             let softsub = streamOptions.find(s => s.type == 'SOFT');
             if(softsub != null) return JSON.stringify({ stream: softsub.stream, subtitles: softsub.subtitles });
 
-            throw("No hard or softsubs found");
+            throw new Error('No hard or softsubs found');
 
             // return JSON.stringify(streamOptions); // (Ideal)
             // return JSON.stringify({ streams: streams, subtitles: subtitles }); // (Sucks)
@@ -213,8 +213,8 @@ async function extractPlayerX(streamData) {
         const html = typeof response === 'object' ? await response.text() : await response;
         console.log(html);
         
-        if(json.error != null) throw(json.error);
-        if(json.url == null) throw('No stream found for Hiki');
+        if(json.error != null) throw new Error(json.error);
+        if(json.url == null) throw new Error('No stream found for Hiki');
 
         return { stream: json.url, subtitles: null, type: 'HARD' };
 
@@ -234,8 +234,8 @@ async function extractHiki(streamData) {
         const response = await soraFetch(proxyUrl + frameSlug);
         const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
         
-        if(json.error != null) throw(json.error);
-        if(json.url == null) throw('No stream found for Hiki');
+        if(json.error != null) throw new Error(json.error);
+        if(json.url == null) throw new Error('No stream found for Hiki');
 
         return { stream: json.url, subtitles: null, type: 'HARD' };
 
@@ -262,7 +262,7 @@ async function extractStreamwish(streamData) {
 
             const files = streamwishUnpacked.match(streamwishRegex);
             if(!files[1]) {
-                throw('No streams found');
+                throw new Error('No streams found');
             }
 
             let subtitles = null;
@@ -288,7 +288,7 @@ async function extractStreamwish(streamData) {
             } else if(filesJson.hls4) {
                 return { stream: filesJson.hls4, subtitles: subtitles, type: type };
             } else {
-                throw('No streams found');
+                throw new Error('No streams found');
             }
         }
     } catch(error) {

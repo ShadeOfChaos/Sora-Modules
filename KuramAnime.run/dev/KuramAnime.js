@@ -126,7 +126,7 @@ async function extractStreamUrl(url) {
         console.log('DEBUG, STAGE 3');
 
         if(kpsMatch == null || kpsMatch[1] == null) {
-            throw('Failed to capture kps data key');
+            throw new Error('Failed to capture kps data key');
         }
 
         const kps = kpsMatch[1]; // f
@@ -138,7 +138,7 @@ async function extractStreamUrl(url) {
         const js = typeof scriptResponse === 'object' ? await scriptResponse.text() : await scriptResponse;
 
         if(js == null || js == '') {
-            throw('Failed to capture env data');
+            throw new Error('Failed to capture env data');
         }
 
         console.log('DEBUG, STAGE 5');

@@ -13,10 +13,10 @@ async function searchResults(keyword) {
         const html = typeof response === 'object' ? await response.text() : await response;
 
         const json = getNextData(html);
-        if (json == null) throw('Error parsing NEXT_DATA json');
+        if (json == null) throw new Error('Error parsing NEXT_DATA json');
 
         const data = json?.props?.pageProps?.data;
-        if(data == null) throw('Error obtaining data');
+        if(data == null) throw new Error('Error obtaining data');
 
         const animesWithSubtitles = await GetAnimes();
         
@@ -53,10 +53,10 @@ async function extractDetails(url) {
         const html = typeof response === 'object' ? await response.text() : await response;
 
         const json = getNextData(html);
-        if (json == null) throw('Error parsing NEXT_DATA json');
+        if (json == null) throw new Error('Error parsing NEXT_DATA json');
 
         const data = json?.props?.pageProps?.data;
-        if(data == null) throw('Error obtaining data');
+        if(data == null) throw new Error('Error obtaining data');
 
         let aliasArray = data?.synonyms;
         if(aliasArray != null && aliasArray.length > 5) {
@@ -97,12 +97,12 @@ async function extractEpisodes(url) {
         var episodes = [];
 
         const json = getNextData(html);
-        if (json == null) throw ('Error parsing NEXT_DATA json');
+        if (json == null) throw new Error('Error parsing NEXT_DATA json');
 
         const origin = json?.props?.pageProps?.data?._id;
 
         const episodesList = json?.props?.pageProps?.data?.ep;
-        if(episodesList == null) throw('Error obtaining episodes');
+        if(episodesList == null) throw new Error('Error obtaining episodes');
 
         const episodesWithSubtitlesJson = await GetEpisodes(json.props.pageProps.data?.mappings?.anilist);
         const episodesWithSubtitles = episodesWithSubtitlesJson.map((entry) => entry?.episode);
@@ -138,11 +138,11 @@ async function extractStreamUrl(url) {
         const html = typeof response === 'object' ? await response.text() : await response;
 
         const json = getNextData(html);
-        if (json == null) throw ('Error parsing NEXT_DATA json');
+        if (json == null) throw new Error('Error parsing NEXT_DATA json');
 
         const streamUrl = json?.props?.pageProps?.episode?.streamLink;
         const subtitles = GetSubtitles(json.props.pageProps?.animeData?.mappings?.anilist, json.props.pageProps.episode?.number);
-        if(subtitles == null) throw('Invalid data while attempting to get subtitles');
+        if(subtitles == null) throw new Error('Invalid data while attempting to get subtitles');
 
         return JSON.stringify({ stream: streamUrl, subtitles: subtitles });
 
@@ -178,9 +178,9 @@ async function GetAnimes() {
         const response = await soraFetch(baseUrl, { headers: { 'Referer': referer } });
         const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
-        if(json == null)                 throw('Error parsing Asura json');
-        if(json?.success !== true)       throw(json?.error);
-        if(json?.result?.length == null) throw('Error obtaining data from Asura API');
+        if(json == null)                 throw new Error('Error parsing Asura json');
+        if(json?.success !== true)       throw new Error(json?.error);
+        if(json?.result?.length == null) throw new Error('Error obtaining data from Asura API');
 
         return json?.result;
 
@@ -202,9 +202,9 @@ async function GetEpisodes(anilistId) {
         const response = await soraFetch(`${ baseUrl }/${ anilistId }`, { headers: { 'Referer': referer } });
         const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
-        if(json == null)                 throw('Error parsing Asura json');
-        if(json?.success !== true)       throw(json?.error);
-        if(json?.result?.length == null) throw('Error obtaining data from Asura API');
+        if(json == null)                 throw new Error('Error parsing Asura json');
+        if(json?.success !== true)       throw new Error(json?.error);
+        if(json?.result?.length == null) throw new Error('Error obtaining data from Asura API');
 
         return json?.result;
 
