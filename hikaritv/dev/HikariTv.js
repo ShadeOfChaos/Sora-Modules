@@ -1,15 +1,15 @@
-// // // //***** LOCAL TESTING
-// (async () => {
-//     const results = await searchResults('conan');
-//     console.log('RESULTS: ', results);
-//     const details = await extractDetails(JSON.parse(results)[0].href);
-//     // console.log('DETAILS: ', details);
-//     const eps = await extractEpisodes(JSON.parse(results)[0].href);
-//     // console.log('EPISODES: ', JSON.parse(eps));
-//     const streamUrl = await extractStreamUrl(JSON.parse(eps)[0].href);
-//     console.log('STREAMURL: ', streamUrl);
-// })();
-// //***** LOCAL TESTING
+// // //***** LOCAL TESTING
+(async () => {
+    const results = await searchResults('Beyblade X');
+    console.log('RESULTS: ', results);
+    const details = await extractDetails(JSON.parse(results)[0].href);
+    // console.log('DETAILS: ', details);
+    const eps = await extractEpisodes(JSON.parse(results)[0].href);
+    // console.log('EPISODES: ', JSON.parse(eps));
+    const streamUrl = await extractStreamUrl(JSON.parse(eps)[78].href);
+    console.log('STREAMURL: ', streamUrl);
+})();
+//***** LOCAL TESTING
 
 async function searchResults(keyword) {
     const searchUrl = "https://api.hikari.gg/api/anime/?sort=created_at&order=asc&page=1&search=";
@@ -154,6 +154,12 @@ async function extractStreamUrl(url) {
     const typeMap = { 'SOFTSUB': 2, 'DUB': 3, 'MULTI': 4, 'HARDSUB': 8 };
     const moduleTypes = ['SOFTSUB', 'HARDSUB'];
     const acceptabledProviders = ['Streamwish', 'SV'];
+    // Keep it in order of preference, leftmost is prefered, following options are fallbacks
+    const streamPreference = [
+        { source: 'Streamwish', type: 'HARD' },
+        { source: 'Streamwish', type: 'SOFT' },
+        { source: 'SV', type: 'SOFT' },
+    ];
 
     try {
         const response = await soraFetch(url);
@@ -197,13 +203,22 @@ async function extractStreamUrl(url) {
                 }
             }
             if(streamOptions.length <= 0) throw new Error('No valid streams found');
+
+            for(let preference of streamPreference) {
+                console.log('[PREFERENCE] streamPreference:', preference);
+                let streamOption = streamOptions.find(s => s.source == preference.source && s.type == preference.type);
+                console.log('[PREFERENCE] StreamOption:', streamOption);
+                if(streamOption != null) return JSON.stringify({ stream: streamOption.stream, subtitles: streamOption.subtitles });
+            }
+
+            // Fallback incase the above fails but we somehow still have a valid stream
             let hardsub = streamOptions.find(s => s.type == 'HARD');
             if(hardsub != null) return JSON.stringify({ stream: hardsub.stream, subtitles: null });
 
             let softsub = streamOptions.find(s => s.type == 'SOFT');
             if(softsub != null) return JSON.stringify({ stream: softsub.stream, subtitles: softsub.subtitles });
 
-            throw new Error('No hard or softsubs found');
+            throw new Error('No hard or softsubs stream found');
 
         }).catch(error => {
             console.log('Stream promise handler error: ' + error.message);
@@ -255,9 +270,9 @@ async function extractStreamwish(streamData) {
             const filesJson = JSON.parse(files[1]);
             
             if(filesJson.hls2) {
-                return { stream: filesJson.hls2, subtitles: subtitles, type: type };
+                return { stream: filesJson.hls2, subtitles: subtitles, type: type, source: 'Streamwish' };
             } else if(filesJson.hls4) {
-                return { stream: filesJson.hls4, subtitles: subtitles, type: type };
+                return { stream: filesJson.hls4, subtitles: subtitles, type: type, source: 'Streamwish' };
             } else {
                 throw new Error('No streams found');
             }
@@ -284,7 +299,7 @@ async function extractSV(streamData) {
         const source = match[1];
         const subtitles = match[2];
 
-        return { stream: source, subtitles: subtitles, type: 'SOFT' };
+        return { stream: source, subtitles: subtitles, type: 'SOFT', source: 'SV' };
 
     } catch(error) {
         console.log('Failed to extract SV: ' + error.message);
