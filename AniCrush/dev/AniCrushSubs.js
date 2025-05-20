@@ -1,6 +1,6 @@
 // //***** LOCAL TESTING
 // const results = await searchResults('One Piece');
-// // console.log(results);
+// // console.log('RESULTS:', results);
 // const details = await extractDetails(JSON.parse(results)[6].href);
 // // console.log('DETAILS:', details);
 // const episodes = await extractEpisodes(JSON.parse(results)[6].href);

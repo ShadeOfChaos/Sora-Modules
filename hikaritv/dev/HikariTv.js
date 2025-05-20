@@ -100,7 +100,7 @@ async function extractEpisodes(slug) {
 
         return JSON.stringify(episodes);        
     } catch (error) {
-        console.log('soraFetch error: ' + error.message);
+        console.error('soraFetch error: ' + error.message);
         return JSON.stringify([]);
     }
 }
@@ -194,12 +194,12 @@ async function extractStreamUrl(url) {
             // return JSON.stringify(stream); // (Less than ideal)
 
         }).catch(error => {
-            console.log('Stream promise handler error: ' + error.message);
+            console.error('Stream promise handler error: ' + error.message);
             return JSON.stringify({ stream: null, subtitles: null });
         });
 
     } catch(error) {
-        console.log('soraFetch error: ' + error.message);
+        console.error('soraFetch error: ' + error.message);
         return JSON.stringify({ stream: null, subtitles: null });
     }
 }
@@ -219,7 +219,7 @@ async function extractPlayerX(streamData) {
         return { stream: json.url, subtitles: null, type: 'HARD' };
 
     } catch (error) {
-        console.log('Failed to extract PlayerX: ', error);
+        console.error('Failed to extract PlayerX: ', error);
         return null;
     }
 }
@@ -240,7 +240,7 @@ async function extractHiki(streamData) {
         return { stream: json.url, subtitles: null, type: 'HARD' };
 
     } catch (error) {
-        console.log('Failed to extract Hiki: ' + error.message);
+        console.error('Failed to extract Hiki: ' + error.message);
         return null;
     }
 }
@@ -292,7 +292,7 @@ async function extractStreamwish(streamData) {
             }
         }
     } catch(error) {
-        console.log('Failed to extract Streamwish: ' + error.message);
+        console.error('Failed to extract Streamwish: ' + error.message);
         return null;
     }
 }
