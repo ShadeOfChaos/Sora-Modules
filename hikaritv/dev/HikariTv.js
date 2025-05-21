@@ -11,8 +11,27 @@
 // })();
 //***** LOCAL TESTING
 
+async function isServerUp() {
+    const host = 'https://hikari.gg';
+
+    try {
+        const response = await soraFetch(host, { method: 'HEAD' });
+        if(response.status == 200) return true;
+        
+        console.log("Host 'hikari.gg' is currently down.");
+        return false;
+
+    } catch (error) {
+        console.log('Server up check error: ' + error.message);
+        return false;
+    }
+}
+
 async function searchResults(keyword) {
     const searchUrl = "https://api.hikari.gg/api/anime/?sort=created_at&order=asc&page=1&search=";
+    const serverUp = await isServerUp();
+
+    if(serverUp === false) return JSON.stringify([]);
 
     try {
         const encodedKeyword = encodeURIComponent(keyword);
