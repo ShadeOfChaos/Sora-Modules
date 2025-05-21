@@ -157,8 +157,8 @@ async function extractStreamUrl(url) {
     // Keep it in order of preference, leftmost is prefered, following options are fallbacks
     const streamPreference = [
         { source: 'Streamwish', type: 'HARD' },
-        { source: 'Streamwish', type: 'SOFT' },
         { source: 'SV', type: 'SOFT' },
+        { source: 'Streamwish', type: 'SOFT' },
     ];
 
     try {
