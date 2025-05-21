@@ -205,9 +205,7 @@ async function extractStreamUrl(url) {
             if(streamOptions.length <= 0) throw new Error('No valid streams found');
 
             for(let preference of streamPreference) {
-                console.log('[PREFERENCE] streamPreference:', preference);
                 let streamOption = streamOptions.find(s => s.source == preference.source && s.type == preference.type);
-                console.log('[PREFERENCE] StreamOption:', streamOption);
                 if(streamOption != null) return JSON.stringify({ stream: streamOption.stream, subtitles: streamOption.subtitles });
             }
 
@@ -218,7 +216,7 @@ async function extractStreamUrl(url) {
             let softsub = streamOptions.find(s => s.type == 'SOFT');
             if(softsub != null) return JSON.stringify({ stream: softsub.stream, subtitles: softsub.subtitles });
 
-            throw new Error('No hard or softsubs stream found');
+            throw new Error('No streams found');
 
         }).catch(error => {
             console.log('Stream promise handler error: ' + error.message);
