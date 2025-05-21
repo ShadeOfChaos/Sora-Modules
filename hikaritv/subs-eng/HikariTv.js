@@ -140,7 +140,13 @@ async function extractEpisodes(slug) {
 async function extractStreamUrl(url) {
     const typeMap = { 'SOFTSUB': 2, 'DUB': 3, 'MULTI': 4, 'HARDSUB': 8 };
     const moduleTypes = ['SOFTSUB', 'HARDSUB'];
-    const acceptabledProviders = ['Streamwish'];
+    const acceptabledProviders = ['Streamwish', 'SV'];
+    // Keep it in order of preference, leftmost is prefered, following options are fallbacks
+    const streamPreference = [
+        { source: 'Streamwish', type: 'HARD' },
+        { source: 'SV', type: 'SOFT' },
+        { source: 'Streamwish', type: 'SOFT' },
+    ];
 
     try {
         const response = await soraFetch(url);
@@ -169,6 +175,10 @@ async function extractStreamUrl(url) {
                 let streamOption = extractStreamwish(entry);
                 streamPromises.push(streamOption);
             }
+            if(entry.embed_name == 'SV') {
+                let streamOption = extractSV(entry);
+                streamPromises.push(streamOption);
+            }
         }
         
         return Promise.allSettled(streamPromises).then((results) => {
@@ -180,13 +190,20 @@ async function extractStreamUrl(url) {
                 }
             }
             if(streamOptions.length <= 0) throw new Error('No valid streams found');
+
+            for(let preference of streamPreference) {
+                let streamOption = streamOptions.find(s => s.source == preference.source && s.type == preference.type);
+                if(streamOption != null) return JSON.stringify({ stream: streamOption.stream, subtitles: streamOption.subtitles });
+            }
+
+            // Fallback incase the above fails but we somehow still have a valid stream
             let hardsub = streamOptions.find(s => s.type == 'HARD');
             if(hardsub != null) return JSON.stringify({ stream: hardsub.stream, subtitles: null });
 
             let softsub = streamOptions.find(s => s.type == 'SOFT');
             if(softsub != null) return JSON.stringify({ stream: softsub.stream, subtitles: softsub.subtitles });
 
-            throw new Error('No hard or softsubs found');
+            throw new Error('No streams found');
 
         }).catch(error => {
             console.log('Stream promise handler error: ' + error.message);
@@ -238,15 +255,39 @@ async function extractStreamwish(streamData) {
             const filesJson = JSON.parse(files[1]);
             
             if(filesJson.hls2) {
-                return { stream: filesJson.hls2, subtitles: subtitles, type: type };
+                return { stream: filesJson.hls2, subtitles: subtitles, type: type, source: 'Streamwish' };
             } else if(filesJson.hls4) {
-                return { stream: filesJson.hls4, subtitles: subtitles, type: type };
+                return { stream: filesJson.hls4, subtitles: subtitles, type: type, source: 'Streamwish' };
             } else {
                 throw new Error('No streams found');
             }
         }
     } catch(error) {
         console.log('Failed to extract Streamwish: ' + error.message);
+        return null;
+    }
+}
+
+async function extractSV(streamData) {
+    const frameUrl = streamData.embed_frame;
+    const pattern = /sources: \[\{file:"([\s\S]+?)"[\s\S]+?tracks: \[\{(file: ".+?)"/;
+
+    try {
+        const response = await soraFetch(frameUrl);
+        const html = typeof response === 'object' ? await response.text() : await response;
+
+        const match = html.match(pattern);
+        if(!match) {
+            throw new Error('No source found in SV embed');
+        }
+
+        const source = match[1];
+        const subtitles = match[2];
+
+        return { stream: source, subtitles: subtitles, type: 'SOFT', source: 'SV' };
+
+    } catch(error) {
+        console.log('Failed to extract SV: ' + error.message);
         return null;
     }
 }
