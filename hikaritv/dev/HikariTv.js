@@ -26,16 +26,16 @@ async function areRequiredServersUp() {
                 if(response.status === 'rejected' || response.value?.status != 200) {
                     let message = 'Required source ' + response.value?.url + ' is currently down.';
                     console.log(message);
-                    return { success: false, error: encodeURIComponent(message) };
+                    return { success: false, error: encodeURIComponent(message), searchTitle: `Error cannot access ${ response.value?.url }, server down. Please try again later.` };
                 }
             }
 
-            return { success: true, error: null };
+            return { success: true, error: null, searchTitle: null };
         })
 
     } catch (error) {
         console.log('Server up check error: ' + error.message);
-        return { success: false, error: encodeURIComponent('#Failed to access required servers') };
+        return { success: false, error: encodeURIComponent('#Failed to access required servers'), searchTitle: 'Error cannot access one or more servers, server down. Please try again later.' };
     }
 }
 
@@ -45,7 +45,7 @@ async function searchResults(keyword) {
 
     if(serversUp.success === false) {
         return JSON.stringify([{
-            title: 'Error, cannot access required servers',
+            title: serversUp.searchTitle,
             image: 'https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/sora_host_down.png',
             href: '#' + serversUp.error,
         }]);
