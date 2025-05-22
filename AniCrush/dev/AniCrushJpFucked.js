@@ -1,5 +1,5 @@
 async function areRequiredServersUp() {
-    const requiredHosts = ['https://anicrush.to', 'https://ac-api.ofchaos.com', 'https://asura.ofchaos.com'];
+    const requiredHosts = ['https://anicrush.to', 'https://ac-api.ofchaos.com', 'https://asura.ofchaos.com', 'https://ac-api.ofchaos.com/subs'];
 
     try {
         let promises = [];
@@ -117,7 +117,7 @@ async function searchResults(keyword) {
  * @returns {Promise<string>} A promise that resolves with a JSON string containing the details in the format: `[{"description": "Description", "aliases": "Aliases", "airdate": "Airdate"}]`
  */
 async function extractDetails(objString) {
-    if(url.startsWith('#')) {
+    if(objString.startsWith('#')) {
         return JSON.stringify([{
             description: decodeURIComponent(url.slice(1)) + ' Please try again later.',
             aliases: '',
@@ -165,7 +165,7 @@ async function extractEpisodes(objString) {
     [json.url, json.origin, json.anilistId, json.detailsUrl, json.episodesUrl] = objString.split(encodedDelimiter);
 
     try {
-        if(url.startsWith('#')) throw new Error('Host down but still attempted to get episodes');
+        if(objString.startsWith('#')) throw new Error('Host down but still attempted to get episodes');
 
         if(json?.episodesUrl == null) {
             throw new Error('No episodes found');

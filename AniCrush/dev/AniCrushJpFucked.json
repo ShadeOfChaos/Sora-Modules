@@ -6,14 +6,14 @@
         "icon": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/ofchaos.jpg",
         "url": "https://asura.ofchaos.com"
     },
-    "version": "1.0.1",
+    "version": "1.0.0",
     "language": "Japanese (SUB)",
     "streamType": "HLS",
     "quality": "1080p",
 	"type": "anime",
     "baseUrl": "https://megacloud.club/",
     "searchBaseUrl": "https://asura.ofchaos.com/api/anime",
-    "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AniCrush/dev/AniCrush.js",
+    "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AniCrush/dev/AniCrushJpFucked.js",
     "asyncJS": true,
     "streamAsyncJS": true,
     "softsub": true
