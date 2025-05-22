@@ -1,14 +1,14 @@
 // // // //***** LOCAL TESTING
-// (async () => {
-//     const results = await searchResults('Beyblade X');
-//     console.log('RESULTS: ', results);
-//     const details = await extractDetails(JSON.parse(results)[0].href);
-//     console.log('DETAILS: ', details);
-//     const eps = await extractEpisodes(JSON.parse(results)[0].href);
-//     // console.log('EPISODES: ', JSON.parse(eps));
-//     const streamUrl = await extractStreamUrl(JSON.parse(eps)[78].href);
-//     console.log('STREAMURL: ', streamUrl);
-// })();
+(async () => {
+    const results = await searchResults('Beyblade X');
+    console.log('RESULTS: ', results);
+    const details = await extractDetails(JSON.parse(results)[0].href);
+    console.log('DETAILS: ', details);
+    const eps = await extractEpisodes(JSON.parse(results)[0].href);
+    // console.log('EPISODES: ', JSON.parse(eps));
+    const streamUrl = await extractStreamUrl(JSON.parse(eps)[78].href);
+    console.log('STREAMURL: ', streamUrl);
+})();
 //***** LOCAL TESTING
 
 async function areRequiredServersUp() {
@@ -18,18 +18,21 @@ async function areRequiredServersUp() {
         let promises = [];
 
         for(let host of requiredHosts) {
-            promises.push(soraFetch(host, { method: 'HEAD' }));
+            promises.push(
+                new Promise(async (resolve) => {
+                    let response = await soraFetch(host, { method: 'HEAD' });
+                    response.host = host;
+                    return resolve(response);
+                })
+            );
         }
 
         return Promise.allSettled(promises).then((responses) => {
-            console.log('================== LOGGING RESPONSES TEST START ==================');
             for(let response of responses) {
-                console.log(JSON.stringify(response));
-                console.log('================== LOGGING RESPONSES TEST END ==================');
                 if(response.status === 'rejected' || response.value?.status != 200) {
-                    let message = 'Required source ' + response.value?.url + ' is currently down.';
+                    let message = 'Required source ' + response.value?.host + ' is currently down.';
                     console.log(message);
-                    return { success: false, error: encodeURIComponent(message), searchTitle: `Error cannot access ${ response.value?.url }, server down. Please try again later.` };
+                    return { success: false, error: encodeURIComponent(message), searchTitle: `Error cannot access ${ response.value?.host }, server down. Please try again later.` };
                 }
             }
 
