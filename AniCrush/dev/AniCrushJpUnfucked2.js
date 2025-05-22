@@ -1,5 +1,5 @@
 async function areRequiredServersUp() {
-    const requiredHosts = ['https://anicrush.to', 'https://ac-api.ofchaos.com', 'https://asura.ofchaos.com', 'https://ac-api.ofchaos.com/subs'];
+    const requiredHosts = ['https://anicrush.to', 'https://ac-api.ofchaos.com', 'https://asura.ofchaos.com'];
 
     try {
         let promises = [];
