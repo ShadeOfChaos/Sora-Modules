@@ -3,7 +3,7 @@
 //     const results = await searchResults('Beyblade X');
 //     console.log('RESULTS: ', results);
 //     const details = await extractDetails(JSON.parse(results)[0].href);
-//     // console.log('DETAILS: ', details);
+//     console.log('DETAILS: ', details);
 //     const eps = await extractEpisodes(JSON.parse(results)[0].href);
 //     // console.log('EPISODES: ', JSON.parse(eps));
 //     const streamUrl = await extractStreamUrl(JSON.parse(eps)[78].href);
@@ -26,7 +26,7 @@ async function areRequiredServersUp() {
                 if(response.status === 'rejected' || response.value?.status != 200) {
                     let message = 'Required source ' + response.value?.url + ' is currently down.';
                     console.log(message);
-                    return { success: false, error: message };
+                    return { success: false, error: encodeURIComponent(message) };
                 }
             }
 
@@ -35,7 +35,7 @@ async function areRequiredServersUp() {
 
     } catch (error) {
         console.log('Server up check error: ' + error.message);
-        return { success: false, error: 'Failed to access required servers' };
+        return { success: false, error: encodeURIComponent('#Failed to access required servers') };
     }
 }
 
@@ -125,7 +125,7 @@ async function extractDetails(slug) {
 
     if(slug.startsWith('#')) {
         return JSON.stringify([{
-            description: slug.slice(1) + 'Please try again later.',
+            description: decodeURIComponent(slug.slice(1)) + ' Please try again later.',
             aliases: '',
             airdate: ''
         }]);
