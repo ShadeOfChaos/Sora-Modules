@@ -67,7 +67,6 @@ async function searchResults(keyword) {
         const response = await soraFetch(`${SEARCH_URL}${encodeURI(keyword)}`);
         const html = typeof response === 'object' ? await response.text() : await response;
 
-
         const matches = html.matchAll(REGEX);
 
         for (let match of matches) {
