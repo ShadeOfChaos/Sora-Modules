@@ -11,27 +11,45 @@
 // })();
 //***** LOCAL TESTING
 
-async function isServerUp() {
-    const host = 'https://hikari.gg';
+async function areRequiredServersUp() {
+    const requiredHosts = ['https://hikari.gg', 'https://api.hikari.gg'];
 
     try {
-        const response = await soraFetch(host, { method: 'HEAD' });
-        if(response.status == 200) return true;
-        
-        console.log("Host 'hikari.gg' is currently down.");
-        return false;
+        let promises = [];
+
+        for(let host of requiredHosts) {
+            promises.push(soraFetch(host, { method: 'HEAD' }));
+        }
+
+        return Promise.allSettled(promises).then((responses) => {
+            for(let response of responses) {
+                if(response.status === 'rejected' || response.value?.status != 200) {
+                    let message = 'Required source ' + response.value?.url + ' is currently down.';
+                    console.log(message);
+                    return { success: false, error: message };
+                }
+            }
+
+            return { success: true, error: null };
+        })
 
     } catch (error) {
         console.log('Server up check error: ' + error.message);
-        return false;
+        return { success: false, error: 'Failed to access required servers' };
     }
 }
 
 async function searchResults(keyword) {
     const searchUrl = "https://api.hikari.gg/api/anime/?sort=created_at&order=asc&page=1&search=";
-    const serverUp = await isServerUp();
+    const serversUp = await areRequiredServersUp();
 
-    if(serverUp === false) return JSON.stringify([]);
+    if(serversUp.success === false) {
+        return JSON.stringify([{
+            title: 'Error, cannot access required servers',
+            image: 'https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/sora_host_down.png',
+            href: '#' + serversUp.error,
+        }]);
+    }
 
     try {
         const encodedKeyword = encodeURIComponent(keyword);
@@ -105,6 +123,14 @@ async function getFollowupSearches(json) {
 async function extractDetails(slug) {
     const detailsUrl = "https://api.hikari.gg/api/anime/uid/";
 
+    if(slug.startsWith('#')) {
+        return JSON.stringify([{
+            description: slug.slice(1) + 'Please try again later.',
+            aliases: '',
+            airdate: ''
+        }]);
+    }
+
     try {
         const response = await soraFetch(detailsUrl + slug);
         const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
@@ -151,6 +177,8 @@ async function extractEpisodes(slug) {
     const embedUrl = "https://api.hikari.gg/api/embed/";
 
     try {
+        if(slug.startsWith('#')) throw new Error('Host down but still attempted to get episodes');
+
         const response = await soraFetch(episodesUrl + slug);
         const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
