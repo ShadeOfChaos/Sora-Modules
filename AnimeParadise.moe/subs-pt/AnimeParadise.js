@@ -1,3 +1,37 @@
+async function areRequiredServersUp() {
+    const requiredHosts = ['https://www.animeparadise.moe'];
+
+    try {
+        let promises = [];
+
+        for(let host of requiredHosts) {
+            promises.push(
+                new Promise(async (resolve) => {
+                    let response = await soraFetch(host, { method: 'HEAD' });
+                    response.host = host;
+                    return resolve(response);
+                })
+            );
+        }
+
+        return Promise.allSettled(promises).then((responses) => {
+            for(let response of responses) {
+                if(response.status === 'rejected' || response.value?.status != 200) {
+                    let message = 'Required source ' + response.value?.host + ' is currently down.';
+                    console.log(message);
+                    return { success: false, error: encodeURIComponent(message), searchTitle: `Error cannot access ${ response.value?.host }, server down. Please try again later.` };
+                }
+            }
+
+            return { success: true, error: null, searchTitle: null };
+        })
+
+    } catch (error) {
+        console.log('Server up check error: ' + error.message);
+        return { success: false, error: encodeURIComponent('#Failed to access required servers'), searchTitle: 'Error cannot access one or more servers, server down. Please try again later.' };
+    }
+}
+
 /**
  * Searches the website for anime with the given keyword and returns the results
  * @param {string} keyword The keyword to search for
@@ -8,6 +42,15 @@ async function searchResults(keyword) {
     const SEARCH_URL = 'https://www.animeparadise.moe/search?q=';
     const REGEX = /a href="(\/anime\/[^"]+)[\s\S]+?src="([^"]+)[\s\S]+?div[\s\S]+?[\s\S]+?div[\s\S]+?>([^<]+)/g;
     var shows = [];
+    const serversUp = await areRequiredServersUp();
+
+    if(serversUp.success === false) {
+        return JSON.stringify([{
+            title: serversUp.searchTitle,
+            image: 'https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/sora_host_down.png',
+            href: '#' + serversUp.error,
+        }]);
+    }
 
     try {
         const response = await soraFetch(`${SEARCH_URL}${encodeURI(keyword)}`);
@@ -37,6 +80,13 @@ async function searchResults(keyword) {
  */
 async function extractDetails(url) {
     const REGEX = /style_specs_header_year.+?>.+([0-9]{4})[\s\S]+style_specs_container_middle.+?>([\s\S]+?)</g;
+    if(url.startsWith('#')) {
+        return JSON.stringify([{
+            description: decodeURIComponent(url.slice(1)) + ' Please try again later.',
+            aliases: '',
+            airdate: ''
+        }]);
+    }
 
     try {
         const response = await soraFetch(url);
@@ -82,6 +132,8 @@ async function extractEpisodes(url) {
     const BASE_URL = 'https://www.animeparadise.moe/watch/';
 
     try {
+        if(url.startsWith('#')) throw new Error('Host down but still attempted to get episodes');
+
         const response = await soraFetch(url);
         const html = typeof response === 'object' ? await response.text() : await response;
         var episodes = [];
