@@ -1,7 +1,39 @@
 const BASE_URL = 'https://www.animegg.org';
 const SEARCH_URL = 'https://www.animegg.org/search/?q=';
-const UTILITY_URL = 'https://ac-api.ofchaos.com';
 const FORMAT = 'DUB'; // SUB | DUB
+async function areRequiredServersUp() {
+    const requiredHosts = ['https://www.animegg.org'];
+
+    try {
+        let promises = [];
+
+        for(let host of requiredHosts) {
+            promises.push(
+                new Promise(async (resolve) => {
+                    let response = await soraFetch(host, { method: 'HEAD' });
+                    response.host = host;
+                    return resolve(response);
+                })
+            );
+        }
+
+        return Promise.allSettled(promises).then((responses) => {
+            for(let response of responses) {
+                if(response.status === 'rejected' || response.value?.status != 200) {
+                    let message = 'Required source ' + response.value?.host + ' is currently down.';
+                    console.log(message);
+                    return { success: false, error: encodeURIComponent(message), searchTitle: `Error cannot access ${ response.value?.host }, server down. Please try again later.` };
+                }
+            }
+
+            return { success: true, error: null, searchTitle: null };
+        })
+
+    } catch (error) {
+        console.log('Server up check error: ' + error.message);
+        return { success: false, error: encodeURIComponent('#Failed to access required servers'), searchTitle: 'Error cannot access one or more servers, server down. Please try again later.' };
+    }
+}
 
 /**
  * Searches the website for anime with the given keyword and returns the results
@@ -10,6 +42,15 @@ const FORMAT = 'DUB'; // SUB | DUB
  */
 async function searchResults(keyword) {
     const REGEX = /a href="([\s\S]+?)"[\s\S]+?img src="([\s\S]+?)"[\s\S]+?h2>([\s\S]+?)</g;
+    const serversUp = await areRequiredServersUp();
+
+    if(serversUp.success === false) {
+        return JSON.stringify([{
+            title: serversUp.searchTitle,
+            image: 'https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/sora_host_down.png',
+            href: '#' + serversUp.error,
+        }]);
+    }
 
     try {
         const response = await soraFetch(`${SEARCH_URL}${encodeURI(keyword)}`);
@@ -41,6 +82,14 @@ async function searchResults(keyword) {
 async function extractDetails(url) {
     // const REGEX = /Alternate Titles: ([\s\S]+?)<[\s\S]+?ptext">([\s\S]+?)</;
     const REGEX = /(?:Alternate Titles: ([\s\S]+?)<[\s\S]+?ptext">([\s\S]+?)<)|(?:ptext">([\s\S]+?)<)/;
+
+    if(url.startsWith('#')) {
+        return JSON.stringify([{
+            description: decodeURIComponent(url.slice(1)) + ' Please try again later.',
+            aliases: '',
+            airdate: ''
+        }]);
+    }
 
     try {
         const response = await soraFetch(url);
@@ -78,6 +127,8 @@ async function extractEpisodes(url) {
     let dubbed_episodes = [];
 
     try {
+        if(url.startsWith('#')) throw new Error('Host down but still attempted to get episodes');
+
         const response = await soraFetch(url);
         const html = typeof response === 'object' ? await response.text() : await response;
 
