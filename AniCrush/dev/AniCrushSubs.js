@@ -1,14 +1,14 @@
 // //***** LOCAL TESTING
-// const results = await searchResults('One Piece');
-// // console.log('RESULTS: ', results);
-// const details = await extractDetails(JSON.parse(results)[6].href);
-// // console.log('DETAILS: ', details);
-// const episodes = await extractEpisodes(JSON.parse(results)[6].href);
-// // console.log('OUTSIDE EPISODES: ', JSON.parse(episodes));
-// var epis = JSON.parse(episodes);
-// // console.log('Episodes', epis);
-// const streamUrl = await extractStreamUrl(epis[1128].href);
-// console.log('STREAMURL: ', streamUrl);
+const results = await searchResults('One Piece');
+// console.log('RESULTS: ', results);
+const details = await extractDetails(JSON.parse(results)[6].href);
+// console.log('DETAILS: ', details);
+const episodes = await extractEpisodes(JSON.parse(results)[6].href);
+// console.log('OUTSIDE EPISODES: ', JSON.parse(episodes));
+var epis = JSON.parse(episodes);
+// console.log('Episodes', epis);
+const streamUrl = await extractStreamUrl(epis[1128].href);
+console.log('STREAMURL: ', streamUrl);
 // //***** LOCAL TESTING
 
 async function areRequiredServersUp() {
@@ -109,9 +109,9 @@ async function searchResults(keyword) {
 async function extractDetails(url) {
     const UTILITY_URL = "https://ac-api.ofchaos.com";
 
-    if(slug.startsWith('#')) {
+    if(url.startsWith('#')) {
         return JSON.stringify([{
-            description: decodeURIComponent(slug.slice(1)) + ' Please try again later.',
+            description: decodeURIComponent(url.slice(1)) + ' Please try again later.',
             aliases: '',
             airdate: ''
         }]);
@@ -183,7 +183,7 @@ async function extractEpisodes(url) {
     const UTILITY_URL = "https://ac-api.ofchaos.com";
 
     try {
-        if(slug.startsWith('#')) throw new Error('Host down but still attempted to get episodes');
+        if(url.startsWith('#')) throw new Error('Host down but still attempted to get episodes');
 
         const movieId = url.split('.').pop();
 
