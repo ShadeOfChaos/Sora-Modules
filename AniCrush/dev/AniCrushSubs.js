@@ -18,15 +18,21 @@ async function areRequiredServersUp() {
         let promises = [];
 
         for(let host of requiredHosts) {
-            promises.push(soraFetch(host, { method: 'HEAD' }));
+            promises.push(
+                new Promise(async (resolve) => {
+                    let response = await soraFetch(host, { method: 'HEAD' });
+                    response.host = host;
+                    return resolve(response);
+                })
+            );
         }
 
         return Promise.allSettled(promises).then((responses) => {
             for(let response of responses) {
                 if(response.status === 'rejected' || response.value?.status != 200) {
-                    let message = 'Required source ' + response.value?.url + ' is currently down.';
+                    let message = 'Required source ' + response.value?.host + ' is currently down.';
                     console.log(message);
-                    return { success: false, error: encodeURIComponent(message), searchTitle: `Error cannot access ${ response.value?.url }, server down. Please try again later.` };
+                    return { success: false, error: encodeURIComponent(message), searchTitle: `Error cannot access ${ response.value?.host }, server down. Please try again later.` };
                 }
             }
 
