@@ -1,18 +1,61 @@
 // // //***** LOCAL TESTING
-(async () => {
-    const results = await searchResults('Beyblade X');
-    // console.log('RESULTS: ', results);
-    const details = await extractDetails(JSON.parse(results)[0].href);
-    // console.log('DETAILS: ', details);
-    const eps = await extractEpisodes(JSON.parse(results)[0].href);
-    // console.log('EPISODES: ', JSON.parse(eps));
-    const streamUrl = await extractStreamUrl(JSON.parse(eps)[78].href);
-    console.log('STREAMURL: ', streamUrl);
-})();
+// (async () => {
+//     const results = await searchResults('Beyblade X');
+//     // console.log('RESULTS: ', results);
+//     const details = await extractDetails(JSON.parse(results)[0].href);
+//     // console.log('DETAILS: ', details);
+//     const eps = await extractEpisodes(JSON.parse(results)[0].href);
+//     // console.log('EPISODES: ', JSON.parse(eps));
+//     const streamUrl = await extractStreamUrl(JSON.parse(eps)[78].href);
+//     console.log('STREAMURL: ', streamUrl);
+// })();
 //***** LOCAL TESTING
+
+async function areRequiredServersUp() {
+    const requiredHosts = ['https://hikari.gg'];
+
+    try {
+        let promises = [];
+
+        for(let host of requiredHosts) {
+            promises.push(
+                new Promise(async (resolve) => {
+                    let response = await soraFetch(host, { method: 'HEAD' });
+                    response.host = host;
+                    return resolve(response);
+                })
+            );
+        }
+
+        return Promise.allSettled(promises).then((responses) => {
+            for(let response of responses) {
+                if(response.status === 'rejected' || response.value?.status != 200) {
+                    let message = 'Required source ' + response.value?.host + ' is currently down.';
+                    console.log(message);
+                    return { success: false, error: encodeURIComponent(message), searchTitle: `Error cannot access ${ response.value?.host }, server down. Please try again later.` };
+                }
+            }
+
+            return { success: true, error: null, searchTitle: null };
+        })
+
+    } catch (error) {
+        console.log('Server up check error: ' + error.message);
+        return { success: false, error: encodeURIComponent('#Failed to access required servers'), searchTitle: 'Error cannot access one or more servers, server down. Please try again later.' };
+    }
+}
 
 async function searchResults(keyword) {
     const searchUrl = "https://api.hikari.gg/api/anime/?sort=created_at&order=asc&page=1&search=";
+    const serversUp = await areRequiredServersUp();
+
+    if(serversUp.success === false) {
+        return JSON.stringify([{
+            title: serversUp.searchTitle,
+            image: 'https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/sora_host_down.png',
+            href: '#' + serversUp.error,
+        }]);
+    }
 
     try {
         const encodedKeyword = encodeURIComponent(keyword);
@@ -86,6 +129,14 @@ async function getFollowupSearches(json) {
 async function extractDetails(slug) {
     const detailsUrl = "https://api.hikari.gg/api/anime/uid/";
 
+    if(slug.startsWith('#')) {
+        return JSON.stringify([{
+            description: decodeURIComponent(slug.slice(1)) + ' Please try again later.',
+            aliases: '',
+            airdate: ''
+        }]);
+    }
+
     try {
         const response = await soraFetch(detailsUrl + slug);
         const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
@@ -132,6 +183,8 @@ async function extractEpisodes(slug) {
     const embedUrl = "https://api.hikari.gg/api/embed/";
 
     try {
+        if(slug.startsWith('#')) throw new Error('Host down but still attempted to get episodes');
+
         const response = await soraFetch(episodesUrl + slug);
         const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 

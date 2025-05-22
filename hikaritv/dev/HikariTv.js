@@ -12,7 +12,7 @@
 //***** LOCAL TESTING
 
 async function areRequiredServersUp() {
-    const requiredHosts = ['https://hikari.gg', 'https://api.hikari.gg'];
+    const requiredHosts = ['https://hikari.gg'];
 
     try {
         let promises = [];
