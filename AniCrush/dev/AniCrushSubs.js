@@ -11,6 +11,34 @@
 // console.log('STREAMURL: ', streamUrl);
 // //***** LOCAL TESTING
 
+async function areRequiredServersUp() {
+    const requiredHosts = ['https://anicrush.to', 'https://api.anicrush.to'	, 'https://ac-api.ofchaos.com'];
+
+    try {
+        let promises = [];
+
+        for(let host of requiredHosts) {
+            promises.push(soraFetch(host, { method: 'HEAD' }));
+        }
+
+        return Promise.allSettled(promises).then((responses) => {
+            for(let response of responses) {
+                if(response.status === 'rejected' || response.value?.status != 200) {
+                    let message = 'Required source ' + response.value?.url + ' is currently down.';
+                    console.log(message);
+                    return { success: false, error: encodeURIComponent(message) };
+                }
+            }
+
+            return { success: true, error: null };
+        })
+
+    } catch (error) {
+        console.log('Server up check error: ' + error.message);
+        return { success: false, error: encodeURIComponent('#Failed to access required servers') };
+    }
+}
+
 /**
  * Given an image path, returns the URL to the resized image on AniCrush's CDN.
  * @param {string} path - The image path to transform.
@@ -40,6 +68,15 @@ function getImage(path, type = "poster") {
 async function searchResults(keyword) {
     const BASE_URL = 'https://anicrush.to';
     const UTILITY_URL = 'https://ac-api.ofchaos.com';
+    const serversUp = await areRequiredServersUp();
+
+    if(serversUp.success === false) {
+        return JSON.stringify([{
+            title: 'Error, cannot access required servers',
+            image: 'https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/sora_host_down.png',
+            href: '#' + serversUp.error,
+        }]);
+    }
 
     try {
         const page = 1;
@@ -71,6 +108,15 @@ async function searchResults(keyword) {
  */
 async function extractDetails(url) {
     const UTILITY_URL = "https://ac-api.ofchaos.com";
+
+    if(slug.startsWith('#')) {
+        return JSON.stringify([{
+            description: decodeURIComponent(slug.slice(1)) + ' Please try again later.',
+            aliases: '',
+            airdate: ''
+        }]);
+    }
+
     const movieId = url.split('.').pop();
 
     try {
@@ -135,9 +181,12 @@ async function extractDetails(url) {
 async function extractEpisodes(url) {
     const SOURCE_API_URL = "https://api.anicrush.to";
     const UTILITY_URL = "https://ac-api.ofchaos.com";
-    const movieId = url.split('.').pop();
 
     try {
+        if(slug.startsWith('#')) throw new Error('Host down but still attempted to get episodes');
+
+        const movieId = url.split('.').pop();
+
         const serverId = 4;
         const streamType = 'sub';
         var episodes = [];
