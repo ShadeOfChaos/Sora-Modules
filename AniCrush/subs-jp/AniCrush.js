@@ -1,3 +1,37 @@
+async function areRequiredServersUp() {
+    const requiredHosts = ['https://anicrush.to', 'https://ac-api.ofchaos.com', 'https://asura.ofchaos.com'];
+
+    try {
+        let promises = [];
+
+        for(let host of requiredHosts) {
+            promises.push(
+                new Promise(async (resolve) => {
+                    let response = await soraFetch(host, { method: 'HEAD' });
+                    response.host = host;
+                    return resolve(response);
+                })
+            );
+        }
+
+        return Promise.allSettled(promises).then((responses) => {
+            for(let response of responses) {
+                if(response.status === 'rejected' || response.value?.status != 200) {
+                    let message = 'Required source ' + response.value?.host + ' is currently down.';
+                    console.log(message);
+                    return { success: false, error: encodeURIComponent(message), searchTitle: `Error cannot access ${ response.value?.host }, server down. Please try again later.` };
+                }
+            }
+
+            return { success: true, error: null, searchTitle: null };
+        })
+
+    } catch (error) {
+        console.log('Server up check error: ' + error.message);
+        return { success: false, error: encodeURIComponent('#Failed to access required servers'), searchTitle: 'Error cannot access one or more servers, server down. Please try again later.' };
+    }
+}
+
 /**
  * Given an image path, returns the URL to the resized image on AniCrush's CDN.
  * @param {string} path - The image path to transform.
@@ -28,6 +62,16 @@ async function searchResults(keyword) {
     const BASE_URL = 'https://anicrush.to';
     const UTILITY_URL = 'https://api.anicrush.to/shared/v2';
     let shows = [];
+
+    const serversUp = await areRequiredServersUp();
+
+    if(serversUp.success === false) {
+        return JSON.stringify([{
+            title: serversUp.searchTitle,
+            image: 'https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/sora_host_down.png',
+            href: '#' + serversUp.error,
+        }]);
+    }
 
     try {
         const asuraList = await GetAnimes();
@@ -73,6 +117,14 @@ async function searchResults(keyword) {
  * @returns {Promise<string>} A promise that resolves with a JSON string containing the details in the format: `[{"description": "Description", "aliases": "Aliases", "airdate": "Airdate"}]`
  */
 async function extractDetails(objString) {
+    if(objString.startsWith('#')) {
+        return JSON.stringify([{
+            description: decodeURIComponent(url.slice(1)) + ' Please try again later.',
+            aliases: '',
+            airdate: ''
+        }]);
+    }
+
     const encodedDelimiter = encodeURIComponent('|');
     let json = {};
     [json.url, json.origin, json.anilistId, json.detailsUrl, json.episodesUrl] = objString.split(encodedDelimiter);
@@ -113,6 +165,8 @@ async function extractEpisodes(objString) {
     [json.url, json.origin, json.anilistId, json.detailsUrl, json.episodesUrl] = objString.split(encodedDelimiter);
 
     try {
+        if(objString.startsWith('#')) throw new Error('Host down but still attempted to get episodes');
+
         if(json?.episodesUrl == null) {
             throw new Error('No episodes found');
         }
