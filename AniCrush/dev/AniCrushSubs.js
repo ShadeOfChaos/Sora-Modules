@@ -1,18 +1,18 @@
 // //***** LOCAL TESTING
-// const results = await searchResults('One Piece');
-// // console.log('RESULTS: ', results);
-// const details = await extractDetails(JSON.parse(results)[6].href);
-// // console.log('DETAILS: ', details);
-// const episodes = await extractEpisodes(JSON.parse(results)[6].href);
-// // console.log('OUTSIDE EPISODES: ', JSON.parse(episodes));
-// var epis = JSON.parse(episodes);
-// // console.log('Episodes', epis);
-// const streamUrl = await extractStreamUrl(epis[1128].href);
-// console.log('STREAMURL: ', streamUrl);
+const results = await searchResults('One Piece');
+// console.log('RESULTS: ', results);
+const details = await extractDetails(JSON.parse(results)[6].href);
+// console.log('DETAILS: ', details);
+const episodes = await extractEpisodes(JSON.parse(results)[6].href);
+// console.log('OUTSIDE EPISODES: ', JSON.parse(episodes));
+var epis = JSON.parse(episodes);
+// console.log('Episodes', epis);
+const streamUrl = await extractStreamUrl(epis[1128].href);
+console.log('STREAMURL: ', streamUrl);
 // //***** LOCAL TESTING
 
 async function areRequiredServersUp() {
-    const requiredHosts = ['https://anicrush.to', 'https://api.anicrush.to'	, 'https://ac-api.ofchaos.com'];
+    const requiredHosts = ['https://anicrush.to', 'https://ac-api.ofchaos.com'];
 
     try {
         let promises = [];
