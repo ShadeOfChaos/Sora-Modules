@@ -15,7 +15,7 @@ const FORMAT = 'SUB'; // SUB | DUB
 //***** LOCAL TESTING
 
 async function areRequiredServersUp() {
-    const requiredHosts = ['https://www.animegg.org'];
+    const requiredHosts = ['https://www.animegg.org/api'];
 
     try {
         let promises = [];
