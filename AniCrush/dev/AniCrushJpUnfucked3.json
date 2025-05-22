@@ -13,7 +13,7 @@
 	"type": "anime",
     "baseUrl": "https://megacloud.club/",
     "searchBaseUrl": "https://asura.ofchaos.com/api/anime",
-    "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AniCrush/dev/AniCrushJpUnfucked.js",
+    "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AniCrush/dev/AniCrushJpUnfucked3.js",
     "asyncJS": true,
     "streamAsyncJS": true,
     "softsub": true
