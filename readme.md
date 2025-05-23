@@ -3,6 +3,9 @@
 > [!NOTE]
 > **dev folders, if the json indicates a different version, are essentially beta versions.**<br>
 
+> [!WARNING]
+> **Hikari modules have been shelved as Hikari has shut down, these are only still up for others to be able to look at the source code.**<br>
+
 ## Modules
 
 <span><img src="https://github.com/ShadeOfChaos/Sora-Modules/blob/f8c4018d432346da0b3a62a1f0542a9c7600127e/AniCrush/logo.png" width="125px" align="left">
@@ -107,22 +110,6 @@
 </span>
 <br><br>
 
-<span><img src="https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/hikaritv/logo_readme.png" width="125px" align="left"><br>
-**Source:** HikariTV.gg<br>
-**Language:** English (HARDSUB)<br>
-**Minimum Sora version required:** 0.2.2<br>
-<span></span>
-[<kbd> <br> Add to Sora <br> </kbd>](https://intradeus.github.io/http-protocol-redirector?r=sora://module?url=https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/hikaritv/subs-eng/HikariTv.json)
-</span>
-<br><br>
-<span><img src="https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/hikaritv/logo_readme.png" width="125px" align="left"><br>
-**Source:** HikariTV.gg<br>
-**Language:** English (DUB)<br>
-**Minimum Sora version required:** 0.2.2<br>
-<span></span>
-[<kbd> <br> Add to Sora <br> </kbd>](https://intradeus.github.io/http-protocol-redirector?r=sora://module?url=https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/hikaritv/dubs-eng/HikariTv.json)
-</span>
-<br><br>
 
 <span><img src="https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/Asura/logo.png" width="125px" align="left"><br>
 **Source:** Asura [Multi][AniCrush][AnimeParadise]<br>
