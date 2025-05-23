@@ -13,7 +13,7 @@
 	"type": "anime",
    "baseUrl": "https://hikari.gg/",
    "searchBaseUrl": "https://api.hikari.gg/api/anime/?sort=created_at&order=asc&page=1&search=%s",
-   "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/hikaritv/dev/HikariTv-hiki.js",
+   "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/hikaritv/shutdown.js",
    "asyncJS": true,
    "streamAsyncJS": true,
    "softsub": true
