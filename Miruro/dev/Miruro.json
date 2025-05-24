@@ -1,5 +1,5 @@
 {
-    "sourceName": "Miruro (ENG SUB)",
+    "sourceName": "Miruro (SOFTDUB, HARDSUB, DUB)",
     "iconUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/Miruro/logo.png",
     "author": {
         "name": "ShadeOfChaos",
@@ -7,7 +7,7 @@
         "url": "https://github.com/ShadeOfChaos/Sora-Modules"
     },
     "version": "0.1.0",
-    "language": "English (SUB)",
+    "language": "English (SOFTSUB, HARDSUB, DUB)",
     "streamType": "HLS",
     "quality": "1080p",
 	"type": "anime",
