@@ -108,6 +108,10 @@ async function extractDetails(objString) {
     let json = {};
     [json.url, json.id, json.malId, json.description, json.aliases, json.airdate, json.episodeCount, json.ongoing, json.host] = objString.split(decodeURIComponent(encodedDelimiter));
 
+    console.log('/////////////////////////////////');
+    console.log(JSON.stringify(json));
+    console.log('/////////////////////////////////');
+
     if(objString.startsWith('#')) {
         return JSON.stringify([{
             description: decodeURIComponent(url.slice(1)) + ' Please try again later.',
@@ -129,6 +133,10 @@ async function extractEpisodes(objString) {
     const encodedDelimiter = '|'; // For local testing
     let json = {};
     [json.url, json.id, json.malId, json.description, json.aliases, json.airdate, json.episodeCount, json.ongoing, json.host] = objString.split(decodeURIComponent(encodedDelimiter));
+
+    console.log('=================================');
+    console.log(JSON.stringify(json));
+    console.log('=================================');
 
     if(objString.startsWith('#')) throw new Error('Host down but still attempted to get episodes');
 
