@@ -88,7 +88,7 @@ async function searchResults(keyword) {
 
             return {
                 title: item.title.romaji,
-                image: item.coverImage.medium,
+                image: item.bannerImage,
                 href: `${ hostUrl }/watch?id=${ item.id }|${ item.id }|${ item.idMal }|${ item.description }|${ item.title.english }, ${ item.title.native }|${ item.startDate.year }-${ item.startDate.month.toString().padStart(2, '0') }-${ item.startDate.day.toString().padStart(2, '0') } to ${ item.endDate.year }-${ item.endDate.month.toString().padStart(2, '0') }-${ item.endDate.day.toString().padStart(2, '0') }|${ item.episodes }|${ ongoing }|${ hostUrl }`
             };
         });
