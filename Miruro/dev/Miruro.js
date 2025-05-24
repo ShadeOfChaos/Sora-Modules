@@ -106,7 +106,7 @@ async function extractDetails(objString) {
     // const encodedDelimiter = encodeURIComponent('|');
     const encodedDelimiter = '|'; // For local testing
     let json = {};
-    [json.url, json.id, json.malId, json.description, json.aliases, json.airdate, json.episodeCount, json.ongoing, json.host] = objString.split(decodeURIComponent(encodedDelimiter));
+    [json.url, json.id, json.malId, json.description, json.aliases, json.airdate, json.episodeCount, json.ongoing, json.host] = decodeURIComponent(objString).split(encodedDelimiter);
 
     console.log('/////////////////////////////////');
     console.log(JSON.stringify(json));
@@ -132,7 +132,7 @@ async function extractEpisodes(objString) {
     // const encodedDelimiter = encodeURIComponent('|');
     const encodedDelimiter = '|'; // For local testing
     let json = {};
-    [json.url, json.id, json.malId, json.description, json.aliases, json.airdate, json.episodeCount, json.ongoing, json.host] = objString.split(decodeURIComponent(encodedDelimiter));
+    [json.url, json.id, json.malId, json.description, json.aliases, json.airdate, json.episodeCount, json.ongoing, json.host] = decodeURIComponent(objString).split((encodedDelimiter));
 
     console.log('=================================');
     console.log(JSON.stringify(json));
