@@ -4,16 +4,16 @@ const SEARCH_URL = '---/api/search/browse?search=|||&page=1&perPage=5&type=ANIME
 
 
 // ***** LOCAL TESTING
-// (async() => {
-//     const results = await searchResults('Wind Breaker Season 2');
-//     console.log('SEARCH RESULTS: ', results);
-//     const details = await extractDetails(JSON.parse(results)[0].href);
-//     console.log('DETAILS: ', details);
-//     const episodes = await extractEpisodes(JSON.parse(results)[0].href);
-//     console.log('EPISODES: ', episodes);
-//     const streamUrl = await extractStreamUrl(JSON.parse(episodes)[0].href);
-//     console.log('STREAMURL: ', streamUrl);
-// })();
+(async() => {
+    const results = await searchResults('Solo Leveling');
+    console.log('SEARCH RESULTS: ', results);
+    const details = await extractDetails(JSON.parse(results)[0].href);
+    console.log('DETAILS: ', details);
+    const episodes = await extractEpisodes(JSON.parse(results)[0].href);
+    console.log('EPISODES: ', episodes);
+    const streamUrl = await extractStreamUrl(JSON.parse(episodes)[0].href);
+    console.log('STREAMURL: ', streamUrl);
+})();
 //***** LOCAL TESTING
 
 
@@ -211,6 +211,8 @@ async function extractStreamUrl(objString) {
         let multiStreams = {
             streams: []
         };
+
+        let jpSubsAdded = false;
         
         for(let stream of streams) {
             if(stream.subtitles == null) {
@@ -232,16 +234,38 @@ async function extractStreamUrl(objString) {
             }
 
             for(let subtitle of stream.subtitles) {
-                let title = `[${subtitle.label} Softsub] ${ stream.provider }`;
+                let label = subtitle.label;
+                if(subtitle.label.includes(' - ')) {
+                    label = subtitle.label.split(' - ')[1];
+                }
+
+                let title = `[${ label } Softsub] ${ stream.provider }`;
 
                 multiStreams.streams.push({
                     title: title,
                     streamUrl: stream.url,
                     headers: { referer: json.host},
                     subtitles: {
-                        [`${ subtitle.label } Softsub`]: subtitle.file
+                        [`${ label } Softsub`]: subtitle.file
                     }
                 });
+
+                if(!jpSubsAdded && subtitle.label.toLowerCase() === 'english') {
+                    jpSubsAdded = true;
+
+                    let doesSubtitleExist = await soraFetch(`https://asura.ofchaos.com/api/anime/${ json.id }/${ episodeNr }`, { method: 'HEAD', headers: { referer: 'SoraApp' }})
+
+                    if(doesSubtitleExist.status === 200) {
+                        multiStreams.streams.push({
+                            title: `[Japanese Softsub][Asura] ${ stream.provider }`,
+                            streamUrl: stream.url,
+                            headers: { referer: json.host},
+                            subtitles: {
+                                'Japanese Softsub': `https://asura.ofchaos.com/api/anime/${ json.id }/${ episodeNr }`
+                            }
+                        });
+                    }
+                }
             }
         }
 
@@ -268,15 +292,21 @@ async function extractAnimez(data, json, episodeNr, category = 'sub') {
 
     try {
         const response = await soraFetch(url);
-        const json = typeof response === 'object' ? await response.json() : JSON.parse(response);
+        const data = typeof response === 'object' ? await response.json() : JSON.parse(response);
 
-        if(!json || json.error) {
+        if(!data || data.error) {
             throw new Error(`No sources found for episode ${ episodeNr } for provider Animez`);
         }
 
         let sources = [];
-        for(const source of json.streams) {
-            sources.push({ provider: 'animez', url: source.url, subtitles: json?.tracks ?? null, type: category });
+        for(const source of data.streams) {
+            let tracks = data.tracks || null;
+
+            if(tracks != null) {
+                tracks = tracks.filter(track => track.kind === 'captions');
+            }
+
+            sources.push({ provider: 'animez', url: source.url, subtitles: tracks, type: category });
         }
 
         return sources;
@@ -318,15 +348,21 @@ async function extractPahe(data, json, episodeNr, category = 'sub') {
 
     try {
         const response = await soraFetch(url);
-        const json = typeof response === 'object' ? await response.json() : JSON.parse(response);
+        const data = typeof response === 'object' ? await response.json() : JSON.parse(response);
 
-        if(!json || json.error) {
+        if(!data || data.error) {
             throw new Error(`No sources found for episode ${ episodeNr } for provider AnimePahe`);
         }
 
         let sources = [];
-        for(const source of json.streams) {
-            sources.push({ provider: 'animepahe', url: source.url, subtitles: json?.tracks ?? null, type: category });
+        for(const source of data.streams) {
+            let tracks = data.tracks || null;
+
+            if(tracks != null) {
+                tracks = tracks.filter(track => track.kind === 'captions');
+            }
+
+            sources.push({ provider: 'animepahe', url: source.url, subtitles: tracks, type: category });
         }
 
         return sources;
@@ -353,15 +389,21 @@ async function extractZoro(data, json, episodeNr, category = 'sub') {
 
     try {
         const response = await soraFetch(url);
-        const json = typeof response === 'object' ? await response.json() : JSON.parse(response);
+        const data = typeof response === 'object' ? await response.json() : JSON.parse(response);
 
-        if(!json || json.error) {
+        if(!data || data.error) {
             throw new Error(`No sources found for episode ${ episodeNr } for provider Zoro`);
         }
 
         let sources = [];
-        for(const source of json.streams) {
-            sources.push({ provider: 'zoro', url: source.url, subtitles: json.tracks ?? null, type: category });
+        for(const source of data.streams) {
+            let tracks = data.tracks || null;
+
+            if(tracks != null) {
+                tracks = tracks.filter(track => track.kind === 'captions');
+            }
+
+            sources.push({ provider: 'zoro', url: source.url, subtitles: tracks, type: category });
         }
 
         return sources;
