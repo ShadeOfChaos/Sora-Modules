@@ -103,10 +103,10 @@ async function searchResults(keyword) {
 
 
 async function extractDetails(objString) {
-    const encodedDelimiter = encodeURIComponent('|');
-    // const encodedDelimiter = '|'; // For local testing
+    // const encodedDelimiter = encodeURIComponent('|');
+    const encodedDelimiter = '|'; // For local testing
     let json = {};
-    [json.url, json.id, json.malId, json.description, json.aliases, json.airdate, json.episodeCount, json.ongoing, json.host] = objString.split(encodedDelimiter);
+    [json.url, json.id, json.malId, json.description, json.aliases, json.airdate, json.episodeCount, json.ongoing, json.host] = objString.split(decodeURIComponent(encodedDelimiter));
 
     if(objString.startsWith('#')) {
         return JSON.stringify([{
@@ -125,10 +125,10 @@ async function extractDetails(objString) {
 
 
 async function extractEpisodes(objString) {
-    const encodedDelimiter = encodeURIComponent('|');
-    // const encodedDelimiter = '|'; // For local testing
+    // const encodedDelimiter = encodeURIComponent('|');
+    const encodedDelimiter = '|'; // For local testing
     let json = {};
-    [json.url, json.id, json.malId, json.description, json.aliases, json.airdate, json.episodeCount, json.ongoing, json.host] = objString.split(encodedDelimiter);
+    [json.url, json.id, json.malId, json.description, json.aliases, json.airdate, json.episodeCount, json.ongoing, json.host] = objString.split(decodeURIComponent(encodedDelimiter));
 
     if(objString.startsWith('#')) throw new Error('Host down but still attempted to get episodes');
 
@@ -231,7 +231,7 @@ async function extractStreamUrl(objString) {
                     streamUrl: stream.url,
                     headers: { referer: json.host},
                     subtitles: {
-                        [subtitle.label]: subtitle.file
+                        [`${ subtitle.label } Softsub`]: subtitle.file
                     }
                 });
             }
