@@ -1,18 +1,16 @@
 const BASE_URLS = ['https://miruro.tv', 'https://miruro.to', 'https://miruro.online'];
 const SEARCH_URL = '---/api/search/browse?search=|||&page=1&perPage=5&type=ANIME&sort=SEARCH_MATCH';
-// const FORMAT = 'SUB'; // SUB | DUB
-
 
 // ***** LOCAL TESTING
 // (async() => {
 //     const results = await searchResults('Wind breaker season 2');
-//     console.log('SEARCH RESULTS: ', results);
+//     // console.log('SEARCH RESULTS: ', results);
 //     const details = await extractDetails(JSON.parse(results)[0].href);
-//     console.log('DETAILS: ', details);
+//     // console.log('DETAILS: ', details);
 //     const episodes = await extractEpisodes(JSON.parse(results)[0].href);
-//     console.log('EPISODES: ', episodes);
+//     // console.log('EPISODES: ', episodes);
 //     const streamUrl = await extractStreamUrl(JSON.parse(episodes)[0].href);
-//     console.log('STREAMURL: ', streamUrl);
+//     // console.log('STREAMURL: ', streamUrl);
 // })();
 //***** LOCAL TESTING
 
@@ -103,8 +101,7 @@ async function searchResults(keyword) {
 
 
 async function extractDetails(objString) {
-    // const encodedDelimiter = encodeURIComponent('|');
-    const encodedDelimiter = '|'; // For local testing
+    const encodedDelimiter = '|';
     let json = {};
     [json.url, json.id, json.malId, json.description, json.aliases, json.airdate, json.episodeCount, json.ongoing, json.host] = decodeURIComponent(objString).split(encodedDelimiter);
 
@@ -173,14 +170,17 @@ async function extractStreamUrl(objString) {
                 promises.push(extractAnimez(data, json, episodeNr, 'dub'));
                 continue;
             }
-            if(key === 'ZORO') {
-                promises.push(extractZoro(data, json, episodeNr, 'sub'));
-                promises.push(extractZoro(data, json, episodeNr, 'dub'));
-                continue;
-            }
             if(key === 'ANIMEPAHE') {
                 promises.push(extractPahe(data, json, episodeNr, 'sub'));
                 promises.push(extractPahe(data, json, episodeNr, 'dub'));
+                continue;
+            }
+            // START - // TODO REMOVE WHEN SORA ADDS EITHER MULTIPLE SOFTSUB SUPPORT WITH DEFAULTS OR ADDS SUBTITLE PER STREAM SUPPORT
+            continue; // Skips key === 'ZORO'
+            // END - // TODO REMOVE WHEN SORA ADDS EITHER MULTIPLE SOFTSUB SUPPORT WITH DEFAULTS OR ADDS SUBTITLE PER STREAM SUPPORT
+            if(key === 'ZORO') {
+                promises.push(extractZoro(data, json, episodeNr, 'sub'));
+                promises.push(extractZoro(data, json, episodeNr, 'dub'));
                 continue;
             }
         }
@@ -230,6 +230,10 @@ async function extractStreamUrl(objString) {
                 continue;
             }
 
+            // START - // TODO REMOVE WHEN SORA ADDS EITHER MULTIPLE SOFTSUB SUPPORT WITH DEFAULTS OR ADDS SUBTITLE PER STREAM SUPPORT
+            continue; // Skips subtitles
+            // END - // TODO REMOVE WHEN SORA ADDS EITHER MULTIPLE SOFTSUB SUPPORT WITH DEFAULTS OR ADDS SUBTITLE PER STREAM SUPPORT
+
             for(let subtitle of stream.subtitles) {
                 let label = subtitle.label;
                 if(subtitle.label.includes(' - ')) {
@@ -266,8 +270,6 @@ async function extractStreamUrl(objString) {
             }
         }
 
-        console.log('Amount of streams:', multiStreams.streams.length);
-
         // Verify if streamsUrls are valid / have not been removed
         let validStreams = [];
         for(let stream of multiStreams.streams) {
@@ -277,7 +279,6 @@ async function extractStreamUrl(objString) {
             }
         }
         multiStreams.streams = validStreams;
-        console.log('Amount of  validstreams:', multiStreams.streams.length);
 
 
         return JSON.stringify(multiStreams);

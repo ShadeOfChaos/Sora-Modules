@@ -1,13 +1,13 @@
 {
-    "sourceName": "[DEV] Miruro (SOFTDUB, HARDSUB, DUB)",
+    "sourceName": "[DEV] Miruro (HARDSUB, DUB)",
     "iconUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/Miruro/logo.png",
     "author": {
         "name": "ShadeOfChaos",
         "icon": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/ofchaos.jpg",
         "url": "https://github.com/ShadeOfChaos/Sora-Modules"
     },
-    "version": "0.4.0",
-    "language": "English (SOFTSUB, HARDSUB, DUB)",
+    "version": "0.9.0",
+    "language": "English (HARDSUB, DUB)",
     "streamType": "HLS",
     "quality": "1080p",
 	"type": "anime",
