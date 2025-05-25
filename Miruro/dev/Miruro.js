@@ -5,7 +5,7 @@ const SEARCH_URL = '---/api/search/browse?search=|||&page=1&perPage=5&type=ANIME
 
 // ***** LOCAL TESTING
 (async() => {
-    const results = await searchResults('Solo Leveling');
+    const results = await searchResults('Wind breaker season 2');
     console.log('SEARCH RESULTS: ', results);
     const details = await extractDetails(JSON.parse(results)[0].href);
     console.log('DETAILS: ', details);
@@ -108,10 +108,6 @@ async function extractDetails(objString) {
     let json = {};
     [json.url, json.id, json.malId, json.description, json.aliases, json.airdate, json.episodeCount, json.ongoing, json.host] = decodeURIComponent(objString).split(encodedDelimiter);
 
-    console.log('/////////////////////////////////');
-    console.log(JSON.stringify(json));
-    console.log('/////////////////////////////////');
-
     if(objString.startsWith('#')) {
         return JSON.stringify([{
             description: decodeURIComponent(url.slice(1)) + ' Please try again later.',
@@ -129,14 +125,9 @@ async function extractDetails(objString) {
 
 
 async function extractEpisodes(objString) {
-    // const encodedDelimiter = encodeURIComponent('|');
-    const encodedDelimiter = '|'; // For local testing
+    const encodedDelimiter = '|';
     let json = {};
     [json.url, json.id, json.malId, json.description, json.aliases, json.airdate, json.episodeCount, json.ongoing, json.host] = decodeURIComponent(objString).split((encodedDelimiter));
-
-    console.log('=================================');
-    console.log(JSON.stringify(json));
-    console.log('=================================');
 
     if(objString.startsWith('#')) throw new Error('Host down but still attempted to get episodes');
 
@@ -227,7 +218,7 @@ async function extractStreamUrl(objString) {
                 multiStreams.streams.push({
                     title: title,
                     streamUrl: stream.url,
-                    headers: { referer: json.host},
+                    headers: { origin: json.host, referer: json.host},
                     subtitles: null
                 });
                 continue;
@@ -244,7 +235,7 @@ async function extractStreamUrl(objString) {
                 multiStreams.streams.push({
                     title: title,
                     streamUrl: stream.url,
-                    headers: { referer: json.host},
+                    headers: { origin: json.host, referer: json.host},
                     subtitles: {
                         [`${ label } Softsub`]: subtitle.file
                     }
@@ -292,6 +283,11 @@ async function extractAnimez(data, json, episodeNr, category = 'sub') {
 
     try {
         const response = await soraFetch(url);
+
+        if(response.headers.get('Content-Type') !== 'application/json; charset=utf-8') {
+            throw new Error(`Animez source temporarily unavailable for episode ${ episodeNr }`);
+        }
+
         const data = typeof response === 'object' ? await response.json() : JSON.parse(response);
 
         if(!data || data.error) {
@@ -348,6 +344,11 @@ async function extractPahe(data, json, episodeNr, category = 'sub') {
 
     try {
         const response = await soraFetch(url);
+
+        if(response.headers.get('Content-Type') !== 'application/json; charset=utf-8') {
+            throw new Error(`AnimePahe source temporarily unavailable for episode ${ episodeNr }`);
+        }
+
         const data = typeof response === 'object' ? await response.json() : JSON.parse(response);
 
         if(!data || data.error) {
@@ -389,6 +390,11 @@ async function extractZoro(data, json, episodeNr, category = 'sub') {
 
     try {
         const response = await soraFetch(url);
+
+        if(response.headers.get('Content-Type') !== 'application/json; charset=utf-8') {
+            throw new Error(`Zoro source temporarily unavailable for episode ${ episodeNr }`);
+        }
+
         const data = typeof response === 'object' ? await response.json() : JSON.parse(response);
 
         if(!data || data.error) {
