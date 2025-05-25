@@ -59,7 +59,7 @@ async function extractStreamUrl(url) {
             },
             "subtitles": "https://s.megastatics.com/subtitle/ae54d67674aea3d25dd054caf4345097/eng-2.vtt"
         }]};
-        return streamUrl;
+        return JSON.stringify(streamUrl);
 
     } catch(e) {
         console.log('Error extracting stream: ' + e.message);
