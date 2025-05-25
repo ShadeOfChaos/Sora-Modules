@@ -240,6 +240,10 @@ async function extractStreamUrl(objString) {
 
                 let title = `[${ label } Softsub] ${ stream.provider }`;
 
+                if(stream.type === 'dub') {
+                    title = `[${ label } Sub & Dub] ${ stream.provider }`;
+                }
+
                 multiStreams.streams.push({
                     title: title,
                     streamUrl: stream.url,
