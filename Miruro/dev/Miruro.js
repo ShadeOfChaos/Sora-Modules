@@ -206,6 +206,14 @@ async function extractStreamUrl(objString) {
         let jpSubsAdded = false;
         
         for(let stream of streams) {
+            let headers = {};
+            if(stream.referer != null) {
+                headers.referer = stream.referer;
+            }
+            if(stream.origin != null) {
+                headers.origin = stream.origin;
+            }
+
             if(stream.subtitles == null) {
                 console.log('STREAM:', stream);
 
@@ -218,7 +226,7 @@ async function extractStreamUrl(objString) {
                 multiStreams.streams.push({
                     title: title,
                     streamUrl: stream.url,
-                    headers: { origin: json.host, referer: json.host},
+                    headers: headers,
                     subtitles: null
                 });
                 continue;
@@ -235,7 +243,7 @@ async function extractStreamUrl(objString) {
                 multiStreams.streams.push({
                     title: title,
                     streamUrl: stream.url,
-                    headers: { origin: json.host, referer: json.host},
+                    headers: headers,
                     subtitles: {
                         [`${ label } Softsub`]: subtitle.file
                     }
@@ -250,7 +258,7 @@ async function extractStreamUrl(objString) {
                         multiStreams.streams.push({
                             title: `[Japanese Softsub][Asura] ${ stream.provider }`,
                             streamUrl: stream.url,
-                            headers: { origin: json.host, referer: json.host },
+                            headers: headers,
                             subtitles: {
                                 'Japanese Softsub': `https://asura.ofchaos.com/api/anime/${ json.id }/${ episodeNr }`
                             }
@@ -284,10 +292,9 @@ async function extractAnimez(data, json, episodeNr, category = 'sub') {
     try {
         const response = await soraFetch(url);
 
-        // Implement this when we know how Sora response headers can be read
-        // if(response.headers.get('Content-Type') !== 'application/json; charset=utf-8') {
-        //     throw new Error(`Animez source temporarily unavailable for episode ${ episodeNr }`);
-        // }
+        if(getResponseHeader(response, 'Content-Type') !== 'application/json; charset=utf-8') {
+            throw new Error(`Animez source temporarily unavailable for episode ${ episodeNr }`);
+        }
 
         const data = typeof response === 'object' ? await response.json() : JSON.parse(response);
 
@@ -303,7 +310,7 @@ async function extractAnimez(data, json, episodeNr, category = 'sub') {
                 tracks = tracks.filter(track => track.kind === 'captions');
             }
 
-            sources.push({ provider: 'animez', url: source.url, subtitles: tracks, type: category });
+            sources.push({ provider: 'animez', url: source.url, subtitles: tracks, type: category, referer: source.url });
         }
 
         return sources;
@@ -346,10 +353,9 @@ async function extractPahe(data, json, episodeNr, category = 'sub') {
     try {
         const response = await soraFetch(url);
 
-        // Implement this when we know how Sora response headers can be read
-        // if(response.headers.get('Content-Type') !== 'application/json; charset=utf-8') {
-        //     throw new Error(`AnimePahe source temporarily unavailable for episode ${ episodeNr }`);
-        // }
+        if(getResponseHeader(response, 'Content-Type') !== 'application/json; charset=utf-8') {
+            throw new Error(`AnimePahe source temporarily unavailable for episode ${ episodeNr }`);
+        }
 
         const data = typeof response === 'object' ? await response.json() : JSON.parse(response);
 
@@ -393,17 +399,9 @@ async function extractZoro(data, json, episodeNr, category = 'sub') {
     try {
         const response = await soraFetch(url);
 
-        // Implement this when we know how Sora response headers can be read
-        // if(response.headers.get('Content-Type') !== 'application/json; charset=utf-8') {
-        //     throw new Error(`Zoro source temporarily unavailable for episode ${ episodeNr }`);
-        // }
-        console.log('=====================');
-        console.log('1. ' + response.headers['Content-Type']);
-        console.log('2. ' + response.headers['content-type']);
-        console.log('3. ' + response.headers['contentType']);
-        console.log('4. ' + response.headers.contentType);
-        console.log('5. ' + JSON.stringify(response.headers));
-        console.log('=====================');
+        if(getResponseHeader(response, 'Content-Type') !== 'application/json; charset=utf-8') {
+            throw new Error(`Zoro source temporarily unavailable for episode ${ episodeNr }`);
+        }
 
         const data = typeof response === 'object' ? await response.json() : JSON.parse(response);
 
@@ -419,7 +417,7 @@ async function extractZoro(data, json, episodeNr, category = 'sub') {
                 tracks = tracks.filter(track => track.kind === 'captions');
             }
 
-            sources.push({ provider: 'zoro', url: source.url, subtitles: tracks, type: category });
+            sources.push({ provider: 'zoro', url: source.url, subtitles: tracks, type: category, referer: json.host, origin: json.host });
         }
 
         return sources;
@@ -427,6 +425,15 @@ async function extractZoro(data, json, episodeNr, category = 'sub') {
     } catch (error) {
         console.log('Error fetching Zoro source: ' + error.message);
         return null;
+    }
+}
+
+
+function getResponseHeader(res, key) {
+    try {
+        return res.headers.get(key);
+    } catch(e) {
+        return res.headers[key];
     }
 }
 
