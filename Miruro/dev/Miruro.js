@@ -4,16 +4,16 @@ const SEARCH_URL = '---/api/search/browse?search=|||&page=1&perPage=5&type=ANIME
 
 
 // ***** LOCAL TESTING
-(async() => {
-    const results = await searchResults('Wind breaker season 2');
-    console.log('SEARCH RESULTS: ', results);
-    const details = await extractDetails(JSON.parse(results)[0].href);
-    console.log('DETAILS: ', details);
-    const episodes = await extractEpisodes(JSON.parse(results)[0].href);
-    console.log('EPISODES: ', episodes);
-    const streamUrl = await extractStreamUrl(JSON.parse(episodes)[0].href);
-    console.log('STREAMURL: ', streamUrl);
-})();
+// (async() => {
+//     const results = await searchResults('Wind breaker season 2');
+//     console.log('SEARCH RESULTS: ', results);
+//     const details = await extractDetails(JSON.parse(results)[0].href);
+//     console.log('DETAILS: ', details);
+//     const episodes = await extractEpisodes(JSON.parse(results)[0].href);
+//     console.log('EPISODES: ', episodes);
+//     const streamUrl = await extractStreamUrl(JSON.parse(episodes)[0].href);
+//     console.log('STREAMURL: ', streamUrl);
+// })();
 //***** LOCAL TESTING
 
 
