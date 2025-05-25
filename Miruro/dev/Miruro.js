@@ -284,9 +284,10 @@ async function extractAnimez(data, json, episodeNr, category = 'sub') {
     try {
         const response = await soraFetch(url);
 
-        if(response.headers.get('Content-Type') !== 'application/json; charset=utf-8') {
-            throw new Error(`Animez source temporarily unavailable for episode ${ episodeNr }`);
-        }
+        // Implement this when we know how Sora response headers can be read
+        // if(response.headers.get('Content-Type') !== 'application/json; charset=utf-8') {
+        //     throw new Error(`Animez source temporarily unavailable for episode ${ episodeNr }`);
+        // }
 
         const data = typeof response === 'object' ? await response.json() : JSON.parse(response);
 
@@ -345,9 +346,10 @@ async function extractPahe(data, json, episodeNr, category = 'sub') {
     try {
         const response = await soraFetch(url);
 
-        if(response.headers.get('Content-Type') !== 'application/json; charset=utf-8') {
-            throw new Error(`AnimePahe source temporarily unavailable for episode ${ episodeNr }`);
-        }
+        // Implement this when we know how Sora response headers can be read
+        // if(response.headers.get('Content-Type') !== 'application/json; charset=utf-8') {
+        //     throw new Error(`AnimePahe source temporarily unavailable for episode ${ episodeNr }`);
+        // }
 
         const data = typeof response === 'object' ? await response.json() : JSON.parse(response);
 
@@ -391,9 +393,10 @@ async function extractZoro(data, json, episodeNr, category = 'sub') {
     try {
         const response = await soraFetch(url);
 
-        if(response.headers.get('Content-Type') !== 'application/json; charset=utf-8') {
-            throw new Error(`Zoro source temporarily unavailable for episode ${ episodeNr }`);
-        }
+        // Implement this when we know how Sora response headers can be read
+        // if(response.headers.get('Content-Type') !== 'application/json; charset=utf-8') {
+        //     throw new Error(`Zoro source temporarily unavailable for episode ${ episodeNr }`);
+        // }
 
         const data = typeof response === 'object' ? await response.json() : JSON.parse(response);
 
