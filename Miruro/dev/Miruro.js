@@ -248,9 +248,7 @@ async function extractStreamUrl(objString) {
                     title: title,
                     streamUrl: stream.url,
                     headers: headers,
-                    subtitles: {
-                        [`${ label } Softsub`]: subtitle.file
-                    }
+                    subtitles: subtitle.file
                 });
 
                 if(!jpSubsAdded && subtitle.label.toLowerCase() === 'english') {
@@ -263,9 +261,7 @@ async function extractStreamUrl(objString) {
                             title: `[Japanese Softsub][Asura] ${ stream.provider }`,
                             streamUrl: stream.url,
                             headers: headers,
-                            subtitles: {
-                                'Japanese Softsub': `https://asura.ofchaos.com/api/anime/${ json.id }/${ episodeNr }`
-                            }
+                            subtitles: `https://asura.ofchaos.com/api/anime/${ json.id }/${ episodeNr }`
                         });
                     }
                 }

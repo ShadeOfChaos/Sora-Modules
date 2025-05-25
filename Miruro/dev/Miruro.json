@@ -6,7 +6,7 @@
         "icon": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/ofchaos.jpg",
         "url": "https://github.com/ShadeOfChaos/Sora-Modules"
     },
-    "version": "0.3.1",
+    "version": "0.3.2",
     "language": "English (SOFTSUB, HARDSUB, DUB)",
     "streamType": "HLS",
     "quality": "1080p",
