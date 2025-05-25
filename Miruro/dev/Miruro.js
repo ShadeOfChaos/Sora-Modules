@@ -215,8 +215,6 @@ async function extractStreamUrl(objString) {
             }
 
             if(stream.subtitles == null) {
-                console.log('STREAM:', stream);
-
                 let title = `[English Hardsub] ${ stream.provider }`;
 
                 if(stream.type === 'dub') {
@@ -267,6 +265,20 @@ async function extractStreamUrl(objString) {
                 }
             }
         }
+
+        console.log('Amount of streams:', multiStreams.streams.length);
+
+        // Verify if streamsUrls are valid / have not been removed
+        let validStreams = [];
+        for(let stream of multiStreams.streams) {
+            const response = await soraFetch(stream.streamUrl, { method: 'HEAD', headers: stream.headers });
+            if(response.status === 200) {
+                validStreams.push(stream);
+            }
+        }
+        multiStreams.streams = validStreams;
+        console.log('Amount of  validstreams:', multiStreams.streams.length);
+
 
         return JSON.stringify(multiStreams);
 
