@@ -259,7 +259,7 @@ async function extractStreamUrl(objString) {
                         multiStreams.streams.push({
                             title: `[Japanese Softsub][Asura] ${ stream.provider }`,
                             streamUrl: stream.url,
-                            headers: { referer: json.host},
+                            headers: { origin: json.host, referer: json.host },
                             subtitles: {
                                 'Japanese Softsub': `https://asura.ofchaos.com/api/anime/${ json.id }/${ episodeNr }`
                             }
