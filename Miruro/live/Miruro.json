@@ -1,5 +1,5 @@
 {
-    "sourceName": "Miruro (ENG SUB)",
+    "sourceName": "Miruro (SOFTDUB, HARDSUB, DUB)",
     "iconUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/Miruro/logo.png",
     "author": {
         "name": "ShadeOfChaos",
@@ -7,14 +7,15 @@
         "url": "https://github.com/ShadeOfChaos/Sora-Modules"
     },
     "version": "0.0.1",
-    "language": "English (SUB)",
+    "language": "English (SOFTSUB, HARDSUB, DUB)",
     "streamType": "HLS",
-    "quality": "720p",
+    "quality": "1080p",
 	"type": "anime",
     "baseUrl": "https://miruro.tv/",
     "searchBaseUrl": "https://www.miruro.tv/api/search/browse?search=%s&page=1&perPage=5&type=ANIME&sort=SEARCH_MATCH",
     "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/Miruro/live/Miruro.js",
     "asyncJS": true,
     "streamAsyncJS": true,
-    "softsub": true
+    "softsub": true,
+    "multiStream": true
  }
