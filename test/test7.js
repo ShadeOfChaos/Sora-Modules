@@ -58,7 +58,7 @@ async function extractStreamUrl(url) {
                     "origin": "https://miruro.tv"
                 },
             }],
-            "subtitles": "https://s.megastatics.com/subtitle/ae54d67674aea3d25dd054caf4345097/eng-2.vtt"
+            "subtitles": ["https://s.megastatics.com/subtitle/ae54d67674aea3d25dd054caf4345097/eng-2.vtt", "https://s.megastatics.com/subtitle/ae54d67674aea3d25dd054caf4345097/ind-3.vtt"]
         };
         return JSON.stringify(streamUrl);
 
