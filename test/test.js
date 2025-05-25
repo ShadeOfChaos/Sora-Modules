@@ -50,7 +50,7 @@ async function extractEpisodes(url) {
  */
 async function extractStreamUrl(url) {
     try {
-        const streamUrl = { stream: 'https://douvid.xyz/_v1_douvid/NVjXNaxco1crLa45Sa9JYw==/jfxMeLVKvB.m3u8", subtitles: https://s.megastatics.com/subtitle/ae54d67674aea3d25dd054caf4345097/eng-2.vtt' };
+        const streamUrl = { streams: [{ title: 'Test show', streamUrl: 'https://douvid.xyz/_v1_douvid/NVjXNaxco1crLa45Sa9JYw==/jfxMeLVKvB.m3u8', subtitles: 'https://s.megastatics.com/subtitle/ae54d67674aea3d25dd054caf4345097/eng-2.vtt' }]};
         return streamUrl;
 
     } catch(e) {
