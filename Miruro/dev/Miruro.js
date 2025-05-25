@@ -397,6 +397,13 @@ async function extractZoro(data, json, episodeNr, category = 'sub') {
         // if(response.headers.get('Content-Type') !== 'application/json; charset=utf-8') {
         //     throw new Error(`Zoro source temporarily unavailable for episode ${ episodeNr }`);
         // }
+        console.log('=====================');
+        console.log('1. ' + response.headers['Content-Type']);
+        console.log('2. ' + response.headers['content-type']);
+        console.log('3. ' + response.headers['contentType']);
+        console.log('4. ' + response.headers.contentType);
+        console.log('5. ' + JSON.stringify(response.headers));
+        console.log('=====================');
 
         const data = typeof response === 'object' ? await response.json() : JSON.parse(response);
 
