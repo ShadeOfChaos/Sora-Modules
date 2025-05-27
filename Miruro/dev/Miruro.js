@@ -58,6 +58,7 @@ async function areRequiredServersUp() {
 
 
 async function searchResults(keyword) {
+    console.log('Running Miruro v0.9.2');
     const serversUp = await areRequiredServersUp();
 
     if(serversUp.success === false) {
