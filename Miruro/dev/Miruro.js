@@ -99,7 +99,7 @@ async function searchResults(keyword) {
             return {
                 title: item.title.romaji,
                 image: image,
-                href: `${ hostUrl }/watch?id=${ item.id }|${ item.id }|${ item.idMal }|${ item.description }|${ item.title.english }, ${ item.title.native }|${ itemDateString }|${ item.episodes }|${ ongoing }|${ hostUrl }`
+                href: `${ hostUrl }/watch?id=${ item.id }|${ item.id }|${ item.idMal }|${ item.description }|${ item.title.english }, ${ item.title.native }|${ itemDateString }|${ episodeCount }|${ ongoing }|${ hostUrl }`
             };
         });
 
