@@ -3,14 +3,14 @@ const SEARCH_URL = '---/api/search/browse?search=|||&page=1&perPage=5&type=ANIME
 
 // ***** LOCAL TESTING
 // (async() => {
-//     const results = await searchResults('Wind breaker season 2');
-//     // console.log('SEARCH RESULTS: ', results);
+//     const results = await searchResults('One piece');
+//     console.log('SEARCH RESULTS: ', results);
 //     const details = await extractDetails(JSON.parse(results)[0].href);
-//     // console.log('DETAILS: ', details);
+//     console.log('DETAILS: ', details);
 //     const episodes = await extractEpisodes(JSON.parse(results)[0].href);
-//     // console.log('EPISODES: ', episodes);
+//     console.log('EPISODES: ', episodes);
 //     const streamUrl = await extractStreamUrl(JSON.parse(episodes)[0].href);
-//     // console.log('STREAMURL: ', streamUrl);
+//     console.log('STREAMURL: ', streamUrl);
 // })();
 //***** LOCAL TESTING
 
@@ -84,7 +84,7 @@ async function searchResults(keyword) {
                 ongoing = 1;
             }
 
-            let itemDateString = getDateStringFromSearchResult();
+            let itemDateString = getDateStringFromSearchResult(item);
 
             return {
                 title: item.title.romaji,
@@ -456,14 +456,14 @@ function getDateStringFromSearchResult(item) {
 
     if(startYear != null) {
         if(startMonth != null && startDay != null) {
-            startYearString = `${ startYear }-${ startMonth.toString().padStart(2, '0') }-${ item.startDate.day.toString().padStart(2, '0') }`;
+            startYearString = `${ startYear }-${ startMonth.toString().padStart(2, '0') }-${ startDay.toString().padStart(2, '0') }`;
         }
         startYearString = `${ startYear }`;
     }
 
     if(endYear != null) {
         if(endMonth != null && endDay != null) {
-            endYearString = `${ item.endDate.year }-${ item.endDate.month.toString().padStart(2, '0') }-${ item.endDate.day.toString().padStart(2, '0') }`;
+            endYearString = `${ item.endDate.year }-${ endMonth.toString().padStart(2, '0') }-${ endDay.toString().padStart(2, '0') }`;
         }
         endYearString = `${ endYear }`;
     }
