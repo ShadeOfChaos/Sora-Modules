@@ -44,6 +44,7 @@ async function areRequiredServersUp() {
 
 
 async function searchResults(keyword) {
+    console.log('Running Miruro v0.9.2+');
     const serversUp = await areRequiredServersUp();
 
     if(serversUp.success === false) {
@@ -66,16 +67,26 @@ async function searchResults(keyword) {
 
         const results = json.map(item => {
             let ongoing = 0;
+            let episodeCount = item.episodes;
+
             if(item.nextAiringEpisode != null) {
                 ongoing = 1;
+
+                if(episodeCount == null) {
+                    let nextEpisode = item?.nextAiringEpisode?.episode;
+                    if(nextEpisode != null) {
+                        episodeCount = parseInt(nextEpisode) - 1;
+                    }
+                }
             }
 
             let itemDateString = getDateStringFromSearchResult(item);
+            let image = item.coverImage?.extraLarge ?? item.coverImage?.large ?? item.coverImage?.medium ?? item.bannerImage ?? item.coverImage?.small;
 
             return {
                 title: item.title.romaji,
-                image: item.bannerImage,
-                href: `${ hostUrl }/watch?id=${ item.id }|${ item.id }|${ item.idMal }|${ item.description }|${ item.title.english }, ${ item.title.native }|${ itemDateString }|${ item.episodes }|${ ongoing }|${ hostUrl }`
+                image: image,
+                href: `${ hostUrl }/watch?id=${ item.id }|${ item.id }|${ item.idMal }|${ item.description }|${ item.title.english }, ${ item.title.native }|${ itemDateString }|${ episodeCount }|${ ongoing }|${ hostUrl }`
             };
         });
 

@@ -58,7 +58,7 @@ async function areRequiredServersUp() {
 
 
 async function searchResults(keyword) {
-    console.log('Running Miruro v0.9.2');
+    console.log('Running Miruro v0.9.2+');
     const serversUp = await areRequiredServersUp();
 
     if(serversUp.success === false) {
@@ -82,6 +82,7 @@ async function searchResults(keyword) {
         const results = json.map(item => {
             let ongoing = 0;
             let episodeCount = item.episodes;
+            
             if(item.nextAiringEpisode != null) {
                 ongoing = 1;
 
