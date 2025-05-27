@@ -2,16 +2,16 @@ const BASE_URLS = ['https://miruro.tv', 'https://miruro.to', 'https://miruro.onl
 const SEARCH_URL = '---/api/search/browse?search=|||&page=1&perPage=5&type=ANIME&sort=SEARCH_MATCH';
 
 // ***** LOCAL TESTING
-// (async() => {
-//     const results = await searchResults('One piece');
-//     console.log('SEARCH RESULTS: ', results);
-//     const details = await extractDetails(JSON.parse(results)[0].href);
-//     console.log('DETAILS: ', details);
-//     const episodes = await extractEpisodes(JSON.parse(results)[0].href);
-//     console.log('EPISODES: ', episodes);
-//     const streamUrl = await extractStreamUrl(JSON.parse(episodes)[0].href);
-//     console.log('STREAMURL: ', streamUrl);
-// })();
+(async() => {
+    const results = await searchResults('One piece');
+    console.log('SEARCH RESULTS: ', results);
+    const details = await extractDetails(JSON.parse(results)[0].href);
+    console.log('DETAILS: ', details);
+    const episodes = await extractEpisodes(JSON.parse(results)[0].href);
+    console.log('EPISODES: ', episodes);
+    const streamUrl = await extractStreamUrl(JSON.parse(episodes)[0].href);
+    console.log('STREAMURL: ', streamUrl);
+})();
 //***** LOCAL TESTING
 
 
@@ -80,15 +80,24 @@ async function searchResults(keyword) {
 
         const results = json.map(item => {
             let ongoing = 0;
+            let episodeCount = item.episodes;
             if(item.nextAiringEpisode != null) {
                 ongoing = 1;
+
+                if(episodeCount == null) {
+                    let nextEpisode = item?.nextAiringEpisode?.episode;
+                    if(nextEpisode != null) {
+                        episodeCount = parseInt(nextEpisode) - 1;
+                    }
+                }
             }
 
             let itemDateString = getDateStringFromSearchResult(item);
+            let image = item.coverImage?.extraLarge ?? item.coverImage?.large ?? item.coverImage?.medium ?? item.bannerImage ?? item.coverImage?.small;
 
             return {
                 title: item.title.romaji,
-                image: item.bannerImage,
+                image: image,
                 href: `${ hostUrl }/watch?id=${ item.id }|${ item.id }|${ item.idMal }|${ item.description }|${ item.title.english }, ${ item.title.native }|${ itemDateString }|${ item.episodes }|${ ongoing }|${ hostUrl }`
             };
         });
