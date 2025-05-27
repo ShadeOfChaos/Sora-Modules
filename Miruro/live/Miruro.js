@@ -70,10 +70,12 @@ async function searchResults(keyword) {
                 ongoing = 1;
             }
 
+            let itemDateString = getDateStringFromSearchResult(item);
+
             return {
                 title: item.title.romaji,
                 image: item.bannerImage,
-                href: `${ hostUrl }/watch?id=${ item.id }|${ item.id }|${ item.idMal }|${ item.description }|${ item.title.english }, ${ item.title.native }|${ item.startDate.year }-${ item.startDate.month.toString().padStart(2, '0') }-${ item.startDate.day.toString().padStart(2, '0') } to ${ item.endDate.year }-${ item.endDate.month.toString().padStart(2, '0') }-${ item.endDate.day.toString().padStart(2, '0') }|${ item.episodes }|${ ongoing }|${ hostUrl }`
+                href: `${ hostUrl }/watch?id=${ item.id }|${ item.id }|${ item.idMal }|${ item.description }|${ item.title.english }, ${ item.title.native }|${ itemDateString }|${ item.episodes }|${ ongoing }|${ hostUrl }`
             };
         });
 
@@ -425,6 +427,44 @@ async function extractZoro(data, json, episodeNr, category = 'sub') {
         console.log('Error fetching Zoro source: ' + error.message);
         return null;
     }
+}
+
+function getDateStringFromSearchResult(item) {
+    let startYear = item.startDate?.year;
+    let startMonth = item.startDate?.month;
+    let startDay = item.startDate?.day;
+    let endYear = item.endDate?.year;
+    let endMonth = item.endDate?.month;
+    let endDay = item.endDate?.day;
+
+    let startYearString = null;
+    let endYearString = null;
+
+    if(startYear != null) {
+        if(startMonth != null && startDay != null) {
+            startYearString = `${ startYear }-${ startMonth.toString().padStart(2, '0') }-${ startDay.toString().padStart(2, '0') }`;
+        }
+        startYearString = `${ startYear }`;
+    }
+
+    if(endYear != null) {
+        if(endMonth != null && endDay != null) {
+            endYearString = `${ item.endDate.year }-${ endMonth.toString().padStart(2, '0') }-${ endDay.toString().padStart(2, '0') }`;
+        }
+        endYearString = `${ endYear }`;
+    }
+
+    if(startYearString != null && endYearString != null) {
+        return `${ startYearString } to ${ endYearString }`;
+    }
+    if(startYearString != null) {
+        return startYearString;
+    }
+    if(endYearString != null) {
+        return endYearString;
+    }
+    
+    return 'Unknown airdate';
 }
 
 
