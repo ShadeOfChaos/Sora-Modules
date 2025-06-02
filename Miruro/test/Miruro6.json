@@ -13,7 +13,7 @@
 	"type": "anime",
     "baseUrl": "https://miruro.tv/",
     "searchBaseUrl": "https://www.miruro.tv/api/search/browse?search=%s&page=1&perPage=5&type=ANIME&sort=SEARCH_MATCH",
-    "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/Miruro/test/Miruro5.js",
+    "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/Miruro/test/Miruro6.js",
     "asyncJS": true,
     "streamAsyncJS": true,
     "softsub": true,

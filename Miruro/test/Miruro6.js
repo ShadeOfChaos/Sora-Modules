@@ -169,8 +169,6 @@ async function extractStreamUrl(objString) {
         episodesApiUrl += '&ongoing=true';
     }
 
-    return null;
-
     try {
         console.log('[DEVTEST] Pre-Episodes API Response');
         const response = await soraFetch(episodesApiUrl);
