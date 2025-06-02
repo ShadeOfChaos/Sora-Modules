@@ -169,7 +169,7 @@ async function extractStreamUrl(objString) {
         episodesApiUrl += '&ongoing=true';
     }
 
-    return null;
+    return {"streams":[{"title":"","streamUrl":"","headers":{},"subtitles":null}]};
 
     try {
         console.log('[DEVTEST] Pre-Episodes API Response');
