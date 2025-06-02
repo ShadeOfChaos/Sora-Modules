@@ -2,16 +2,16 @@ const BASE_URLS = ['https://miruro.tv', 'https://miruro.to', 'https://miruro.onl
 const SEARCH_URL = '---/api/search/browse?search=|||&page=1&perPage=5&type=ANIME&sort=SEARCH_MATCH';
 
 // ***** LOCAL TESTING
-(async() => {
-    const results = await searchResults('Solo leveling');
-    console.log('SEARCH RESULTS: ', results);
-    const details = await extractDetails(JSON.parse(results)[0].href);
-    console.log('DETAILS: ', details);
-    const episodes = await extractEpisodes(JSON.parse(results)[0].href);
-    console.log('EPISODES: ', episodes);
-    const streamUrl = await extractStreamUrl(JSON.parse(episodes)[0].href);
-    console.log('STREAMURL: ', streamUrl);
-})();
+// (async() => {
+//     const results = await searchResults('Solo leveling');
+//     console.log('SEARCH RESULTS: ', results);
+//     const details = await extractDetails(JSON.parse(results)[0].href);
+//     console.log('DETAILS: ', details);
+//     const episodes = await extractEpisodes(JSON.parse(results)[0].href);
+//     console.log('EPISODES: ', episodes);
+//     const streamUrl = await extractStreamUrl(JSON.parse(episodes)[0].href);
+//     console.log('STREAMURL: ', streamUrl);
+// })();
 //***** LOCAL TESTING
 
 
