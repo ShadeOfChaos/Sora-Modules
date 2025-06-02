@@ -170,7 +170,6 @@ async function extractStreamUrl(objString) {
     }
 
     try {
-        console.log('[DEVTEST] Pre-Episodes API Response');
         const response = await soraFetch(episodesApiUrl);
         const data = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
