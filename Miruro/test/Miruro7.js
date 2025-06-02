@@ -295,9 +295,7 @@ async function extractStreamUrl(objString) {
         // }
         // multiStreams.streams = validStreams;
 
-
-        console.log('[DEVTEST] Multi streams: ' + JSON.stringify(multiStreams));
-        return null;
+        return JSON.stringify(multiStreams);
 
     } catch(e) {
         console.log('Error extracting stream: ' + e.message);
