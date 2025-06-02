@@ -286,14 +286,14 @@ async function extractStreamUrl(objString) {
         }
 
         // Verify if streamsUrls are valid / have not been removed
-        // let validStreams = [];
-        // for(let stream of multiStreams.streams) {
-        //     const response = await soraFetch(stream.streamUrl, { method: 'HEAD', headers: stream.headers });
-        //     if(response?.status === 200) {
-        //         validStreams.push(stream);
-        //     }
-        // }
-        // multiStreams.streams = validStreams;
+        let validStreams = [];
+        for(let stream of multiStreams.streams) {
+            const response = await soraFetch(stream.streamUrl, { method: 'HEAD', headers: stream.headers });
+            if(response?.status === 200) {
+                validStreams.push(stream);
+            }
+        }
+        multiStreams.streams = validStreams;
 
         return JSON.stringify(multiStreams);
 
