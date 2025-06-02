@@ -169,6 +169,8 @@ async function extractStreamUrl(objString) {
         episodesApiUrl += '&ongoing=true';
     }
 
+    return null;
+
     try {
         console.log('[DEVTEST] Pre-Episodes API Response');
         const response = await soraFetch(episodesApiUrl);
@@ -306,49 +308,49 @@ async function extractStreamUrl(objString) {
 }
 
 
-async function extractAnimez(data, json, episodeNr, category = 'sub') {
-    const ongoingString = json.ongoing == 1 ? '&ongoing=true' : '&ongoing=false';
-    const animezData = Object.values(data.ANIMEZ)[0];
-    const episodeData = animezData.episodeList.episodes[category].find(ep => ep.number == episodeNr);
+// async function extractAnimez(data, json, episodeNr, category = 'sub') {
+//     const ongoingString = json.ongoing == 1 ? '&ongoing=true' : '&ongoing=false';
+//     const animezData = Object.values(data.ANIMEZ)[0];
+//     const episodeData = animezData.episodeList.episodes[category].find(ep => ep.number == episodeNr);
 
-    if(!episodeData) {
-        console.log(`Episode ${ episodeNr } not found in category ${ category } with provider Animez`);
-        return null;
-    }
+//     if(!episodeData) {
+//         console.log(`Episode ${ episodeNr } not found in category ${ category } with provider Animez`);
+//         return null;
+//     }
 
-    const url = `${ json.host }/api/sources?episodeId=${ episodeData.id }&provider=animez&fetchType=&category=${ category }${ ongoingString }`;
+//     const url = `${ json.host }/api/sources?episodeId=${ episodeData.id }&provider=animez&fetchType=&category=${ category }${ ongoingString }`;
 
-    try {
-        const response = await soraFetch(url);
+//     try {
+//         const response = await soraFetch(url);
 
-        if(getResponseHeader(response, 'Content-Type') !== 'application/json; charset=utf-8') {
-            throw new Error(`Animez source temporarily unavailable for episode ${ episodeNr }`);
-        }
+//         if(getResponseHeader(response, 'Content-Type') !== 'application/json; charset=utf-8') {
+//             throw new Error(`Animez source temporarily unavailable for episode ${ episodeNr }`);
+//         }
 
-        const data = typeof response === 'object' ? await response.json() : JSON.parse(response);
+//         const data = typeof response === 'object' ? await response.json() : JSON.parse(response);
 
-        if(!data || data.error) {
-            throw new Error(`No sources found for episode ${ episodeNr } for provider Animez`);
-        }
+//         if(!data || data.error) {
+//             throw new Error(`No sources found for episode ${ episodeNr } for provider Animez`);
+//         }
 
-        let sources = [];
-        for(const source of data.streams) {
-            let tracks = data.tracks || null;
+//         let sources = [];
+//         for(const source of data.streams) {
+//             let tracks = data.tracks || null;
 
-            if(tracks != null) {
-                tracks = tracks.filter(track => track.kind === 'captions');
-            }
+//             if(tracks != null) {
+//                 tracks = tracks.filter(track => track.kind === 'captions');
+//             }
 
-            sources.push({ provider: 'animez', url: source.url, subtitles: tracks, type: category, referer: source.url });
-        }
+//             sources.push({ provider: 'animez', url: source.url, subtitles: tracks, type: category, referer: source.url });
+//         }
 
-        return sources;
+//         return sources;
 
-    } catch (error) {
-        console.log('Error fetching Animez source: ' + error.message);
-        return null;
-    }
-}
+//     } catch (error) {
+//         console.log('Error fetching Animez source: ' + error.message);
+//         return null;
+//     }
+// }
 
 
 async function extractPahe(data, json, episodeNr, category = 'sub') {
