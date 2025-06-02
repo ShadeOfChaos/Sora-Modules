@@ -3,7 +3,7 @@ const SEARCH_URL = '---/api/search/browse?search=|||&page=1&perPage=5&type=ANIME
 
 // ***** LOCAL TESTING
 (async() => {
-    const results = await searchResults('Chivalry of a failed knight');
+    const results = await searchResults('One piece');
     console.log('SEARCH RESULTS: ', results);
     const details = await extractDetails(JSON.parse(results)[0].href);
     console.log('DETAILS: ', details);
@@ -217,7 +217,7 @@ async function extractStreamUrl(objString) {
         };
 
         let jpSubsAdded = false;
-
+        
         for(let stream of streams) {
             let headers = {};
             if(stream.referer != null) {
@@ -282,30 +282,17 @@ async function extractStreamUrl(objString) {
                 }
             }
         }
-        
+
         // Verify if streamsUrls are valid / have not been removed
         let validStreams = [];
-        let hostsDown = [];
         for(let stream of multiStreams.streams) {
-            let hostArr = stream.title.split(']');
-            let host = hostArr[hostArr.length - 1].trim();
-
-            if(hostsDown.includes(host)) {
-                console.log(`Host ${ host } is down, skipping`)
-                continue;
-            }
-
             const response = await soraFetch(stream.streamUrl, { method: 'HEAD', headers: stream.headers });
-            if(response == null) {
-                console.log(`Host ${ host } is down caused slowdown, removing from list`);
-                hostsDown.push(host);
-                continue;
-            }
-            if(response?.status === 200) {
+            if(response.status === 200) {
                 validStreams.push(stream);
             }
         }
         multiStreams.streams = validStreams;
+
 
         return JSON.stringify(multiStreams);
 
@@ -314,6 +301,7 @@ async function extractStreamUrl(objString) {
         return null;
     }
 }
+
 
 async function extractAnimez(data, json, episodeNr, category = 'sub') {
     const ongoingString = json.ongoing == 1 ? '&ongoing=true' : '&ongoing=false';
