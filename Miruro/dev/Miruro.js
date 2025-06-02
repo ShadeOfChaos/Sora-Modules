@@ -3,7 +3,7 @@ const SEARCH_URL = '---/api/search/browse?search=|||&page=1&perPage=5&type=ANIME
 
 // ***** LOCAL TESTING
 (async() => {
-    const results = await searchResults('One piece');
+    const results = await searchResults('Solo leveling');
     console.log('SEARCH RESULTS: ', results);
     const details = await extractDetails(JSON.parse(results)[0].href);
     console.log('DETAILS: ', details);
@@ -35,7 +35,7 @@ async function areRequiredServersUp() {
             let serversUp = [];
 
             for(let response of responses) {
-                if(response.status === 'fulfilled' && response.value?.status === 200) {
+                if(response?.status === 'fulfilled' && response?.value?.status === 200) {
                     serversUp.push(response.value.host);
                 }
             }
@@ -287,7 +287,7 @@ async function extractStreamUrl(objString) {
         let validStreams = [];
         for(let stream of multiStreams.streams) {
             const response = await soraFetch(stream.streamUrl, { method: 'HEAD', headers: stream.headers });
-            if(response.status === 200) {
+            if(response?.status === 200) {
                 validStreams.push(stream);
             }
         }
