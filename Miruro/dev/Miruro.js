@@ -179,6 +179,7 @@ async function extractStreamUrl(objString) {
 
         for(const key in data) {
             if(key === 'ANIMEZ') {
+                continue;
                 promises.push(extractAnimez(data, json, episodeNr, 'sub'));
                 promises.push(extractAnimez(data, json, episodeNr, 'dub'));
                 continue;
