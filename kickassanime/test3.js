@@ -88,6 +88,7 @@ async function extractStreamUrl(url) {
         'Referer': 'https://kickassanime.com.es/'
     };
 
+    console.log(iframeUrl);
     const streamResponse = await soraFetch(iframeUrl, { headers: headers });
     const streamHtml = await streamResponse.text();
     const idMatch = streamHtml.match(/data-id="(\d+)"/);
@@ -111,7 +112,7 @@ async function extractStreamUrl(url) {
     const result = {
         title: "Testing",
         streamUrl: streams,
-        headers: finalHeaders,
+        headers: { referer: "https://megaplay.buzz/" },
         subtitles: subtitles
     }
 
