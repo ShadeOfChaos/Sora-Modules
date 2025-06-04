@@ -111,9 +111,9 @@ async function extractStreamUrl(url) {
 
     const result = {
         title: "Testing",
-        streamUrl: streams,
+        streamUrl: "https://cdn.dotstream.buzz/anime/9fcf121685a67211a2c72753dbdece9a/0e46487e09a8ce373f01ea3a6c965a72/index-f1-v1-a1.m3u8",
         headers: { referer: "https://megaplay.buzz/" },
-        subtitles: null
+        subtitles: subtitles
     }
 
     console.log(JSON.stringify(result));
