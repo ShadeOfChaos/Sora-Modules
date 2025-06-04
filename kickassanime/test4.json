@@ -13,7 +13,7 @@
 	"type": "anime",
     "baseUrl": "https://megaplay.buzz/",
     "searchBaseUrl": "",
-    "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/kickassanime/test3.js",
+    "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/kickassanime/test4.js",
     "asyncJS": true,
     "streamAsyncJS": true,
     "softsub": true,

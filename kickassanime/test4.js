@@ -1,13 +1,13 @@
-(async() => {
-    const results = await searchResults('Once Upon a Witch');
-    console.log('SEARCH RESULTS: ', results);
-    const details = await extractDetails(JSON.parse(results)[0].href);
-    console.log('DETAILS: ', details);
-    const episodes = await extractEpisodes(JSON.parse(results)[0].href);
-    console.log('EPISODES: ', episodes);
-    const streamUrl = await extractStreamUrl(JSON.parse(episodes)[9].href);
-    console.log('STREAMURL: ', streamUrl);
-})();
+// (async() => {
+//     const results = await searchResults('Once Upon a Witch');
+//     console.log('SEARCH RESULTS: ', results);
+//     const details = await extractDetails(JSON.parse(results)[0].href);
+//     console.log('DETAILS: ', details);
+//     const episodes = await extractEpisodes(JSON.parse(results)[0].href);
+//     console.log('EPISODES: ', episodes);
+//     const streamUrl = await extractStreamUrl(JSON.parse(episodes)[9].href);
+//     console.log('STREAMURL: ', streamUrl);
+// })();
 
 async function searchResults(keyword) {
     const results = [];
@@ -104,8 +104,6 @@ async function extractStreamUrl(url) {
     const finalResponse = await soraFetch(finalUrl, { headers: finalHeaders });
     const finalData = await finalResponse.json();
 
-    console.log(JSON.stringify(finalData));
-
     const streams = finalData.sources?.file ?? null;
     const subtitles = finalData.tracks?.find(track => track.label === "English")?.file ?? null;
 
@@ -115,6 +113,8 @@ async function extractStreamUrl(url) {
         headers: { referer: "https://megaplay.buzz/" },
         subtitles: subtitles
     }
+
+    console.log(JSON.stringify(result));
 
     return JSON.stringify(result);
 }
