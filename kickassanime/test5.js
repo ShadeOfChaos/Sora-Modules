@@ -107,11 +107,13 @@ async function extractStreamUrl(url) {
     const streams = finalData.sources?.file ?? null;
     const subtitles = finalData.tracks?.find(track => track.label === "English")?.file ?? null;
 
+    console.log(streams);
+
     const result = {
         title: "Testing",
         streamUrl: streams,
         headers: { referer: "https://megaplay.buzz/" },
-        subtitles: subtitles
+        subtitles: null
     }
 
     console.log(JSON.stringify(result));

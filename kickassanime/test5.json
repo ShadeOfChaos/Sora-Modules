@@ -1,5 +1,5 @@
 {
-    "sourceName": "[DEV][test] Kickassanime Paul",
+    "sourceName": "[DEV][test] Kickassanime Paul 5",
     "iconUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/ofchaos.jpg",
     "author": {
         "name": "ShadeOfChaos",
@@ -13,7 +13,7 @@
 	"type": "anime",
     "baseUrl": "https://megaplay.buzz/",
     "searchBaseUrl": "",
-    "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/kickassanime/test4.js",
+    "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/kickassanime/test5.js",
     "asyncJS": true,
     "streamAsyncJS": true,
     "softsub": true,
