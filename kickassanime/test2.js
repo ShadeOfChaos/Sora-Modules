@@ -109,11 +109,13 @@ async function extractStreamUrl(url) {
     const subtitles = finalData.tracks?.find(track => track.label === "English")?.file ?? null;
 
     const result = {
-        streams,
-        subtitles
-    };
+        title: "Testing",
+        streamUrl: streams,
+        headers: finalHeaders,
+        subtitles: subtitles
+    }
 
-    return JSON.stringify(streams);
+    return JSON.stringify(result);
 }
 
 
