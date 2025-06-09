@@ -16,5 +16,6 @@
     "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AniCrush/subs/AniCrush.js",
     "asyncJS": true,
     "streamAsyncJS": true,
-    "softsub": true
+    "softsub": true,
+    "note": "Currently not working due to new encryption of file host"
  }
