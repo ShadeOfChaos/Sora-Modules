@@ -208,8 +208,14 @@ async function extractStreamUrl(url) {
             //     subtitles
             // }
 
-            console.log('Result: ' + finalUrl);
-            return JSON.stringify(finalUrl);
+            return JSON.stringify([{
+                title: "Stream",
+                streamUrl: masterM3u8,
+                headers: { Referer: "https://vidsrc.xyz/" },
+                subtitles: null
+            }]);
+
+
         } else if (url.includes('tv')) {
             const match = url.match(/tv\/([^\/]+)\/([^\/]+)\/([^\/]+)/);
             if (!match) throw new Error("Invalid URL format");

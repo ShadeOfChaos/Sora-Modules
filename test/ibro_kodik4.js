@@ -273,7 +273,7 @@ async function extractStreamUrl(url) {
 
             return JSON.stringify([{
                 title: "Stream",
-                streamUrl: finalUrl,
+                streamUrl: masterM3u8,
                 headers: { Referer: "https://vidsrc.to/" },
                 subtitles: null
             }]);
