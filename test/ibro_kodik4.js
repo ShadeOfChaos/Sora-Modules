@@ -270,11 +270,11 @@ async function extractStreamUrl(url) {
             //     stream,
             //     subtitles
             // }
-
+            
             return JSON.stringify([{
                 title: "Stream",
                 streamUrl: finalUrl,
-                headers: { Referer: "https://cloudnestra.com/" },
+                headers: { Referer: "https://vidsrc.to/" },
                 subtitles: null
             }]);
 
