@@ -273,7 +273,7 @@ async function extractStreamUrl(url) {
 
             return JSON.stringify([{
                     title: "Stream",
-                    streamUrl: stream,
+                    streamUrl: finalUrl,
                     headers: { Referer: "https://cloudnestra.com/", Host: "https://cloudnestra.com" },
                     subtitles: null
             }]);
