@@ -1,12 +1,12 @@
 // // //***** LOCAL TESTING
-const results = await searchResults('Breaking bad');
-console.log('RESULTS: ', results);
-const details = await extractDetails(JSON.parse(results)[0].href);
-console.log('DETAILS: ', details);
-const episodesa = await extractEpisodes(JSON.parse(results)[0].href);
-console.log('EPISODES: ', episodesa);
-const streamUrl = await extractStreamUrl(JSON.parse(episodesa)[0].href);
-console.log('STREAMURL: ', streamUrl);
+// const results = await searchResults('Breaking bad');
+// console.log('RESULTS: ', results);
+// const details = await extractDetails(JSON.parse(results)[0].href);
+// console.log('DETAILS: ', details);
+// const episodesa = await extractEpisodes(JSON.parse(results)[0].href);
+// console.log('EPISODES: ', episodesa);
+// const streamUrl = await extractStreamUrl(JSON.parse(episodesa)[0].href);
+// console.log('STREAMURL: ', streamUrl);
 //***** LOCAL TESTING
 
 async function searchResults(keyword) {
