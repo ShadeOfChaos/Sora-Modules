@@ -6,11 +6,11 @@
         "icon": "https://raw.githubusercontent.com/xibrox/sora-movie-module/refs/heads/main/profile.jpg",
         "url": "https://github.com/xibrox"
     },
-    "version": "1.0.10",
+    "version": "1.0.11",
     "language": "English",
     "streamType": "HLS",
     "quality": "1080p",
-    "baseUrl": "https://cloudnestra.com/",
+    "baseUrl": "https://vidsrc.to/",
     "searchBaseUrl": "https://api.themoviedb.org/3/search/multi?api_key=68e094699525b18a70bab2f86b1fa706&query=%s",
     "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/test/ibro_kodik4.js",
     "type": "anime/shows/movies",

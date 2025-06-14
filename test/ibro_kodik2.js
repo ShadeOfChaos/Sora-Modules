@@ -1,4 +1,5 @@
 // // //***** LOCAL TESTING
+// (async () => {
 // const results = await searchResults('Breaking bad');
 // console.log('RESULTS: ', results);
 // const details = await extractDetails(JSON.parse(results)[0].href);
@@ -7,6 +8,7 @@
 // console.log('EPISODES: ', episodesa);
 // const streamUrl = await extractStreamUrl(JSON.parse(episodesa)[0].href);
 // console.log('STREAMURL: ', streamUrl);
+// })();
 //***** LOCAL TESTING
 
 async function searchResults(keyword) {
@@ -162,6 +164,7 @@ async function extractStreamUrl(url) {
             const iframeSrc = iframeMatch ? iframeMatch[1] : null;
 
             const fullUrl = iframeSrc.startsWith("//") ? "https:" + iframeSrc : iframeSrc;
+            console.log('fullUrl', fullUrl);
 
             const response = await soraFetch(fullUrl);
             const html2 = await response.text();
@@ -170,7 +173,7 @@ async function extractStreamUrl(url) {
 
             const relativeUrl = match2[1];
             const fullUrl2 = `https://cloudnestra.com${relativeUrl}`;
-            console.log(fullUrl2);
+            console.log('fullurl2:', fullUrl2);
 
             const response2 = await soraFetch(fullUrl2, { headers: { 'Referer': 'https://vidsrc.xyz/' } });
             const html3 = await response2.text();
@@ -225,6 +228,7 @@ async function extractStreamUrl(url) {
             const iframeSrc = iframeMatch ? iframeMatch[1] : null;
 
             const fullUrl = iframeSrc.startsWith("//") ? "https:" + iframeSrc : iframeSrc;
+            console.log('fullUrl', fullUrl);
 
             const response = await soraFetch(fullUrl);
             const html2 = await response.text();
@@ -233,10 +237,18 @@ async function extractStreamUrl(url) {
 
             const relativeUrl = match2[1];
             const fullUrl2 = `https://cloudnestra.com${relativeUrl}`;
-            console.log(fullUrl2);
+            // fullUrl2.replace('https://cloudnestra.com/prorcp/', 'https://cloudnestra.com/prorcpsb/');
+            console.log('fullUrl2', fullUrl2);
 
-            const response2 = await soraFetch(fullUrl2, { headers: { 'Referer': 'https://vidsrc.xyz/' } });
+            const response2 = await soraFetch(fullUrl2, { headers: { 'Referer': 'https://vidsrc.stream/' } });
             const html3 = await response2.text();
+
+            const passUrl = "https//tmstr2.shadowlandschronicles.com/rt_ping.php";
+            const responsePass = await soraFetch(passUrl, { headers: { 'Referer': fullUrl2 } });
+            
+            // console.log('================================================');
+            // console.log(html3);
+            // console.log('================================================');
 
             const match3 = html3.match(/file:\s*['"]([^'"]+)['"]/);
 
@@ -270,10 +282,10 @@ async function extractStreamUrl(url) {
             //     stream,
             //     subtitles
             // }
-
+a
             return JSON.stringify([{
                 title: "Stream",
-                streamUrl: masterM3u8,
+                streamUrl: fileUrl,
                 headers: { Referer: "https://cloudnestra.com/" },
                 subtitles: null
             }]);

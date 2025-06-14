@@ -286,7 +286,7 @@ a
             return JSON.stringify([{
                 title: "Stream",
                 streamUrl: fileUrl,
-                headers: { Referer: "https://vidsrc.xyz/" },
+                headers: { Referer: "https://vidsrc.stream/" },
                 subtitles: null
             }]);
 
