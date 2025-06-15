@@ -37,7 +37,7 @@ async function extractEpisodes(url) {
 
 async function extractStreamUrl(url) {
     console.log('STREAMING');
-    const REGEX = /data-media-sources="([\s\S]*?)"/;
+    const REGEX = /data-media-sources="([\s\S]*?)"[\s]*data-anime-id="([\s\S]*?)"[\s]*data-episode-id="([\s\S]*?)"[\s]*data-episode-number="([\s\S]*?)"[\s]*data-current-episode="([\s\S]*?)"/;
     const apiUrl = 'https://aninow.to/api/{source}/sources?url=';
     const kwikUrl = apiUrl.replace('{source}', 'kwik');
     const paheUrl = apiUrl.replace('{source}', 'gojo');
@@ -60,6 +60,10 @@ async function extractStreamUrl(url) {
 
         const sources = JSON.parse(decodeHtmlEntities(decodeURI(match[1]))).map(source => {
             source.url = encodeURIComponent(source.url);
+            source.headers['X-Anime-Id'] = match[2];
+            source.headers['X-Episode-Id'] = match[3];
+            source.headers['X-Episode-Number'] = match[4];
+            source.currentNumber = match[5];
             return source;
         });
 
