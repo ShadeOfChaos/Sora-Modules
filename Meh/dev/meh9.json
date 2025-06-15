@@ -1,5 +1,5 @@
 {
-    "sourceName": "[DEV] Meh 8",
+    "sourceName": "[DEV] Meh 9",
     "iconUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/Meh/logo.png",
     "author": {
         "name": "ShadeOfChaos",
@@ -13,7 +13,7 @@
 	"type": "anime",
     "baseUrl": "https://aninow.to/",
     "searchBaseUrl": "https://aninow.to/browse?search=%s",
-    "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/Meh/dev/meh8.js",
+    "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/Meh/dev/meh9.js",
     "asyncJS": true,
     "streamAsyncJS": true,
     "softsub": true,
