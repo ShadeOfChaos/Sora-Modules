@@ -1,11 +1,3 @@
-//***** LOCAL TESTING
-// const results = await searchResults();
-// const details = await extractDetails();
-// const episodes = await extractEpisodes();
-// const streamUrl = await extractStreamUrl();
-// console.log('STREAMURL: ', streamUrl);
-//***** LOCAL TESTING
-
 async function searchResults(keyword) {
     console.log('SEARCHING');
     return JSON.stringify([{ title: 'Test show', image: 'https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AniCrush/ofchaos.jpg', href: '#' }]);
