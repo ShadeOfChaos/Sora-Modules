@@ -24,7 +24,6 @@ async function extractEpisodes(url) {
 
 async function extractStreamUrl(url) {
     console.log('STREAMING');
-    /*
     const REGEX = /data-media-sources="([\s\S]*?)"/;
     const apiUrl = 'https://aninow.to/api/{source}/sources?url=';
     const kwikUrl = apiUrl.replace('{source}', 'kwik');
@@ -112,7 +111,6 @@ async function extractStreamUrl(url) {
         // console.log('Error extracting stream: ' + e.message);
         return null;
     }
-    */
 }
 
 function decodeHtmlEntities(text) {
