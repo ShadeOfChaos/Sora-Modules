@@ -101,10 +101,10 @@ async function extractStreamUrl(url) {
             
             for(let source of mediaSource.sources) {
                 streams.push({
-                    title: `[${ language }] ${ mediaSource.info.provider } (${ source.quality })`,
-                    streamUrl: streamPreUrl + source.url,
-                    headers: mediaSource.info.headers,
-                    subtitles: mediaSource.subtitles
+                    "title": `[${ language }] ${ mediaSource.info.provider } (${ source.quality })`,
+                    "streamUrl": streamPreUrl + source.url,
+                    "headers": mediaSource.info.headers,
+                    "subtitles": mediaSource.subtitles
                 });
             }
         }
@@ -112,7 +112,7 @@ async function extractStreamUrl(url) {
         return JSON.stringify(streams);
 
     } catch(e) {
-        console.log('Error extracting stream: ' + e.message);
+        // console.log('Error extracting stream: ' + e.message);
         return null;
     }
 }
@@ -121,11 +121,11 @@ function decodeHtmlEntities(text) {
     let tempString = text;
 
     const entities = {
-        "&": "&amp;",
+        /*"&": "&amp;",
         "<": "&lt;",
         ">": "&gt;",
         "\"": "&quot;",
-        "'": "&apos;"
+        "'": "&apos;"*/
     }
 
     for (const [decoded, encoded] of Object.entries(entities)) {
@@ -169,7 +169,7 @@ async function processFetchUrl(url, source) {
             
             return reject(null);
         } catch(e) {
-            console.log('[processFetchUrl] Error:' + e.message);
+            // console.log('[processFetchUrl] Error:' + e.message);
             return reject(null);
         }  
     });

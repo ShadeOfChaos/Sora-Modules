@@ -13,7 +13,7 @@
 	"type": "anime",
     "baseUrl": "https://aninow.to/",
     "searchBaseUrl": "https://aninow.to/browse?search=%s",
-    "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AniNow/dev/AniNow.js",
+    "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AniNow/dev/AniNow2.js",
     "asyncJS": true,
     "streamAsyncJS": true,
     "softsub": true,
