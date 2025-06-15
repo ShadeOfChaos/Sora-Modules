@@ -115,6 +115,7 @@ async function extractStreamUrl(url) {
     */
 }
 
+/*
 function decodeHtmlEntities(text) {
     let tempString = text;
 
@@ -172,3 +173,4 @@ async function processFetchUrl(url, source) {
         }  
     });
 }
+*/
