@@ -6,7 +6,7 @@
         "icon": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/ofchaos.jpg",
         "url": "https://asura.ofchaos.com"
     },
-    "version": "1.1.0",
+    "version": "1.1.1",
     "language": "Japanese (SUB)",
     "streamType": "HLS",
     "quality": "1080p",
@@ -16,6 +16,5 @@
     "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AniCrush/subs-jp/AniCrush.js",
     "asyncJS": true,
     "streamAsyncJS": true,
-    "softsub": true,
-    "note": "Currently not working due to new encryption of file host"
+    "softsub": true
  }
