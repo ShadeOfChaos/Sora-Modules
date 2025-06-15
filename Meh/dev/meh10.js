@@ -11,6 +11,10 @@
 //     console.log('STREAMURL: ', streamUrl);
 // })();
 //***** LOCAL TESTING
+
+// TODO - Get past HLS AES-128 encryption
+
+
 async function searchResults(keyword) {
     console.log('SEARCHING');
     return JSON.stringify([{ title: 'Test show', image: 'https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/ofchaos.jpg', href: '#' }]);

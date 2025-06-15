@@ -181,7 +181,7 @@ async function extractEpisodes(url) {
         const movieId = url.split('.').pop();
 
         const serverId = 4;
-        const streamType = 'sub';
+        const format = 'sub';
         var episodes = [];
 
         const response = await soraFetch(`${ UTILITY_URL }/api/anime/episodes?movieId=${ movieId }`);
@@ -194,7 +194,7 @@ async function extractEpisodes(url) {
         for(let episodeList in data.result) {
             for(let episode of data.result[episodeList]) {
                 episodes.push({
-                    href: `${ SOURCE_API_URL }/shared/v2/episode/sources?_movieId=${ movieId }&ep=${ episode.number }&sv=${ serverId }&sc=${ streamType }`,
+                    href: `${ SOURCE_API_URL }/shared/v2/episode/sources?_movieId=${ movieId }&ep=${ episode.number }&sv=${ serverId }&sc=${ format }`,
                     number: episode.number
                 });
             }
@@ -294,7 +294,7 @@ async function extractStreamUrl(url) {
         // const hlsResponse = await soraFetch(hlsUrl);
         // const hlsData = await JSON.parse(hlsResponse);
 
-        const hlsUrl = `${ UTILITY_URL }/api/anime/embed/convert?embedUrl=${ encodeURIComponent(source) }&host=${ encodeURIComponent(SOURCE_BASE_URL) }`;
+        const hlsUrl = `${ UTILITY_URL }/api/anime/embed/convert/v2?embedUrl=${ encodeURIComponent(source) }`;
         const hlsResponse = await soraFetch(hlsUrl);
         const hlsData = typeof hlsResponse === 'object' ? await hlsResponse.json() : await JSON.parse(hlsResponse);
 
@@ -353,8 +353,8 @@ async function extractStreamUrl(url) {
         }
 
         const streamUrl = {
-            stream: streamSource ? streamSource.file : null,
-            subtitles: subtitles ? subtitles.file : null
+            stream: streamSource?.file,
+            subtitles: subtitles?.file
         };
 
         return JSON.stringify(streamUrl);
