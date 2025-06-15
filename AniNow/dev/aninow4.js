@@ -7,10 +7,12 @@
 //***** LOCAL TESTING
 
 async function searchResults(keyword) {
+    console.log('SEARCHING');
     return JSON.stringify([{ title: 'Test show', image: 'https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AniCrush/ofchaos.jpg', href: '#' }]);
 }
 
 async function extractDetails(url) {
+    console.log('DETAILING');
     const details = {
         description: 'Test show',
         aliases: '',
@@ -21,6 +23,7 @@ async function extractDetails(url) {
 }
 
 async function extractEpisodes(url) {
+    console.log('EPISODING');
     return JSON.stringify([{
         href: '#',
         number: 1
@@ -28,6 +31,7 @@ async function extractEpisodes(url) {
 }
 
 async function extractStreamUrl(url) {
+    console.log('STREAMING');
     const REGEX = /data-media-sources="([\s\S]*?)"/;
     const apiUrl = 'https://aninow.to/api/{source}/sources?url=';
     const kwikUrl = apiUrl.replace('{source}', 'kwik');
@@ -119,18 +123,6 @@ async function extractStreamUrl(url) {
 
 function decodeHtmlEntities(text) {
     let tempString = text;
-
-    const entities = {
-        /*"&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        "\"": "&quot;",
-        "'": "&apos;"*/
-    }
-
-    for (const [decoded, encoded] of Object.entries(entities)) {
-        tempString = tempString.replaceAll(encoded, decoded);
-    }
 
     return tempString;
 }
