@@ -1,5 +1,5 @@
 // ***** LOCAL TESTING
-// (async() => {
+(async() => {
     // const results = await searchResults('Solo leveling');
     // console.log('SEARCH RESULTS: ', results);
     // const details = await extractDetails(JSON.parse(results)[0].href);
@@ -7,13 +7,13 @@
     // const episodes = await extractEpisodes(JSON.parse(results)[0].href);
     // console.log('EPISODES: ', episodes);
     // const streamUrl = await extractStreamUrl(JSON.parse(episodes)[0].href);
-    // const streamUrl = await extractStreamUrl();
-    // console.log('STREAMURL: ', streamUrl);
-// })();
+    const streamUrl = await extractStreamUrl();
+    console.log('STREAMURL: ', streamUrl);
+})();
 //***** LOCAL TESTING
 async function searchResults(keyword) {
     console.log('SEARCHING');
-    return JSON.stringify([{ title: 'Test show', image: 'https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AniCrush/ofchaos.jpg', href: '#' }]);
+    return JSON.stringify([{ title: 'Test show', image: 'https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/ofchaos.jpg', href: '#' }]);
 }
 
 async function extractDetails(url) {
@@ -170,9 +170,14 @@ async function soraFetch(url, options = { headers: {}, method: 'GET', body: null
 }
 
 async function processFetchUrl(url, source) {
+    console.log('Fetching URL: ' + url);
+    console.log('Fetching for source: ' + JSON.stringify(source));
+
     return new Promise(async (resolve, reject) => {
         try {
-            const res = await soraFetch(url);
+            const res = await soraFetch(url, { method: "GET", headers: {} });
+            console.log('Response Status: ' + res.status);
+            console.log('Response OK: ' + res.ok);
             if(res.status == 200 && res.ok) {
                 let data = await res.json();
                 data.info = source;
