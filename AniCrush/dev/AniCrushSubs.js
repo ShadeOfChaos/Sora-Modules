@@ -307,7 +307,7 @@ async function extractStreamUrl(url) {
         // const hlsResponse = await soraFetch(hlsUrl);
         // const hlsData = await JSON.parse(hlsResponse);
 
-        const hlsUrl = `${ UTILITY_URL }/api/anime/embed/convert?embedUrl=${ encodeURIComponent(source) }&host=${ encodeURIComponent(SOURCE_BASE_URL) }`;
+        const hlsUrl = `${ UTILITY_URL }/api/anime/embed/convert/v2?embedUrl=${ encodeURIComponent(source) }&host=${ encodeURIComponent(SOURCE_BASE_URL) }`;
         const hlsResponse = await soraFetch(hlsUrl);
         const hlsData = typeof hlsResponse === 'object' ? await hlsResponse.json() : await JSON.parse(hlsResponse);
 
