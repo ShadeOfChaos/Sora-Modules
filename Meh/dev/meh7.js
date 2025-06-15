@@ -103,6 +103,7 @@ async function extractStreamUrl(url) {
         const results = await Promise.allSettled(promises);
         
         for(let result of results) {
+            console.log(result?.info?.provider + ': ' +result.status);
             if(result.status != 'fulfilled') continue;
 
             let mediaSource = result.value;
