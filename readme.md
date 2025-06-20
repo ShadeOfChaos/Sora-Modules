@@ -1,10 +1,11 @@
 # Modules for [Sulfur](https://github.com/cranci1/Sora)
+## Note: Modules may be freely used elsewhere, please note however that I can't test what I don't use myself.
 
 > [!NOTE]
-> **dev folders, if the json indicates a different version, are essentially beta versions.**<br>
+> **Dev folders, if the json indicates a different version, are essentially beta versions.**<br>
 
-> [!WARNING]
-> **Hikari modules have been shelved as Hikari has shut down, these are only still up for others to be able to look at the source code.**<br>
+> [!TIP]
+> **Something going wrong, open an issue or @mention me on the Sulfur discord server.**
 
 ## Modules
 
@@ -42,7 +43,8 @@
 </span>
 <br><br>
 
-<span><img src="https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/Miruro/logo.png" width="125px" align="left"><br>
+
+<span><img src="https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/Miruro/logo.png" height="125px" width="125px" align="left"><br>
 **Source:** Miruro<br>
 **Language:** English (HARDSUB & DUB)<br>
 **Sulfur version:** 0.2.2+<br>
@@ -50,6 +52,7 @@
 [<kbd> <br> Add to Sora <br> </kbd>](https://intradeus.github.io/http-protocol-redirector?r=sora://module?url=https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/Miruro/live/Miruro.json)
 </span>
 <br><br>
+
 
 <span><img src="https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AnimeParadise.moe/logo.png" width="125px" align="left"><br>
 **Source:** AnimeParadise<br>
@@ -129,7 +132,3 @@
 [<kbd> <br> Add to Sora <br> </kbd>](https://intradeus.github.io/http-protocol-redirector?r=sora://module?url=https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/Asura/subs-jp/Asura.json)
 </span>
 <br><br>
-
-
-> [!TIP]
-> **Something going wrong, open an issue or @mention me on the sora discord server.**
