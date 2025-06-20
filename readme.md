@@ -1,6 +1,7 @@
 # Modules for [Sulfur](https://github.com/cranci1/Sora)
 
 ### Note: Modules may be freely used elsewhere, please note however that I can't test what I don't use myself.
+<span>P.S. If using AniCrush or any of my API's outside of Sulfur, please replace 'SoraApp' as the Referer. This won't be used to block you, it's used to ensure that I know where to go/who to talk to if an app/site is bombarding the api, thank you.</span>
 
 <br>
 
