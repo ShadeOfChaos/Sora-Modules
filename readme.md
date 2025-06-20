@@ -1,5 +1,8 @@
 # Modules for [Sulfur](https://github.com/cranci1/Sora)
-## Note: Modules may be freely used elsewhere, please note however that I can't test what I don't use myself.
+
+### Note: Modules may be freely used elsewhere, please note however that I can't test what I don't use myself.
+
+<br>
 
 > [!NOTE]
 > **Dev folders, if the json indicates a different version, are essentially beta versions.**<br>
