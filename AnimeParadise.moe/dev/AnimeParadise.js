@@ -1,3 +1,5 @@
+await searchResults('Solo leveling');
+
 // // //***** LOCAL TESTING
 // const results = await searchResults('Solo leveling');
 // console.log('RESULTS: ', results);
