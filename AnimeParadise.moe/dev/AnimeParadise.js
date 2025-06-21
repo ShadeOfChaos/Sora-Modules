@@ -1,4 +1,6 @@
-await searchResults('Solo leveling');
+(async () => {
+    await searchResults('Solo leveling');
+})();
 
 // // //***** LOCAL TESTING
 // const results = await searchResults('Solo leveling');
