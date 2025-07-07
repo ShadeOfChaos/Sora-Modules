@@ -2,16 +2,17 @@ const BASE_URLS = ['https://miruro.tv', 'https://miruro.to', 'https://miruro.onl
 const SEARCH_URL = '---/api/search/browse?search=|||&page=1&perPage=5&type=ANIME&sort=SEARCH_MATCH';
 
 // ***** LOCAL TESTING
-// (async() => {
-//     const results = await searchResults('Solo leveling');
-//     console.log('SEARCH RESULTS: ', results);
-//     const details = await extractDetails(JSON.parse(results)[0].href);
-//     console.log('DETAILS: ', details);
-//     const episodes = await extractEpisodes(JSON.parse(results)[0].href);
-//     console.log('EPISODES: ', episodes);
-//     const streamUrl = await extractStreamUrl(JSON.parse(episodes)[0].href);
-//     console.log('STREAMURL: ', streamUrl);
-// })();
+(async() => {
+    // const results = await searchResults('Solo leveling');
+    const results = await searchResults('Mizu zokusei no mahou tsukai');
+    console.log('SEARCH RESULTS: ', results);
+    const details = await extractDetails(JSON.parse(results)[0].href);
+    console.log('DETAILS: ', details);
+    const episodes = await extractEpisodes(JSON.parse(results)[0].href);
+    console.log('EPISODES: ', episodes);
+    const streamUrl = await extractStreamUrl(JSON.parse(episodes)[0].href);
+    console.log('STREAMURL: ', streamUrl);
+})();
 //***** LOCAL TESTING
 
 
@@ -233,7 +234,9 @@ async function extractStreamUrl(objString) {
                 headers.origin = stream.origin;
             }
 
-            if(stream.subtitles == null) {
+           headers.provider = stream.provider;
+
+            if(stream.subtitles == null || stream.subtitles?.length === 0) {
                 let title = `[English Hardsub] ${ stream.provider }`;
 
                 if(stream.type === 'dub') {
@@ -454,7 +457,9 @@ async function extractKai(data, json, episodeNr, category = 'sub') {
                 tracks = tracks.filter(track => track.kind === 'captions');
             }
 
-            sources.push({ provider: 'animekai', url: source.url, subtitles: tracks, type: category, referer: json.host, origin: json.host });
+            let url = `https://prxy.miruro.to/m3u8?url=` + encodeURIComponent(source.url);
+
+            sources.push({ provider: 'animekai', url: url, subtitles: tracks, type: category, referer: json.host, origin: json.host });
         }
 
         return sources;
