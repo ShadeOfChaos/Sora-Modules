@@ -189,6 +189,11 @@ async function extractStreamUrl(objString) {
                 promises.push(extractPahe(data, json, episodeNr, 'dub'));
                 continue;
             }
+            if(key === 'ANIMEKAI') {
+                promises.push(extractKai(data, json, episodeNr, 'sub'));
+                promises.push(extractKai(data, json, episodeNr, 'dub'));
+                continue;
+            }
             // START - // TODO REMOVE WHEN SORA ADDS EITHER MULTIPLE SOFTSUB SUPPORT WITH DEFAULTS OR ADDS SUBTITLE PER STREAM SUPPORT
             continue; // Skips key === 'ZORO'
             // END - // TODO REMOVE WHEN SORA ADDS EITHER MULTIPLE SOFTSUB SUPPORT WITH DEFAULTS OR ADDS SUBTITLE PER STREAM SUPPORT
@@ -409,6 +414,56 @@ async function extractPahe(data, json, episodeNr, category = 'sub') {
     
 }
 
+async function extractKai(data, json, episodeNr, category = 'sub') {
+    const ongoingString = json.ongoing == 1 ? '&ongoing=true' : '&ongoing=false';
+    const kaiData = Object.values(data.ANIMEKAI)[0];
+    const kaiEpisodesList = kaiData?.episodeList;
+
+    if(kaiEpisodesList?.episodes == null) {
+        console.log(`No episodes found in category ${ category } with provider AnimeKai`);
+        return null;
+    }
+
+    const episodeData = kaiData.episodeList.episodes.find(ep => ep.number == episodeNr);
+
+    if(!episodeData) {
+        console.log(`Episode ${ episodeNr } not found in category ${ category } with provider AnimeKai`);
+        return null;
+    }
+
+    const url = `${ json.host }/api/sources?episodeId=${ episodeData.id }&provider=animekai&fetchType=m3u8&category=${ category }${ ongoingString }`;
+
+    try {
+        const response = await soraFetch(url);
+
+        if(getResponseHeader(response, 'Content-Type') !== 'application/json; charset=utf-8') {
+            throw new Error(`AnimeKai source temporarily unavailable for episode ${ episodeNr }`);
+        }
+
+        const data = typeof response === 'object' ? await response.json() : JSON.parse(response);
+
+        if(!data || data.error) {
+            throw new Error(`No sources found for episode ${ episodeNr } for provider AnimeKai`);
+        }
+
+        let sources = [];
+        for(const source of data.streams) {
+            let tracks = data.tracks || null;
+
+            if(tracks != null) {
+                tracks = tracks.filter(track => track.kind === 'captions');
+            }
+
+            sources.push({ provider: 'animekai', url: source.url, subtitles: tracks, type: category, referer: json.host, origin: json.host });
+        }
+
+        return sources;
+
+    } catch (error) {
+        console.log('Error fetching AnimeKai source: ' + error.message);
+        return null;
+    }
+}
 
 async function extractZoro(data, json, episodeNr, category = 'sub') {
     const ongoingString = json.ongoing == 1 ? '&ongoing=true' : '&ongoing=false';
