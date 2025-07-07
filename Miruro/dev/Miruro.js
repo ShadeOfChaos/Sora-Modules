@@ -470,11 +470,7 @@ async function extractKai(data, json, episodeNr, category = 'sub') {
                 tracks = tracks.filter(track => track.kind === 'captions');
             }
 
-            // let url = `https://prxy.miruro.to/m3u8?url=${ source.url }`;
-            let url = source.url;
-            const referer = json.host + '/';
-
-            sources.push({ provider: 'animekai', url: url, subtitles: tracks, type: category/*, referer: referer, origin: json.host*/ });
+            sources.push({ provider: 'animekai', url: source.url, subtitles: tracks, type: category });
         }
 
         return sources;
@@ -521,11 +517,9 @@ async function extractZoro(data, json, episodeNr, category = 'sub') {
                 tracks = tracks.filter(track => track.kind === 'captions');
             }
 
-            // let url = `https://prxy.miruro.to/m3u8?url=${ source.url }`;
-            let url = source.url;
             const referer = 'https://megacloud.club/';
 
-            sources.push({ provider: 'zoro', url: url, subtitles: tracks, type: category, referer: referer/*, origin: json.host*/ });
+            sources.push({ provider: 'zoro', url: source.url, subtitles: tracks, type: category, referer: referer });
         }
 
         return sources;
