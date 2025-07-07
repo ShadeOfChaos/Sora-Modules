@@ -4,13 +4,16 @@ const SEARCH_URL = '---/api/search/browse?search=|||&page=1&perPage=5&type=ANIME
 // ***** LOCAL TESTING
 (async() => {
     // const results = await searchResults('Solo leveling');
-    const results = await searchResults('Mizu zokusei no mahou tsukai');
+    // const results = await searchResults('Mizu zokusei no mahou tsukai'); // AnimeKai ongoing test
+    const results = await searchResults('Sentai Daishikkaku 2'); // Animekai finished test
     console.log('SEARCH RESULTS: ', results);
-    const details = await extractDetails(JSON.parse(results)[0].href);
+    const details = await extractDetails(JSON.parse(results)[0].href); // First search result
     console.log('DETAILS: ', details);
-    const episodes = await extractEpisodes(JSON.parse(results)[0].href);
+    console.log(JSON.parse(results));
+    const episodes = await extractEpisodes(JSON.parse(results)[0].href); // First search result
     console.log('EPISODES: ', episodes);
-    const streamUrl = await extractStreamUrl(JSON.parse(episodes)[0].href);
+    // const streamUrl = await extractStreamUrl(JSON.parse(episodes)[0].href); // Episode 1
+    const streamUrl = await extractStreamUrl(JSON.parse(episodes)[11].href); // Sentai episode 12
     console.log('STREAMURL: ', streamUrl);
 })();
 //***** LOCAL TESTING
@@ -59,7 +62,7 @@ async function areRequiredServersUp() {
 
 
 async function searchResults(keyword) {
-    console.log('Running Miruro v0.9.2+');
+    console.log('Running Miruro v0.9.4+');
     const serversUp = await areRequiredServersUp();
 
     if(serversUp.success === false) {
@@ -115,6 +118,7 @@ async function searchResults(keyword) {
 
 
 async function extractDetails(objString) {
+    console.log(objString);
     const encodedDelimiter = '|';
     let json = {};
     [json.url, json.id, json.malId, json.description, json.aliases, json.airdate, json.episodeCount, json.ongoing, json.host] = decodeURIComponent(objString).split(encodedDelimiter);
@@ -434,10 +438,16 @@ async function extractKai(data, json, episodeNr, category = 'sub') {
         return null;
     }
 
-    const url = `${ json.host }/api/sources?episodeId=${ episodeData.id }&provider=animekai&fetchType=m3u8&category=${ category }${ ongoingString }`;
+    let url = `${ json.host }/api/sources?episodeId=${ episodeData.id }&provider=animekai&fetchType=m3u8&category=${ category }${ ongoingString }`;
 
     try {
-        const response = await soraFetch(url);
+        let response = await soraFetch(url);
+
+        if(response.status === 500) {
+            let correctedOngoingString = json.ongoing == 0 ? '&ongoing=true' : '&ongoing=false';
+            url = url.replace(ongoingString, correctedOngoingString);
+            response = await soraFetch(url);
+        }
 
         if(getResponseHeader(response, 'Content-Type') !== 'application/json; charset=utf-8') {
             throw new Error(`AnimeKai source temporarily unavailable for episode ${ episodeNr }`);
