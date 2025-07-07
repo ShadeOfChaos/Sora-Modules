@@ -5,15 +5,16 @@ const SEARCH_URL = '---/api/search/browse?search=|||&page=1&perPage=5&type=ANIME
 (async() => {
     // const results = await searchResults('Solo leveling');
     // const results = await searchResults('Mizu zokusei no mahou tsukai'); // AnimeKai ongoing test
-    const results = await searchResults('Sentai Daishikkaku 2'); // Animekai finished test
+    // const results = await searchResults('Sentai Daishikkaku 2'); // Animekai finished test
+    const results = await searchResults('Narut'); // Animekai finished test
     console.log('SEARCH RESULTS: ', results);
     const details = await extractDetails(JSON.parse(results)[0].href); // First search result
     console.log('DETAILS: ', details);
     console.log(JSON.parse(results));
     const episodes = await extractEpisodes(JSON.parse(results)[0].href); // First search result
-    console.log('EPISODES: ', episodes);
+    // console.log('EPISODES: ', episodes);
     // const streamUrl = await extractStreamUrl(JSON.parse(episodes)[0].href); // Episode 1
-    const streamUrl = await extractStreamUrl(JSON.parse(episodes)[11].href); // Sentai episode 12
+    const streamUrl = await extractStreamUrl(JSON.parse(episodes)[1].href); // Sentai episode 12
     console.log('STREAMURL: ', streamUrl);
 })();
 //***** LOCAL TESTING
@@ -199,11 +200,11 @@ async function extractStreamUrl(objString) {
                 promises.push(extractKai(data, json, episodeNr, 'dub'));
                 continue;
             }
-            // START - // TODO REMOVE WHEN SORA ADDS EITHER MULTIPLE SOFTSUB SUPPORT WITH DEFAULTS OR ADDS SUBTITLE PER STREAM SUPPORT
-            continue; // Skips key === 'ZORO'
-            // END - // TODO REMOVE WHEN SORA ADDS EITHER MULTIPLE SOFTSUB SUPPORT WITH DEFAULTS OR ADDS SUBTITLE PER STREAM SUPPORT
+            
             if(key === 'ZORO') {
-                promises.push(extractZoro(data, json, episodeNr, 'sub'));
+                // START - // TODO REMOVE WHEN SORA ADDS EITHER MULTIPLE SOFTSUB SUPPORT WITH DEFAULTS OR ADDS SUBTITLE PER STREAM SUPPORT
+                // promises.push(extractZoro(data, json, episodeNr, 'sub'));
+                // END - // TODO REMOVE WHEN SORA ADDS EITHER MULTIPLE SOFTSUB SUPPORT WITH DEFAULTS OR ADDS SUBTITLE PER STREAM SUPPORT
                 promises.push(extractZoro(data, json, episodeNr, 'dub'));
                 continue;
             }
@@ -461,7 +462,10 @@ async function extractKai(data, json, episodeNr, category = 'sub') {
 
         let sources = [];
         for(const source of data.streams) {
-            let tracks = data.tracks || null;
+            // START - // TODO REMOVE COMMENT WHEN SORA ADDS EITHER MULTIPLE SOFTSUB SUPPORT WITH DEFAULTS OR ADDS SUBTITLE PER STREAM SUPPORT
+            let tracks = null;
+            // let tracks = data.tracks || null;
+            // END - // TODO REMOVE COMMENT WHEN SORA ADDS EITHER MULTIPLE SOFTSUB SUPPORT WITH DEFAULTS OR ADDS SUBTITLE PER STREAM SUPPORT
 
             if(tracks != null) {
                 tracks = tracks.filter(track => track.kind === 'captions');
@@ -507,13 +511,18 @@ async function extractZoro(data, json, episodeNr, category = 'sub') {
 
         let sources = [];
         for(const source of data.streams) {
-            let tracks = data.tracks || null;
+            // START - // TODO REMOVE COMMENT WHEN SORA ADDS EITHER MULTIPLE SOFTSUB SUPPORT WITH DEFAULTS OR ADDS SUBTITLE PER STREAM SUPPORT
+            let tracks = null;
+            // let tracks = data.tracks || null;
+            // END - // TODO REMOVE COMMENT WHEN SORA ADDS EITHER MULTIPLE SOFTSUB SUPPORT WITH DEFAULTS OR ADDS SUBTITLE PER STREAM SUPPORT
 
             if(tracks != null) {
                 tracks = tracks.filter(track => track.kind === 'captions');
             }
 
-            sources.push({ provider: 'zoro', url: source.url, subtitles: tracks, type: category, referer: json.host, origin: json.host });
+            let url = `https://prxy.miruro.to/m3u8?url=${ source.url }`;
+
+            sources.push({ provider: 'zoro', url: url, subtitles: tracks, type: category, referer: json.host, origin: json.host });
         }
 
         return sources;
