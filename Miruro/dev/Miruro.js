@@ -119,7 +119,6 @@ async function searchResults(keyword) {
 
 
 async function extractDetails(objString) {
-    console.log(objString);
     const encodedDelimiter = '|';
     let json = {};
     [json.url, json.id, json.malId, json.description, json.aliases, json.airdate, json.episodeCount, json.ongoing, json.host] = decodeURIComponent(objString).split(encodedDelimiter);

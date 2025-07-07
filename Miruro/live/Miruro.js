@@ -180,11 +180,11 @@ async function extractStreamUrl(objString) {
                 promises.push(extractKai(data, json, episodeNr, 'dub'));
                 continue;
             }
-            // START - // TODO REMOVE WHEN SORA ADDS EITHER MULTIPLE SOFTSUB SUPPORT WITH DEFAULTS OR ADDS SUBTITLE PER STREAM SUPPORT
-            continue; // Skips key === 'ZORO'
-            // END - // TODO REMOVE WHEN SORA ADDS EITHER MULTIPLE SOFTSUB SUPPORT WITH DEFAULTS OR ADDS SUBTITLE PER STREAM SUPPORT
+            
             if(key === 'ZORO') {
-                promises.push(extractZoro(data, json, episodeNr, 'sub'));
+                // START - // TODO REMOVE WHEN SORA ADDS EITHER MULTIPLE SOFTSUB SUPPORT WITH DEFAULTS OR ADDS SUBTITLE PER STREAM SUPPORT
+                // promises.push(extractZoro(data, json, episodeNr, 'sub'));
+                // END - // TODO REMOVE WHEN SORA ADDS EITHER MULTIPLE SOFTSUB SUPPORT WITH DEFAULTS OR ADDS SUBTITLE PER STREAM SUPPORT
                 promises.push(extractZoro(data, json, episodeNr, 'dub'));
                 continue;
             }
@@ -419,10 +419,16 @@ async function extractKai(data, json, episodeNr, category = 'sub') {
         return null;
     }
 
-    const url = `${ json.host }/api/sources?episodeId=${ episodeData.id }&provider=animekai&fetchType=m3u8&category=${ category }${ ongoingString }`;
+    let url = `${ json.host }/api/sources?episodeId=${ episodeData.id }&provider=animekai&fetchType=m3u8&category=${ category }${ ongoingString }`;
 
     try {
-        const response = await soraFetch(url);
+        let response = await soraFetch(url);
+
+        if(response.status === 500) {
+            let correctedOngoingString = json.ongoing == 0 ? '&ongoing=true' : '&ongoing=false';
+            url = url.replace(ongoingString, correctedOngoingString);
+            response = await soraFetch(url);
+        }
 
         if(getResponseHeader(response, 'Content-Type') !== 'application/json; charset=utf-8') {
             throw new Error(`AnimeKai source temporarily unavailable for episode ${ episodeNr }`);
@@ -436,7 +442,10 @@ async function extractKai(data, json, episodeNr, category = 'sub') {
 
         let sources = [];
         for(const source of data.streams) {
-            let tracks = data.tracks || null;
+            // START - // TODO REMOVE COMMENT WHEN SORA ADDS EITHER MULTIPLE SOFTSUB SUPPORT WITH DEFAULTS OR ADDS SUBTITLE PER STREAM SUPPORT
+            let tracks = null;
+            // let tracks = data.tracks || null;
+            // END - // TODO REMOVE COMMENT WHEN SORA ADDS EITHER MULTIPLE SOFTSUB SUPPORT WITH DEFAULTS OR ADDS SUBTITLE PER STREAM SUPPORT
 
             if(tracks != null) {
                 tracks = tracks.filter(track => track.kind === 'captions');
@@ -482,13 +491,18 @@ async function extractZoro(data, json, episodeNr, category = 'sub') {
 
         let sources = [];
         for(const source of data.streams) {
-            let tracks = data.tracks || null;
+            // START - // TODO REMOVE COMMENT WHEN SORA ADDS EITHER MULTIPLE SOFTSUB SUPPORT WITH DEFAULTS OR ADDS SUBTITLE PER STREAM SUPPORT
+            let tracks = null;
+            // let tracks = data.tracks || null;
+            // END - // TODO REMOVE COMMENT WHEN SORA ADDS EITHER MULTIPLE SOFTSUB SUPPORT WITH DEFAULTS OR ADDS SUBTITLE PER STREAM SUPPORT
 
             if(tracks != null) {
                 tracks = tracks.filter(track => track.kind === 'captions');
             }
 
-            sources.push({ provider: 'zoro', url: source.url, subtitles: tracks, type: category, referer: json.host, origin: json.host });
+            let url = `https://prxy.miruro.to/m3u8?url=${ source.url }`;
+
+            sources.push({ provider: 'zoro', url: url, subtitles: tracks, type: category, referer: json.host, origin: json.host });
         }
 
         return sources;
