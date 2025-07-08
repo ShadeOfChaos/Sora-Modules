@@ -1,16 +1,16 @@
 const BASE_URLS = ['https://miruro.tv', 'https://miruro.to', 'https://miruro.online'];
-const SEARCH_URL = '---/api/search/browse?search=|||&page=1&perPage=45&type=ANIME&sort=SEARCH_MATCH';
+const SEARCH_URL = '---/api/search/browse?search=|||&page=1&perPage=100&type=ANIME&sort=SEARCH_MATCH';
 
 // ***** LOCAL TESTING
 (async() => {
     // const results = await searchResults('Solo leveling');
     // const results = await searchResults('Mizu zokusei no mahou tsukai'); // AnimeKai ongoing test
     // const results = await searchResults('Sentai Daishikkaku 2'); // Animekai finished test
-    const results = await searchResults('Narut'); // Animekai finished test
-    console.log('SEARCH RESULTS: ', results);
+    const results = await searchResults('Conan'); // Animekai finished test
+    // console.log('SEARCH RESULTS: ', results);
     const details = await extractDetails(JSON.parse(results)[0].href); // First search result
-    console.log('DETAILS: ', details);
-    console.log(JSON.parse(results));
+    // console.log('DETAILS: ', details);
+    // console.log(JSON.parse(results));
     const episodes = await extractEpisodes(JSON.parse(results)[0].href); // First search result
     // console.log('EPISODES: ', episodes);
     // const streamUrl = await extractStreamUrl(JSON.parse(episodes)[0].href); // Episode 1
