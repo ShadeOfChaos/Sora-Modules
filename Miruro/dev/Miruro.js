@@ -1,5 +1,5 @@
 const BASE_URLS = ['https://miruro.tv', 'https://miruro.to', 'https://miruro.online'];
-const SEARCH_URL = '---/api/search/browse?search=|||&page=1&perPage=5&type=ANIME&sort=SEARCH_MATCH';
+const SEARCH_URL = '---/api/search/browse?search=|||&page=1&perPage=45&type=ANIME&sort=SEARCH_MATCH';
 
 // ***** LOCAL TESTING
 (async() => {

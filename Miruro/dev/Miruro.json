@@ -12,7 +12,7 @@
     "quality": "1080p",
 	"type": "anime",
     "baseUrl": "https://miruro.tv/",
-    "searchBaseUrl": "https://www.miruro.tv/api/search/browse?search=%s&page=1&perPage=5&type=ANIME&sort=SEARCH_MATCH",
+    "searchBaseUrl": "https://www.miruro.tv/api/search/browse?search=%s&page=1&perPage=50&type=ANIME&sort=TITLE_ROMAJI%2CTITLE_ENGLISH%2CSEARCH_MATCH",
     "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/Miruro/dev/Miruro.js",
     "asyncJS": true,
     "streamAsyncJS": true,
