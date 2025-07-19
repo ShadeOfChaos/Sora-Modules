@@ -84,7 +84,7 @@ async function searchResults(keyword) {
             let image = item.coverImage?.extraLarge ?? item.coverImage?.large ?? item.coverImage?.medium ?? item.bannerImage ?? item.coverImage?.small;
 
             return {
-                title: item.title.romaji,
+                title: item.title.english,
                 image: image,
                 href: `${ hostUrl }/watch?id=${ item.id }|${ item.id }|${ item.idMal }|${ item.description }|${ item.title.english }, ${ item.title.native }|${ itemDateString }|${ episodeCount }|${ ongoing }|${ hostUrl }`
             };

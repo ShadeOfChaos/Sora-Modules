@@ -6,7 +6,7 @@ const SEARCH_URL = '---/api/search/browse?search=|||&page=1&perPage=100&type=ANI
     // const results = await searchResults('Solo leveling');
     // const results = await searchResults('Mizu zokusei no mahou tsukai'); // AnimeKai ongoing test
     // const results = await searchResults('Sentai Daishikkaku 2'); // Animekai finished test
-    const results = await searchResults('Conan'); // Animekai finished test
+    const results = await searchResults('My hero aca'); // Animekai finished test
     // console.log('SEARCH RESULTS: ', results);
     const details = await extractDetails(JSON.parse(results)[0].href); // First search result
     // console.log('DETAILS: ', details);
@@ -102,8 +102,10 @@ async function searchResults(keyword) {
             let itemDateString = getDateStringFromSearchResult(item);
             let image = item.coverImage?.extraLarge ?? item.coverImage?.large ?? item.coverImage?.medium ?? item.bannerImage ?? item.coverImage?.small;
 
+            console.log(item.title);
+
             return {
-                title: item.title.romaji,
+                title: item.title.english,
                 image: image,
                 href: `${ hostUrl }/watch?id=${ item.id }|${ item.id }|${ item.idMal }|${ item.description }|${ item.title.english }, ${ item.title.native }|${ itemDateString }|${ episodeCount }|${ ongoing }|${ hostUrl }`
             };
