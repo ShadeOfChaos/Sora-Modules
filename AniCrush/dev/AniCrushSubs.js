@@ -311,6 +311,10 @@ async function extractStreamUrl(url) {
         const hlsResponse = await soraFetch(hlsUrl);
         const hlsData = typeof hlsResponse === 'object' ? await hlsResponse.json() : await JSON.parse(hlsResponse);
 
+        console.log('==================');
+        console.log(hlsData);
+        console.log('==================');
+
         if(hlsData?.status == false || hlsData?.result == null || hlsData?.error != null) {
             throw new Error('No stream found');
         }
@@ -341,6 +345,7 @@ async function extractStreamUrl(url) {
 
         if(hlsData.result?.tracks?.length <= 0) {
             return JSON.stringify({ stream: streamSource?.file, subtitles: null });
+            return JSON.stringify({ streams: [{"title": "SUB", "streamUrl": streamSource?.file, "headers": { "referer": "https://megacloud.blog/" }}], subtitles: null });
         }
 
         let reserveSubtitles = null;
@@ -370,7 +375,8 @@ async function extractStreamUrl(url) {
             subtitles: subtitles?.file
         };
 
-        return JSON.stringify(streamUrl);
+        // return JSON.stringify(streamUrl);
+        return JSON.stringify({ streams: [{"title": "SUB", "streamUrl": streamSource?.file, "headers": { "referer": "https://megacloud.blog/" }}], subtitles: null });
 
     } catch (error) {
         console.log('Fetch error: ' + error.message);
