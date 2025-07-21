@@ -344,7 +344,7 @@ async function extractStreamUrl(url) {
         }
 
         if(hlsData.result?.tracks?.length <= 0) {
-            return JSON.stringify({ stream: streamSource?.file, subtitles: null });
+            // return JSON.stringify({ stream: streamSource?.file, subtitles: null });
             return JSON.stringify({ streams: [{"title": "SUB", "streamUrl": streamSource?.file, "headers": { "referer": "https://megacloud.blog/" }}], subtitles: null });
         }
 
