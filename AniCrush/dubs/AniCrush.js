@@ -84,7 +84,7 @@ async function searchResults(keyword) {
         const results = data.result.movies.map(movie => {
             const href = `${ BASE_URL }/watch/${ movie.slug }.${ movie.id }`;
 
-            return { title: movie.name, image: getImage(movie.poster_path), href: href }
+            return { title: movie?.name_english || movie.name, image: getImage(movie.poster_path), href: href }
         });
 
         return JSON.stringify(results);
