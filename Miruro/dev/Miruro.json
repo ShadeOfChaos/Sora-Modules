@@ -6,11 +6,12 @@
         "icon": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/ofchaos.jpg",
         "url": "https://github.com/ShadeOfChaos/Sora-Modules"
     },
-    "version": "0.9.9",
+    "version": "0.9.10",
     "language": "English (HARDSUB, DUB)",
     "streamType": "HLS",
     "quality": "1080p",
 	"type": "anime",
+    "downloadSupport": true,
     "baseUrl": "https://miruro.tv/",
     "searchBaseUrl": "https://www.miruro.tv/api/search/browse?search=%s&page=1&perPage=45&type=ANIME&sort=TITLE_ROMAJI%2CTITLE_ENGLISH%2CSEARCH_MATCH",
     "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/Miruro/dev/Miruro.js",

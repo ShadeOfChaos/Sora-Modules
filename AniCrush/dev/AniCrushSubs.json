@@ -6,11 +6,12 @@
         "icon": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/ofchaos.jpg",
         "url": "https://github.com/ShadeOfChaos/Sora-Modules"
     },
-    "version": "2.2.2",
+    "version": "2.2.3",
     "language": "English (SUB)",
     "streamType": "HLS",
     "quality": "1080p",
 	"type": "anime",
+    "downloadSupport": true,
     "baseUrl": "https://megacloud.club/",
     "searchBaseUrl": "https://ac-api.ofchaos.com/api/anime/search?keyword=%s",
     "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/AniCrush/dev/AniCrushSubs.js",

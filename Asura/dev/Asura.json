@@ -6,11 +6,12 @@
         "icon": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/ofchaos.jpg",
         "url": "https://asura.ofchaos.com"
     },
-    "version": "1.0.2",
+    "version": "1.0.3",
     "language": "Japanese (SUB)",
     "streamType": "HLS",
     "quality": "1080p",
 	"type": "anime",
+    "downloadSupport": true,
     "baseUrl": "https://megacloud.club/",
     "searchBaseUrl": "",
     "scriptUrl": "https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/Asura/dev/Asura.js",
