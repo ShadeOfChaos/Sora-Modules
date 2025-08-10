@@ -4,7 +4,7 @@ async function areRequiredServersUp() {
     try {
         let promises = [];
 
-        for(let host of requiredHosts) {
+        for (let host of requiredHosts) {
             promises.push(
                 new Promise(async (resolve) => {
                     let response = await soraFetch(host, { method: 'HEAD' });
@@ -15,11 +15,11 @@ async function areRequiredServersUp() {
         }
 
         return Promise.allSettled(promises).then((responses) => {
-            for(let response of responses) {
-                if(response.status === 'rejected' || response.value?.status != 200) {
+            for (let response of responses) {
+                if (response.status === 'rejected' || response.value?.status != 200) {
                     let message = 'Required source ' + response.value?.host + ' is currently down.';
                     console.log(message);
-                    return { success: false, error: encodeURIComponent(message), searchTitle: `Error cannot access ${ response.value?.host }, server down. Please try again later.` };
+                    return { success: false, error: encodeURIComponent(message), searchTitle: `Error cannot access ${response.value?.host}, server down. Please try again later.` };
                 }
             }
 
@@ -43,7 +43,7 @@ async function searchResults(keyword) {
     var shows = [];
     const serversUp = await areRequiredServersUp();
 
-    if(serversUp.success === false) {
+    if (serversUp.success === false) {
         return JSON.stringify([{
             title: serversUp.searchTitle,
             image: 'https://raw.githubusercontent.com/ShadeOfChaos/Sora-Modules/refs/heads/main/sora_host_down.png',
@@ -51,33 +51,49 @@ async function searchResults(keyword) {
         }]);
     }
 
+    const searchUrl = `${SEARCH_URL}${encodeURI(keyword)}`;
+    const animesWithSubtitles = await GetAnimes();
+
     try {
-        const response = await soraFetch(`${SEARCH_URL}${encodeURI(keyword)}`);
+        const response = await soraFetch(searchUrl);
         const html = typeof response === 'object' ? await response.text() : await response;
 
         const json = getNextData(html);
-        if (json == null) throw new Error('Error parsing NEXT_DATA json');
-
         const data = json?.props?.pageProps?.data;
-        if(data == null) throw new Error('Error obtaining data');
-
-        const animesWithSubtitles = await GetAnimes();
-        
-        for(let entry of data) {
-            if(!animesWithSubtitles.includes(entry.mappings.anilist)) {
-                continue;
+        if (data != null) {
+            for (let entry of data) {
+                if (!animesWithSubtitles.includes(entry.mappings.anilist)) {
+                    continue;
+                }
+                shows.push({
+                    title: entry.title,
+                    image: entry.posterImage.original,
+                    href: ANIME_URL + entry.link + '|' + transferData
+                });
             }
+        } else {
+            const results = await getSearchResultsViaExtraction(searchUrl, keyword);
+            for (let result of results) {
+                if (!animesWithSubtitles.includes(result?.mappings?.anilist)) {
+                    continue;
+                }
 
-            shows.push({
-                title: entry.title,
-                image: entry.posterImage.original,
-                href: ANIME_URL + entry.link
-            });
+                const transferData = JSON.stringify({
+                    episodeSlugs: result?.ep,
+                    origin: result?._id,
+                    anilistId: result?.mappings?.anilist
+                });
+
+                shows.push({
+                    title: result?.title,
+                    image: result?.posterImage?.large ?? result?.posterImage?.medium ?? result?.posterImage?.small ?? result?.posterImage?.original,
+                    href: '+' + ANIME_URL + result?.link + '|' + transferData
+                });
+            }
         }
 
         return JSON.stringify(shows);
     } catch (error) {
-        console.log('Test');
         console.log('Fetch error: ' + error.message);
         return JSON.stringify([]);
     }
@@ -90,11 +106,32 @@ async function searchResults(keyword) {
  */
 async function extractDetails(url) {
     const REGEX = /style_specs_header_year.+?>.+([0-9]{4})[\s\S]+style_specs_container_middle.+?>([\s\S]+?)</g;
-    if(url.startsWith('#')) {
+    if (url.startsWith('#')) {
         return JSON.stringify([{
             description: decodeURIComponent(url.slice(1)) + ' Please try again later.',
             aliases: '',
             airdate: ''
+        }]);
+    }
+    if (url.startsWith('+')) {
+        const transferData = url.split('|')[1];
+        const jsonData = JSON.parse(transferData);
+
+        const anilistResult = await Anilist.lookup({ 'id': jsonData.anilistId });
+        const data = anilistResult?.Page?.media?.[0];
+
+        if (data == null) {
+            return JSON.stringify([{
+                description: 'Error loading description',
+                aliases: 'Duration: Unknown',
+                airdate: 'Aired: Unknown'
+            }]);
+        }
+
+        return JSON.stringify([{
+            description: data?.description,
+            aliases: data?.title?.english,
+            airdate: Anilist.convertAnilistDateToDateStr(data?.startDate)
         }]);
     }
 
@@ -106,10 +143,10 @@ async function extractDetails(url) {
         if (json == null) throw new Error('Error parsing NEXT_DATA json');
 
         const data = json?.props?.pageProps?.data;
-        if(data == null) throw new Error('Error obtaining data');
+        if (data == null) throw new Error('Error obtaining data');
 
         let aliasArray = data?.synonyms;
-        if(aliasArray != null && aliasArray.length > 5) {
+        if (aliasArray != null && aliasArray.length > 5) {
             aliasArray = aliasArray.slice(0, 5);
         }
         const aliases = aliasArray.join(', ');
@@ -140,37 +177,68 @@ async function extractDetails(url) {
  */
 async function extractEpisodes(url) {
     const BASE_URL = 'https://www.animeparadise.moe/watch/';
+    if (url.startsWith('+')) {
+        var transferData = url.split('|')[1];
+        var jsonData = JSON.parse(transferData);
+        var url = url.split('|')[0].slice(1);
+    }
 
     try {
-        if(url.startsWith('#')) throw new Error('Host down but still attempted to get episodes');
+        if (url.startsWith('#')) throw new Error('Host down but still attempted to get episodes');
 
         const response = await soraFetch(url);
         const html = typeof response === 'object' ? await response.text() : await response;
         var episodes = [];
 
         const json = getNextData(html);
-        if (json == null) throw new Error('Error parsing NEXT_DATA json');
+        if (json != null) {
+            url = url.split('|')[0].slice(1);
 
-        const origin = json?.props?.pageProps?.data?._id;
+            const origin = json?.props?.pageProps?.data?._id;
 
-        const episodesList = json?.props?.pageProps?.data?.ep;
-        if(episodesList == null) throw new Error('Error obtaining episodes');
+            const episodesList = json?.props?.pageProps?.data?.ep;
+            if (episodesList == null) throw new Error('Error obtaining episodes');
 
-        const episodesWithSubtitlesJson = await GetEpisodes(json.props.pageProps.data?.mappings?.anilist);
-        const episodesWithSubtitles = episodesWithSubtitlesJson.map((entry) => entry?.episode);
+            const episodesWithSubtitlesJson = await GetEpisodes(json.props.pageProps.data?.mappings?.anilist);
+            const episodesWithSubtitles = episodesWithSubtitlesJson.map((entry) => entry?.episode);
 
-        for(let i=1,len=episodesList.length; i<=len; i++) {
-            if(!episodesWithSubtitles.includes(i)) {
-                continue;
+            for (let i = 1, len = episodesList.length; i <= len; i++) {
+                if (!episodesWithSubtitles.includes(i)) {
+                    continue;
+                }
+
+                let url = `${BASE_URL}${episodesList[i]}?origin=${origin}`;
+
+                episodes.push({
+                    href: url,
+                    number: i
+                })
             }
+        } else {
+            const streamsJson = await getStreamsViaExtraction(jsonData.episodeSlugs[0], jsonData.origin);
+            if (streamsJson == null) return null;
 
-            let url = `${ BASE_URL }${ episodesList[i] }?origin=${ origin }`;
+            const episodesWithSubtitlesJson = await GetEpisodes(jsonData.anilistId);
+            const episodesWithSubtitles = episodesWithSubtitlesJson.map((entry) => entry?.episode);
 
-            episodes.push({
-                href: url,
-                number: i
-            })
+            for (let stream of streamsJson.episodeList) {
+                if (!episodesWithSubtitles.includes(parseInt(stream.number))) {
+                    continue;
+                }
+                
+                const transferStream = JSON.stringify({
+                    stream: stream.streamLink ?? stream?.streamLinkBackup,
+                    anilistId: jsonData.anilistId,
+                    number: stream.number
+                });
+
+                episodes.push({
+                    href: transferStream,
+                    number: stream.number
+                });
+            }
         }
+
 
         return JSON.stringify(episodes);
     } catch (error) {
@@ -185,6 +253,14 @@ async function extractEpisodes(url) {
  * @returns {Promise<string|null>} A promise that resolves with the stream URL if successful, or null if an error occurs during the fetch operation.
  */
 async function extractStreamUrl(url) {
+    const baseUrl = 'https://www.animeparadise.moe';
+
+    if (url.startsWith('{')) {
+        const data = JSON.parse(url);
+        const subtitles = GetSubtitles(data.anilistId, data.number);
+        return JSON.stringify({ stream: data.stream, subtitles: subtitles });
+    }
+
     try {
         const response = await soraFetch(url);
         const html = typeof response === 'object' ? await response.text() : await response;
@@ -194,7 +270,7 @@ async function extractStreamUrl(url) {
 
         const streamUrl = json?.props?.pageProps?.episode?.streamLink;
         const subtitles = GetSubtitles(json.props.pageProps?.animeData?.mappings?.anilist, json.props.pageProps.episode?.number);
-        if(subtitles == null) throw new Error('Invalid data while attempting to get subtitles');
+        if (subtitles == null) throw new Error('Invalid data while attempting to get subtitles');
 
         return JSON.stringify({ stream: streamUrl, subtitles: subtitles });
 
@@ -216,13 +292,6 @@ function getNextData(html) {
     }
 }
 
-// Trims around the content, leaving only the area between the start and end string
-function trimHtml(html, startString, endString) {
-    const startIndex = html.indexOf(startString);
-    const endIndex = html.indexOf(endString, startIndex);
-    return html.substring(startIndex, endIndex);
-}
-
 async function GetAnimes() {
     const baseUrl = 'https://asura.ofchaos.com/api/anime';
     const referer = 'SoraApp';
@@ -230,20 +299,20 @@ async function GetAnimes() {
         const response = await soraFetch(baseUrl, { headers: { 'Referer': referer } });
         const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
-        if(json == null)                 throw new Error('Error parsing Asura json');
-        if(json?.success !== true)       throw new Error(json?.error);
-        if(json?.result?.length == null) throw new Error('Error obtaining data from Asura API');
+        if (json == null) throw new Error('Error parsing Asura json');
+        if (json?.success !== true) throw new Error(json?.error);
+        if (json?.result?.length == null) throw new Error('Error obtaining data from Asura API');
 
         return json?.result;
 
-    } catch(error) {
+    } catch (error) {
         console.log('[ASURA][GetAnimes] Error: ' + error.message);
         return [];
     }
 }
 
 async function GetEpisodes(anilistId) {
-    if(anilistId == null || isNaN(parseInt(anilistId))) {
+    if (anilistId == null || isNaN(parseInt(anilistId))) {
         return [];
     }
 
@@ -251,23 +320,23 @@ async function GetEpisodes(anilistId) {
     const referer = 'SoraApp';
 
     try {
-        const response = await soraFetch(`${ baseUrl }/${ anilistId }`, { headers: { 'Referer': referer } });
+        const response = await soraFetch(`${baseUrl}/${anilistId}`, { headers: { 'Referer': referer } });
         const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
-        if(json == null)                 throw new Error('Error parsing Asura json');
-        if(json?.success !== true)       throw new Error(json?.error);
-        if(json?.result?.length == null) throw new Error('Error obtaining data from Asura API');
+        if (json == null) throw new Error('Error parsing Asura json');
+        if (json?.success !== true) throw new Error(json?.error);
+        if (json?.result?.length == null) throw new Error('Error obtaining data from Asura API');
 
         return json?.result;
 
-    } catch(error) {
+    } catch (error) {
         console.log('[ASURA][GetEpisodes] Error: ' + error.message);
         return [];
     }
 }
 
 function GetSubtitles(anilistId, episodeNr) {
-    if(
+    if (
         anilistId == null ||
         isNaN(parseInt(anilistId)) ||
         episodeNr == null ||
@@ -278,18 +347,339 @@ function GetSubtitles(anilistId, episodeNr) {
 
     const baseUrl = 'https://asura.ofchaos.com/api/anime';
 
-    return `${ baseUrl }/${ anilistId }/${ episodeNr }`;
+    return `${baseUrl}/${anilistId}/${episodeNr}`;
 }
 
-// Uses Sora's fetchv2 on ipad, fallbacks to regular fetch on Windows
+async function getSearchResultsViaExtraction(url, keyword) {
+    const baseUrl = 'https://www.animeparadise.moe';
+
+    const searchPageResponse = await fetch(url, { method: 'POST' });
+    const searchPageHtml = await searchPageResponse.text();
+
+    const fuckYoSearchPageRegex = /src="(\/_next\/static\/chunks\/app\/search\/page-[^"]*.js)"/;
+    const searchPageSrc = searchPageHtml.match(fuckYoSearchPageRegex)?.[1];
+    if (searchPageSrc == null) return null;
+
+    const searchJsResponse = await fetch(`${baseUrl}${searchPageSrc}`);
+    const searchJs = await searchJsResponse.text();
+
+    const fuckYoNextActionBsRegex = /createServerReference\)\("([^"]*)"[^"]*"searchAnime"/;
+    const nextAction = searchJs.match(fuckYoNextActionBsRegex)?.[1];
+    if (nextAction == null) return null;
+
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            "Accept": "text/x-component",
+            "Content-Type": "application/json",
+            "Next-Action": nextAction,
+            "Next-Router-State-Tree": "%5B%22%22%2C%7B%22children%22%3A%5B%22search%22%2C%7B%22children%22%3A%5B%22__PAGE__%22%2C%7B%7D%2Cnull%2Cnull%5D%7D%2Cnull%2Cnull%5D%7D%2Cnull%2Cnull%2Ctrue%5D"
+        },
+        body: JSON.stringify([keyword, { "genres": [], "year": null, "season": null, "page": 1 }])
+    });
+    const text = await response.text();
+    const jsonString = text.slice(text.indexOf('1:{') + 2);
+    const json = JSON.parse(jsonString);
+
+    if (json?.error == true) {
+        console.error('Error in search', json);
+        return null;
+    }
+
+    return json?.data?.searchData;
+}
+
+async function getStreamsViaExtraction(episodeId, origin) {
+    const baseUrl = 'https://www.animeparadise.moe';
+    const url = `${baseUrl}/watch/${episodeId}?origin=${origin}`;
+
+    const watchPageResponse = await fetch(url, { method: 'POST' });
+    const watchPageHtml = await watchPageResponse.text();
+
+    const fuckYoWatchPageRegex = /src="(\/_next\/static\/chunks\/app\/watch\/%5Bid%5D\/page-[^"]*.js)"/;
+    let watchPageSrc = watchPageHtml.match(fuckYoWatchPageRegex)?.[1];
+    if (watchPageSrc == null) return null;
+    // I don't even need this, why is the placeholder's only acceptable value the placeholder urlencoded, wtf am I looking at?
+    // watchPageSrc = watchPageSrc.replace('%5Bid%5D', episodeId);
+
+    const watchJsResponse = await fetch(`${baseUrl}${watchPageSrc}`);
+    const watchJs = await watchJsResponse.text();
+
+    const fuckYoNextActionBsRegex = /createServerReference\)\("([^"]*)"[^"]*"getEpisode"/;
+    const nextAction = watchJs.match(fuckYoNextActionBsRegex)?.[1];
+    if (nextAction == null) return null;
+
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            "Accept": "text/x-component",
+            "Content-Type": "application/json",
+            "Next-Action": nextAction,
+            "Next-Router-State-Tree": "%5B%22%22%2C%7B%22children%22%3A%5B%22watch%22%2C%7B%22children%22%3A%5B%5B%22id%22%2C%228bf78dcf-e00b-433d-b17a-6d087f8d4bff%22%2C%22d%22%5D%2C%7B%22children%22%3A%5B%22__PAGE__%22%2C%7B%7D%2Cnull%2Cnull%5D%7D%2Cnull%2Cnull%5D%7D%2Cnull%2Cnull%5D%7D%2Cnull%2Cnull%2Ctrue%5D"
+        },
+        body: JSON.stringify([episodeId, origin])
+    });
+    const text = await response.text();
+
+    const jsonString = text.slice(text.indexOf('1:{') + 2);
+    const json = JSON.parse(jsonString);
+
+    if (json?.error == true) {
+        console.error('Error in search', json);
+        return null;
+    }
+
+    return json;
+}
+
+// Trims around the content, leaving only the area between the start and end string
+function trimHtml(html, startString, endString) {
+    const startIndex = html.indexOf(startString);
+    const endIndex = html.indexOf(endString, startIndex);
+    return html.substring(startIndex, endIndex);
+}
+
 async function soraFetch(url, options = { headers: {}, method: 'GET', body: null }) {
     try {
         return await fetchv2(url, options.headers ?? {}, options.method ?? 'GET', options.body ?? null);
-    } catch(e) {
+    } catch (e) {
         try {
             return await fetch(url, options);
-        } catch(error) {
+        } catch (error) {
             return null;
         }
     }
+}
+
+// Anilist (not really) singleton
+class Anilist {
+    static async search(keyword, filters = {}) {
+        const query = `query (
+                $search: String,
+                $page: Int,
+                $perPage: Int,
+                $sort: [MediaSort],
+                $genre_in: [String],
+                $tag_in: [String],
+                $type: MediaType,
+                $format: MediaFormat,
+                $status: MediaStatus,
+                $countryOfOrigin: CountryCode,
+                $isAdult: Boolean,
+                $season: MediaSeason,
+                $startDate_like: String,
+                $source: MediaSource,
+                $averageScore_greater: Int,
+                $averageScore_lesser: Int
+            ) {
+                Page(page: $page, perPage: $perPage) {
+                media(
+                    search: $search,
+                    type: $type,
+                    sort: $sort,
+                    genre_in: $genre_in,
+                    tag_in: $tag_in,
+                    format: $format,
+                    status: $status,
+                    countryOfOrigin: $countryOfOrigin,
+                    isAdult: $isAdult,
+                    season: $season,
+                    startDate_like: $startDate_like,
+                    source: $source,
+                    averageScore_greater: $averageScore_greater,
+                    averageScore_lesser: $averageScore_lesser
+                ) {
+                    id
+                    idMal
+                    averageScore
+                    title {
+                        romaji
+                        english
+                        native
+                    }
+                    episodes
+                    nextAiringEpisode {
+                        airingAt
+                        timeUntilAiring
+                        episode
+                    }
+                    status
+                    genres
+                    format
+                    description
+                    startDate {
+                        year
+                        month
+                        day
+                    }
+                    endDate {
+                        year
+                        month
+                        day
+                    }
+                    popularity
+                    coverImage {
+                        color
+                        large
+                        extraLarge
+                    }
+                }
+            }
+        }`;
+
+        const variables = {
+            "page": 1,
+            "perPage": 50,
+            "sort": [
+                "SEARCH_MATCH",
+                "TITLE_ENGLISH_DESC",
+                "TITLE_ROMAJI_DESC"
+            ],
+            "search": keyword,
+            "type": "ANIME",
+            ...filters
+        }
+
+        // console.log(filters, variables);
+
+        return Anilist.anilistFetch(query, variables);
+    }
+
+    static async lookup(filters) {
+        const query = `query (
+                $id: Int,
+                $idMal: Int
+            ) {
+                Page(page: 1, perPage: 1) {
+                media(
+                    id: $id,
+                    idMal: $idMal
+                ) {
+                    id
+                    idMal
+                    averageScore
+                    title {
+                        romaji
+                        english
+                        native
+                    }
+                    episodes
+                    nextAiringEpisode {
+                        airingAt
+                        timeUntilAiring
+                        episode
+                    }
+                    status
+                    genres
+                    format
+                    description
+                    startDate {
+                        year
+                        month
+                        day
+                    }
+                    endDate {
+                        year
+                        month
+                        day
+                    }
+                    popularity
+                    coverImage {
+                        color
+                        large
+                        extraLarge
+                    }
+                }
+            }
+        }`;
+
+        const variables = {
+            "type": "ANIME",
+            ...filters
+        }
+
+        return Anilist.anilistFetch(query, variables);
+    }
+
+    static async getLatest() {
+
+    }
+
+    static async anilistFetch(query, variables) {
+        const url = 'https://graphql.anilist.co/';
+        const extraTimeoutMs = 250;
+
+        try {
+            const response = await soraFetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify({
+                    query: query,
+                    variables: variables
+                })
+            });
+
+            if (response.status !== 200) {
+                if (response.status === 429) {
+                    console.info('=== RATE LIMIT EXCEEDED, SLEEPING AND RETRYING ===');
+                    const retryTimeout = response.headers.get('Retry-After');
+                    const timeout = Math.ceil((parseInt(retryTimeout))) * 1000 + extraTimeoutMs;
+                    await sleep(timeout);
+                    return await AnilistFetch(query, variables);
+
+                }
+
+                console.error('Error fetching Anilist data:', response.statusText);
+                return null;
+            }
+
+            const json = await response.json();
+            if (json?.errors) {
+                console.error('Error fetching Anilist data:', json.errors);
+            }
+
+            return json?.data;
+
+        } catch (error) {
+            console.error('Error fetching Anilist data:', error);
+            return null;
+        }
+    }
+
+    static convertAnilistDateToDateStr(dateObject) {
+        if (dateObject.year == null) {
+            return null;
+        }
+        if (dateObject.month == null || parseInt(dateObject.month) < 1) {
+            dateObject.month = 1;
+        }
+        if (dateObject.day == null || parseInt(dateObject.day) < 1) {
+            dateObject.day = 1;
+        }
+        return dateObject.year + "-" + (dateObject.month).toString().padStart(2, '0') + "-" + (dateObject.day).toString().padStart(2, '0');
+    }
+
+
+    // Yes it's stupid, but I kinda love it which is why I'm not optimizing this
+    static nextAnilistAirDateToCountdown(timestamp) {
+        if (timestamp == null) return null;
+
+        const airDate = new Date((timestamp * 1000));
+        const now = new Date();
+
+        if (now > airDate) return null;
+
+        let [days, hourRemainder] = (((airDate - now) / 1000) / 60 / 60 / 24).toString().split('.');
+        let [hours, minRemainder] = (parseFloat("0." + hourRemainder) * 24).toString().split('.');
+        let minutes = Math.ceil((parseFloat("0." + minRemainder) * 60));
+
+        return `Next episode will air in ${days} days, ${hours} hours and ${minutes} minutes at ${airDate.getFullYear()}-${(airDate.getMonth() + 1).toString().padStart(2, '0')}-${(airDate.getDate()).toString().padStart(2, '0')} ${airDate.getHours()}:${airDate.getMinutes()}`;
+    }
+}
+
+function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
 }
