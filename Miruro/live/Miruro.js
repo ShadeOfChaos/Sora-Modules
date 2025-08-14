@@ -153,6 +153,8 @@ async function extractStreamUrl(objString) {
     let episodesApiUrl = `${ json.host }/api/episodes?malId=${ json.malId }`;
     if(json.ongoing == 1) {
         episodesApiUrl += '&ongoing=true';
+    } else { // Is required to have ongoing false implicitly set
+        episodesApiUrl += '&ongoing=false';
     }
 
     try {

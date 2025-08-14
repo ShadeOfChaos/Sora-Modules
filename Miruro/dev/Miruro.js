@@ -6,15 +6,15 @@ const SEARCH_URL = '---/api/search/browse?search=|||&page=1&perPage=100&type=ANI
     // const results = await searchResults('Solo leveling');
     // const results = await searchResults('Mizu zokusei no mahou tsukai'); // AnimeKai ongoing test
     // const results = await searchResults('Sentai Daishikkaku 2'); // Animekai finished test
-    const results = await searchResults('My hero aca'); // Animekai finished test
+    const results = await searchResults('dan da dan'); // Animekai finished test
     // console.log('SEARCH RESULTS: ', results);
     const details = await extractDetails(JSON.parse(results)[0].href); // First search result
-    // console.log('DETAILS: ', details);
+    console.log('DETAILS: ', details);
     // console.log(JSON.parse(results));
     const episodes = await extractEpisodes(JSON.parse(results)[0].href); // First search result
     // console.log('EPISODES: ', episodes);
     // const streamUrl = await extractStreamUrl(JSON.parse(episodes)[0].href); // Episode 1
-    const streamUrl = await extractStreamUrl(JSON.parse(episodes)[1].href); // Sentai episode 12
+    const streamUrl = await extractStreamUrl(JSON.parse(episodes)[0].href); // Sentai episode 12
     console.log('STREAMURL: ', streamUrl);
 })();
 //***** LOCAL TESTING
@@ -102,7 +102,8 @@ async function searchResults(keyword) {
             let itemDateString = getDateStringFromSearchResult(item);
             let image = item.coverImage?.extraLarge ?? item.coverImage?.large ?? item.coverImage?.medium ?? item.bannerImage ?? item.coverImage?.small;
 
-            console.log(item.title);
+            console.log(item);
+            console.log('============');
 
             return {
                 title: item.title.english,
@@ -174,6 +175,8 @@ async function extractStreamUrl(objString) {
     let episodesApiUrl = `${ json.host }/api/episodes?malId=${ json.malId }`;
     if(json.ongoing == 1) {
         episodesApiUrl += '&ongoing=true';
+    } else { // Is required to have ongoing false implicitly set
+        episodesApiUrl += '&ongoing=false';
     }
 
     try {
