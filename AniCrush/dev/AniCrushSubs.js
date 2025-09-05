@@ -1,13 +1,13 @@
 // //***** LOCAL TESTING
-const results = await searchResults('Solo leveling');
+const results = await searchResults('fermat no ryouri');
 // // console.log('RESULTS: ', results);
-const details = await extractDetails(JSON.parse(results)[1].href);
+const details = await extractDetails(JSON.parse(results)[0].href);
 // // console.log('DETAILS: ', details);
-const episodes = await extractEpisodes(JSON.parse(results)[1].href);
+const episodes = await extractEpisodes(JSON.parse(results)[0].href);
 // // console.log('OUTSIDE EPISODES: ', JSON.parse(episodes));
 var epis = JSON.parse(episodes);
 // // console.log('Episodes', epis);
-const streamUrl = await extractStreamUrl(epis[0].href);
+const streamUrl = await extractStreamUrl(epis[7].href);
 console.log('STREAMURL: ', streamUrl);
 // //***** LOCAL TESTING
 
@@ -369,6 +369,10 @@ async function extractStreamUrl(url) {
             stream: streamSource?.file,
             subtitles: subtitles?.file
         };
+
+        console.log('======================= StreamUrl =======================');
+        console.log(JSON.stringify(streamUrl));
+        console.log('=========================================================');
 
         return JSON.stringify(streamUrl);
 
