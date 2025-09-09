@@ -1,14 +1,14 @@
 //***** LOCAL TESTING
-// (async () => {
-// const results = await searchResults('One Piece');
-// // console.log('RESULTS: ', results);
-// const details = await extractDetails(JSON.parse(results)[0].href);
-// // console.log('DETAILS: ', details);
-// const episodesa = await extractEpisodes(JSON.parse(results)[0].href);
-// // console.log('EPISODES: ', episodesa);
-// const streamUrl = await extractStreamUrl(JSON.parse(episodesa)[0].href);
-// console.log('STREAMURL: ', streamUrl);
-// })();
+(async () => {
+const results = await searchResults('Cowboy Bebop');
+// console.log('RESULTS: ', results);
+const details = await extractDetails(JSON.parse(results)[0].href);
+// console.log('DETAILS: ', details);
+const episodesa = await extractEpisodes(JSON.parse(results)[0].href);
+// console.log('EPISODES: ', episodesa);
+const streamUrl = await extractStreamUrl(JSON.parse(episodesa)[0].href);
+console.log('STREAMURL: ', streamUrl);
+})();
 //***** LOCAL TESTING
 
 async function areRequiredServersUp() {
@@ -284,21 +284,21 @@ function getNextData(html) {
 async function getSearchResultsViaExtraction(url, keyword) {
     const baseUrl = 'https://www.animeparadise.moe';
 
-    const searchPageResponse = await fetch(url, { method: 'POST' });
+    const searchPageResponse = await soraFetch(url, { method: 'POST' });
     const searchPageHtml = await searchPageResponse.text();
 
     const fuckYoSearchPageRegex = /src="(\/_next\/static\/chunks\/app\/search\/page-[^"]*.js)"/;
     const searchPageSrc = searchPageHtml.match(fuckYoSearchPageRegex)?.[1];
     if (searchPageSrc == null) return null;
 
-    const searchJsResponse = await fetch(`${baseUrl}${searchPageSrc}`);
+    const searchJsResponse = await soraFetch(`${baseUrl}${searchPageSrc}`);
     const searchJs = await searchJsResponse.text();
 
     const fuckYoNextActionBsRegex = /createServerReference\)\("([^"]*)"[^"]*"searchAnime"/;
     const nextAction = searchJs.match(fuckYoNextActionBsRegex)?.[1];
     if (nextAction == null) return null;
 
-    const response = await fetch(url, {
+    const response = await soraFetch(url, {
         method: 'POST',
         headers: {
             "Accept": "text/x-component",
@@ -324,7 +324,7 @@ async function getStreamsViaExtraction(episodeId, origin) {
     const baseUrl = 'https://www.animeparadise.moe';
     const url = `${baseUrl}/watch/${episodeId}?origin=${origin}`;
 
-    const watchPageResponse = await fetch(url, { method: 'POST' });
+    const watchPageResponse = await soraFetch(url, { method: 'POST' });
     const watchPageHtml = await watchPageResponse.text();
 
     const fuckYoWatchPageRegex = /src="(\/_next\/static\/chunks\/app\/watch\/%5Bid%5D\/page-[^"]*.js)"/;
@@ -333,14 +333,14 @@ async function getStreamsViaExtraction(episodeId, origin) {
     // I don't even need this, why is the placeholder's only acceptable value the placeholder urlencoded, wtf am I looking at?
     // watchPageSrc = watchPageSrc.replace('%5Bid%5D', episodeId);
 
-    const watchJsResponse = await fetch(`${baseUrl}${watchPageSrc}`);
+    const watchJsResponse = await soraFetch(`${baseUrl}${watchPageSrc}`);
     const watchJs = await watchJsResponse.text();
 
     const fuckYoNextActionBsRegex = /createServerReference\)\("([^"]*)"[^"]*"getEpisode"/;
     const nextAction = watchJs.match(fuckYoNextActionBsRegex)?.[1];
     if (nextAction == null) return null;
 
-    const response = await fetch(url, {
+    const response = await soraFetch(url, {
         method: 'POST',
         headers: {
             "Accept": "text/x-component",
