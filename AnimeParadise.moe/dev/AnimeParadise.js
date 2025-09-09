@@ -95,7 +95,6 @@ async function searchResults(keyword) {
  * @returns {Promise<string>} A promise that resolves with a JSON string containing the details in the format: `[{"description": "Description", "aliases": "Aliases", "airdate": "Airdate"}]`
  */
 async function extractDetails(url) {
-    const REGEX = /style_specs_header_year.+?>.+([0-9]{4})[\s\S]+style_specs_container_middle.+?>([\s\S]+?)</g;
     if (url.startsWith('#')) {
         return JSON.stringify([{
             description: decodeURIComponent(url.slice(1)) + ' Please try again later.',
@@ -108,10 +107,17 @@ async function extractDetails(url) {
 
     try {
         var jsonData = JSON.parse(transferData);
+    } catch(e) {
+        console.log('Error in details parsing data: ' + e.message);
+        console.log(transferData);
+    }
+    
+    try {
         var anilistResult = await Anilist.lookup({ 'id': jsonData.anilistId });
     } catch(e) {
-        console.log('Error in details parsing data and getting anilist data: ' + e.message);
+        console.log('Error in details getting anilist data: ' + e.message);
     }
+    
 
     const data = anilistResult?.Page?.media?.[0];
 
@@ -175,8 +181,6 @@ async function extractEpisodes(url) {
  * @returns {Promise<string|null>} A promise that resolves with the stream URL if successful, or null if an error occurs during the fetch operation.
  */
 async function extractStreamUrl(url) {
-    const baseUrl = 'https://www.animeparadise.moe';
-
     try {
         const data = JSON.parse(url);
         return JSON.stringify({ stream: data.stream, subtitles: data.subtitles.find(sub => sub.type === 'vtt' && sub.label === 'English') });
