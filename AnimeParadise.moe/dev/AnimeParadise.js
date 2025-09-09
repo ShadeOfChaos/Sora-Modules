@@ -1,14 +1,14 @@
 //***** LOCAL TESTING
-(async () => {
-const results = await searchResults('Cowboy Bebop');
-// console.log('RESULTS: ', results);
-const details = await extractDetails(JSON.parse(results)[0].href);
-// console.log('DETAILS: ', details);
-const episodesa = await extractEpisodes(JSON.parse(results)[0].href);
-// console.log('EPISODES: ', episodesa);
-const streamUrl = await extractStreamUrl(JSON.parse(episodesa)[0].href);
-console.log('STREAMURL: ', streamUrl);
-})();
+// (async () => {
+// const results = await searchResults('Cowboy Bebop');
+// // console.log('RESULTS: ', results);
+// const details = await extractDetails(JSON.parse(results)[0].href);
+// // console.log('DETAILS: ', details);
+// const episodesa = await extractEpisodes(JSON.parse(results)[0].href);
+// // console.log('EPISODES: ', episodesa);
+// const streamUrl = await extractStreamUrl(JSON.parse(episodesa)[0].href);
+// console.log('STREAMURL: ', streamUrl);
+// })();
 //***** LOCAL TESTING
 
 async function areRequiredServersUp() {
@@ -53,7 +53,6 @@ async function areRequiredServersUp() {
 async function searchResults(keyword) {
     const BASE_URL = 'https://www.animeparadise.moe';
     const SEARCH_URL = 'https://www.animeparadise.moe/search?q=';
-    const REGEX = /a href="(\/anime\/[^"]+)[\s\S]+?src="([^"]+)[\s\S]+?div[\s\S]+?[\s\S]+?div[\s\S]+?>([^<]+)/g;
     var shows = [];
     const serversUp = await areRequiredServersUp();
 
@@ -68,34 +67,19 @@ async function searchResults(keyword) {
     const searchUrl = `${SEARCH_URL}${encodeURI(keyword)}`;
 
     try {
-        const response = await soraFetch(searchUrl);
-        const html = typeof response === 'object' ? await response.text() : await response;
+        const results = await getSearchResultsViaExtraction(searchUrl, keyword);
+        for (let result of results) {
+            const transferData = JSON.stringify({
+                episodeSlugs: result?.ep,
+                origin: result?._id,
+                anilistId: result?.mappings?.anilist
+            });
 
-        const matches = html.matchAll(REGEX);
-        if (matches?.length != null) {
-            for (let match of matches) {
-                shows.push({
-                    title: match[3],
-                    image: match[2],
-                    href: BASE_URL + match[1]
-                });
-            }
-
-        } else {
-            const results = await getSearchResultsViaExtraction(searchUrl, keyword);
-            for (let result of results) {
-                const transferData = JSON.stringify({
-                    episodeSlugs: result?.ep,
-                    origin: result?._id,
-                    anilistId: result?.mappings?.anilist
-                });
-
-                shows.push({
-                    title: result?.title,
-                    image: result?.posterImage?.large ?? result?.posterImage?.medium ?? result?.posterImage?.small ?? result?.posterImage?.original,
-                    href: '+' + BASE_URL + '/anime/' + result?.link + '|' + transferData
-                });
-            }
+            shows.push({
+                title: result?.title,
+                image: result?.posterImage?.large ?? result?.posterImage?.medium ?? result?.posterImage?.small ?? result?.posterImage?.original,
+                href: BASE_URL + '/anime/' + result?.link + '|' + transferData
+            });
         }
 
         return JSON.stringify(shows);
@@ -119,60 +103,31 @@ async function extractDetails(url) {
             airdate: ''
         }]);
     }
-    if (url.startsWith('+')) {
-        const transferData = url.split('|')[1];
-        const jsonData = JSON.parse(transferData);
 
-        const anilistResult = await Anilist.lookup({ 'id': jsonData.anilistId });
-        const data = anilistResult?.Page?.media?.[0];
-
-        if (data == null) {
-            return JSON.stringify([{
-                description: 'Error loading description',
-                aliases: 'Duration: Unknown',
-                airdate: 'Aired: Unknown'
-            }]);
-        }
-
-        return JSON.stringify([{
-            description: data?.description,
-            aliases: data?.title?.english,
-            airdate: Anilist.convertAnilistDateToDateStr(data?.startDate)
-        }]);
-    }
+    const transferData = url.split('|')[1];
 
     try {
-        const response = await soraFetch(url);
-        const html = typeof response === 'object' ? await response.text() : await response;
+        var jsonData = JSON.parse(transferData);
+        var anilistResult = await Anilist.lookup({ 'id': jsonData.anilistId });
+    } catch(e) {
+        console.log('Error in details parsing data and getting anilist data: ' + e.message);
+    }
 
-        const json = getNextData(html);
-        if (json == null) throw new Error('Error parsing NEXT_DATA json');
+    const data = anilistResult?.Page?.media?.[0];
 
-        const data = json?.props?.pageProps?.data;
-        if (data == null) throw new Error('Error obtaining data');
-
-        let aliasArray = data?.synonyms;
-        if (aliasArray != null && aliasArray.length > 5) {
-            aliasArray = aliasArray.slice(0, 5);
-        }
-        const aliases = aliasArray.join(', ');
-
-        const details = {
-            description: data?.synopsys,
-            aliases: aliases,
-            airdate: data?.animeSeason?.season + ' ' + data?.animeSeason?.year
-        }
-
-        return JSON.stringify([details]);
-
-    } catch (error) {
-        console.log('Details error: ' + error.message);
+    if (data == null) {
         return JSON.stringify([{
             description: 'Error loading description',
             aliases: 'Duration: Unknown',
             airdate: 'Aired: Unknown'
         }]);
     }
+
+    return JSON.stringify([{
+        description: data?.description,
+        aliases: data?.title?.english,
+        airdate: Anilist.convertAnilistDateToDateStr(data?.startDate)
+    }]);
 }
 
 /**
@@ -182,56 +137,32 @@ async function extractDetails(url) {
  * If an error occurs during the fetch operation, an empty array is returned in JSON format.
  */
 async function extractEpisodes(url) {
-    const BASE_URL = 'https://www.animeparadise.moe/watch/';
-    if (url.startsWith('+')) {
-        var transferData = url.split('|')[1];
-        var jsonData = JSON.parse(transferData);
-        var url = url.split('|')[0].slice(1);
-    }
+    var transferData = url.split('|')[1];
+    var jsonData = JSON.parse(transferData);
+    var url = url.split('|')[0].slice(1);
 
     try {
         if (url.startsWith('#')) throw new Error('Host down but still attempted to get episodes');
 
-        const response = await soraFetch(url);
-        const html = typeof response === 'object' ? await response.text() : await response;
         var episodes = [];
 
-        const json = getNextData(html);
-        if (json != null) {
-            url = url.split('|')[0].slice(1);
+        const streamsJson = await getStreamsViaExtraction(jsonData.episodeSlugs[0], jsonData.origin);
+        if (streamsJson == null) return null;
 
-            const origin = json?.props?.pageProps?.data?._id;
+        for (let stream of streamsJson.episodeList) {
+            const transferStream = JSON.stringify({
+                stream: stream.streamLink ?? stream?.streamLinkBackup,
+                subtitles: stream?.subData
+            });
 
-            const episodesList = json?.props?.pageProps?.data?.ep;
-            if (episodesList == null) throw new Error('Error obtaining episodes');
-
-            for (let i = 0, len = episodesList.length; i < len; i++) {
-                let url = `${BASE_URL}${episodesList[i]}?origin=${origin}`;
-
-                episodes.push({
-                    href: url,
-                    number: i + 1
-                })
-            }
-        } else {
-            const streamsJson = await getStreamsViaExtraction(jsonData.episodeSlugs[0], jsonData.origin);
-            if (streamsJson == null) return null;
-
-            for (let stream of streamsJson.episodeList) {
-                const transferStream = JSON.stringify({
-                    stream: stream.streamLink ?? stream?.streamLinkBackup,
-                    subtitles: stream?.subData
-                });
-
-                episodes.push({
-                    href: transferStream,
-                    number: stream.number
-                });
-            }
+            episodes.push({
+                href: transferStream,
+                number: stream.number
+            });
         }
 
-
         return JSON.stringify(episodes);
+
     } catch (error) {
         console.log('Fetch error: ' + error.message);
         return JSON.stringify([]);
@@ -246,37 +177,12 @@ async function extractEpisodes(url) {
 async function extractStreamUrl(url) {
     const baseUrl = 'https://www.animeparadise.moe';
 
-    if (url.startsWith('{')) {
+    try {
         const data = JSON.parse(url);
         return JSON.stringify({ stream: data.stream, subtitles: data.subtitles.find(sub => sub.type === 'vtt' && sub.label === 'English') });
-    }
 
-    try {
-        const response = await soraFetch(url);
-        const html = typeof response === 'object' ? await response.text() : await response;
-
-        const json = getNextData(html);
-        if (json == null) throw new Error('Error parsing NEXT_DATA json, no new method found');
-
-        const streamUrl = json?.props?.pageProps?.episode?.streamLink;
-        const subtitles = json?.props?.pageProps?.episode?.subData.find(sub => sub.type === 'vtt' && sub.label === 'English');
-
-        return JSON.stringify({ stream: streamUrl, subtitles: subtitles?.src });
-
-    } catch (e) {
-        console.log('Error extracting stream: ' + e.message);
-        return JSON.stringify({ stream: null, subtitles: null });
-    }
-}
-
-function getNextData(html) {
-    const trimmedHtml = trimHtml(html, '__NEXT_DATA__', '</script>');
-    const jsonString = trimmedHtml.slice(39);
-
-    try {
-        return JSON.parse(jsonString);
-    } catch (e) {
-        console.log('Error parsing NEXT_DATA json');
+    } catch(e) {
+        console.log('Failed to parse streams json.');
         return null;
     }
 }
@@ -361,13 +267,6 @@ async function getStreamsViaExtraction(episodeId, origin) {
     }
 
     return json;
-}
-
-// Trims around the content, leaving only the area between the start and end string
-function trimHtml(html, startString, endString) {
-    const startIndex = html.indexOf(startString);
-    const endIndex = html.indexOf(endString, startIndex);
-    return html.substring(startIndex, endIndex);
 }
 
 async function soraFetch(url, options = { headers: {}, method: 'GET', body: null }) {
