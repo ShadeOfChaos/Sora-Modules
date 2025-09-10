@@ -1,3 +1,16 @@
+//***** LOCAL TESTING
+(async () => {
+const results = await searchResults('Cowboy Bebop');
+// console.log('RESULTS: ', results);
+const details = await extractDetails(JSON.parse(results)[0].href);
+// console.log('DETAILS: ', details);
+const episodesa = await extractEpisodes(JSON.parse(results)[0].href);
+// console.log('EPISODES: ', episodesa);
+const streamUrl = await extractStreamUrl(JSON.parse(episodesa)[0].href);
+console.log('STREAMURL: ', streamUrl);
+})();
+//***** LOCAL TESTING
+
 async function areRequiredServersUp() {
     const requiredHosts = ['https://www.animeparadise.moe', 'https://asura.ofchaos.com'];
 
@@ -38,7 +51,7 @@ async function areRequiredServersUp() {
  * @returns {Promise<string>} A promise that resolves with a JSON string containing the search results in the format: `[{"title": "Title", "image": "Image URL", "href": "URL"}, ...]`
  */
 async function searchResults(keyword) {
-    const ANIME_URL = 'https://www.animeparadise.moe/anime/';
+    const BASE_URL = 'https://www.animeparadise.moe';
     const SEARCH_URL = 'https://www.animeparadise.moe/search?q=';
     var shows = [];
     const serversUp = await areRequiredServersUp();
@@ -55,41 +68,23 @@ async function searchResults(keyword) {
     const animesWithSubtitles = await GetAnimes();
 
     try {
-        const response = await soraFetch(searchUrl);
-        const html = typeof response === 'object' ? await response.text() : await response;
-
-        const json = getNextData(html);
-        const data = json?.props?.pageProps?.data;
-        if (data != null) {
-            for (let entry of data) {
-                if (!animesWithSubtitles.includes(entry.mappings.anilist)) {
-                    continue;
-                }
-                shows.push({
-                    title: entry.title,
-                    image: entry.posterImage.original,
-                    href: ANIME_URL + entry.link + '|' + transferData
-                });
+        const results = await getSearchResultsViaExtraction(searchUrl, keyword);
+        for (let result of results) {
+            if (!animesWithSubtitles.includes(result?.mappings?.anilist)) {
+                continue;
             }
-        } else {
-            const results = await getSearchResultsViaExtraction(searchUrl, keyword);
-            for (let result of results) {
-                if (!animesWithSubtitles.includes(result?.mappings?.anilist)) {
-                    continue;
-                }
 
-                const transferData = JSON.stringify({
-                    episodeSlugs: result?.ep,
-                    origin: result?._id,
-                    anilistId: result?.mappings?.anilist
-                });
+            const transferData = JSON.stringify({
+                episodeSlugs: result?.ep,
+                origin: result?._id,
+                anilistId: result?.mappings?.anilist
+            });
 
-                shows.push({
-                    title: result?.title,
-                    image: result?.posterImage?.large ?? result?.posterImage?.medium ?? result?.posterImage?.small ?? result?.posterImage?.original,
-                    href: '+' + ANIME_URL + result?.link + '|' + transferData
-                });
-            }
+            shows.push({
+                title: result?.title,
+                image: result?.posterImage?.large ?? result?.posterImage?.medium ?? result?.posterImage?.small ?? result?.posterImage?.original,
+                href: BASE_URL + '/anime/' + result?.link + '|' + transferData
+            });
         }
 
         return JSON.stringify(shows);
@@ -104,8 +99,11 @@ async function searchResults(keyword) {
  * @param {string} url The id required to fetch the details
  * @returns {Promise<string>} A promise that resolves with a JSON string containing the details in the format: `[{"description": "Description", "aliases": "Aliases", "airdate": "Airdate"}]`
  */
-async function extractDetails(url) {
-    const REGEX = /style_specs_header_year.+?>.+([0-9]{4})[\s\S]+style_specs_container_middle.+?>([\s\S]+?)</g;
+async function extractDetails(objString) {
+    const encodedDelimiter = '|';
+    const [url, jsonString] = decodeURIComponent(objString).split(encodedDelimiter);
+    const jsonData = JSON.parse(jsonString || '{}');
+    
     if (url.startsWith('#')) {
         return JSON.stringify([{
             description: decodeURIComponent(url.slice(1)) + ' Please try again later.',
@@ -113,60 +111,28 @@ async function extractDetails(url) {
             airdate: ''
         }]);
     }
-    if (url.startsWith('+')) {
-        const transferData = url.split('|')[1];
-        const jsonData = JSON.parse(transferData);
-
-        const anilistResult = await Anilist.lookup({ 'id': jsonData.anilistId });
-        const data = anilistResult?.Page?.media?.[0];
-
-        if (data == null) {
-            return JSON.stringify([{
-                description: 'Error loading description',
-                aliases: 'Duration: Unknown',
-                airdate: 'Aired: Unknown'
-            }]);
-        }
-
-        return JSON.stringify([{
-            description: data?.description,
-            aliases: data?.title?.english,
-            airdate: Anilist.convertAnilistDateToDateStr(data?.startDate)
-        }]);
+    
+    try {
+        var anilistResult = await Anilist.lookup({ 'id': jsonData.anilistId });
+    } catch(e) {
+        console.log('Error in details getting anilist data: ' + e.message);
     }
 
-    try {
-        const response = await soraFetch(url);
-        const html = typeof response === 'object' ? await response.text() : await response;
+    const data = anilistResult?.Page?.media?.[0];
 
-        const json = getNextData(html);
-        if (json == null) throw new Error('Error parsing NEXT_DATA json');
-
-        const data = json?.props?.pageProps?.data;
-        if (data == null) throw new Error('Error obtaining data');
-
-        let aliasArray = data?.synonyms;
-        if (aliasArray != null && aliasArray.length > 5) {
-            aliasArray = aliasArray.slice(0, 5);
-        }
-        const aliases = aliasArray.join(', ');
-
-        const details = {
-            description: data?.synopsys,
-            aliases: aliases,
-            airdate: data?.animeSeason?.season + ' ' + data?.animeSeason?.year
-        }
-
-        return JSON.stringify([details]);
-
-    } catch (error) {
-        console.log('Details error: ' + error.message);
+    if (data == null) {
         return JSON.stringify([{
             description: 'Error loading description',
             aliases: 'Duration: Unknown',
             airdate: 'Aired: Unknown'
         }]);
     }
+
+    return JSON.stringify([{
+        description: data?.description,
+        aliases: data?.title?.english,
+        airdate: Anilist.convertAnilistDateToDateStr(data?.startDate)
+    }]);
 }
 
 /**
@@ -175,72 +141,41 @@ async function extractDetails(url) {
  * @returns {Promise<string>} A promise that resolves with a JSON string containing the episodes in the format: `[{ "href": "Episode URL", "number": Episode Number }, ...]`.
  * If an error occurs during the fetch operation, an empty array is returned in JSON format.
  */
-async function extractEpisodes(url) {
-    const BASE_URL = 'https://www.animeparadise.moe/watch/';
-    if (url.startsWith('+')) {
-        var transferData = url.split('|')[1];
-        var jsonData = JSON.parse(transferData);
-        var url = url.split('|')[0].slice(1);
-    }
+async function extractEpisodes(objString) {
+    const encodedDelimiter = '|';
+    const [url, jsonString] = decodeURIComponent(objString).split(encodedDelimiter);
+    const jsonData = JSON.parse(jsonString || '{}');
 
     try {
         if (url.startsWith('#')) throw new Error('Host down but still attempted to get episodes');
 
-        const response = await soraFetch(url);
-        const html = typeof response === 'object' ? await response.text() : await response;
         var episodes = [];
 
-        const json = getNextData(html);
-        if (json != null) {
-            url = url.split('|')[0].slice(1);
+        const streamsJson = await getStreamsViaExtraction(jsonData.episodeSlugs[0], jsonData.origin);
+        if (streamsJson == null) return null;
 
-            const origin = json?.props?.pageProps?.data?._id;
+        const episodesWithSubtitlesJson = await GetEpisodes(jsonData.anilistId);
+        const episodesWithSubtitles = episodesWithSubtitlesJson.map((entry) => entry?.episode);
 
-            const episodesList = json?.props?.pageProps?.data?.ep;
-            if (episodesList == null) throw new Error('Error obtaining episodes');
-
-            const episodesWithSubtitlesJson = await GetEpisodes(json.props.pageProps.data?.mappings?.anilist);
-            const episodesWithSubtitles = episodesWithSubtitlesJson.map((entry) => entry?.episode);
-
-            for (let i = 1, len = episodesList.length; i <= len; i++) {
-                if (!episodesWithSubtitles.includes(i)) {
-                    continue;
-                }
-
-                let url = `${BASE_URL}${episodesList[i]}?origin=${origin}`;
-
-                episodes.push({
-                    href: url,
-                    number: i
-                })
+        for (let stream of streamsJson.episodeList) {
+            if (!episodesWithSubtitles.includes(parseInt(stream.number))) {
+                continue;
             }
-        } else {
-            const streamsJson = await getStreamsViaExtraction(jsonData.episodeSlugs[0], jsonData.origin);
-            if (streamsJson == null) return null;
 
-            const episodesWithSubtitlesJson = await GetEpisodes(jsonData.anilistId);
-            const episodesWithSubtitles = episodesWithSubtitlesJson.map((entry) => entry?.episode);
+            const transferStream = JSON.stringify({
+                stream: stream.streamLink ?? stream?.streamLinkBackup,
+                anilistId: jsonData.anilistId,
+                number: parseInt(stream.number)
+            });
 
-            for (let stream of streamsJson.episodeList) {
-                if (!episodesWithSubtitles.includes(parseInt(stream.number))) {
-                    continue;
-                }
-                
-                const transferStream = JSON.stringify({
-                    stream: stream.streamLink ?? stream?.streamLinkBackup,
-                    anilistId: jsonData.anilistId,
-                    number: stream.number
-                });
-
-                episodes.push({
-                    href: transferStream,
-                    number: stream.number
-                });
-            }
+            episodes.push({
+                href: transferStream,
+                number: parseInt(stream.number)
+            });
         }
 
-
         return JSON.stringify(episodes);
+
     } catch (error) {
         console.log('Fetch error: ' + error.message);
         return JSON.stringify([]);
@@ -249,45 +184,16 @@ async function extractEpisodes(url) {
 
 /**
  * Extracts the stream URL from the given url, using a utility function on ac-api.ofchaos.com.
- * @param {string} url - The url to extract the stream URL from.
+ * @param {string} objString - The url to extract the stream URL from.
  * @returns {Promise<string|null>} A promise that resolves with the stream URL if successful, or null if an error occurs during the fetch operation.
  */
-async function extractStreamUrl(url) {
-    const baseUrl = 'https://www.animeparadise.moe';
-
-    if (url.startsWith('{')) {
-        const data = JSON.parse(url);
+async function extractStreamUrl(objString) {
+    try {
+        const data = JSON.parse(objString);
         const subtitles = GetSubtitles(data.anilistId, data.number);
         return JSON.stringify({ stream: data.stream, subtitles: subtitles });
-    }
-
-    try {
-        const response = await soraFetch(url);
-        const html = typeof response === 'object' ? await response.text() : await response;
-
-        const json = getNextData(html);
-        if (json == null) throw new Error('Error parsing NEXT_DATA json');
-
-        const streamUrl = json?.props?.pageProps?.episode?.streamLink;
-        const subtitles = GetSubtitles(json.props.pageProps?.animeData?.mappings?.anilist, json.props.pageProps.episode?.number);
-        if (subtitles == null) throw new Error('Invalid data while attempting to get subtitles');
-
-        return JSON.stringify({ stream: streamUrl, subtitles: subtitles });
-
-    } catch (error) {
-        console.log('Error extracting stream url: ' + error.message);
-        return JSON.stringify({ stream: null, subtitles: null });
-    }
-}
-
-function getNextData(html) {
-    const trimmedHtml = trimHtml(html, '__NEXT_DATA__', '</script>');
-    const jsonString = trimmedHtml.slice(39);
-
-    try {
-        return JSON.parse(jsonString);
-    } catch (e) {
-        console.log('Error parsing NEXT_DATA json');
+    } catch(e) {
+        console.log('Failed to parse streams json.');
         return null;
     }
 }
@@ -430,13 +336,6 @@ async function getStreamsViaExtraction(episodeId, origin) {
     }
 
     return json;
-}
-
-// Trims around the content, leaving only the area between the start and end string
-function trimHtml(html, startString, endString) {
-    const startIndex = html.indexOf(startString);
-    const endIndex = html.indexOf(endString, startIndex);
-    return html.substring(startIndex, endIndex);
 }
 
 async function soraFetch(url, options = { headers: {}, method: 'GET', body: null }) {

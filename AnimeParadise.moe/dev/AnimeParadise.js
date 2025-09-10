@@ -1,14 +1,14 @@
 //***** LOCAL TESTING
-(async () => {
-const results = await searchResults('Cowboy Bebop');
-// console.log('RESULTS: ', results);
-const details = await extractDetails(JSON.parse(results)[0].href);
-// console.log('DETAILS: ', details);
-const episodesa = await extractEpisodes(JSON.parse(results)[0].href);
-// console.log('EPISODES: ', episodesa);
-const streamUrl = await extractStreamUrl(JSON.parse(episodesa)[0].href);
-console.log('STREAMURL: ', streamUrl);
-})();
+// (async () => {
+// const results = await searchResults('Cowboy Bebop');
+// // console.log('RESULTS: ', results);
+// const details = await extractDetails(JSON.parse(results)[0].href);
+// // console.log('DETAILS: ', details);
+// const episodesa = await extractEpisodes(JSON.parse(results)[0].href);
+// // console.log('EPISODES: ', episodesa);
+// const streamUrl = await extractStreamUrl(JSON.parse(episodesa)[0].href);
+// console.log('STREAMURL: ', streamUrl);
+// })();
 //***** LOCAL TESTING
 
 async function areRequiredServersUp() {
@@ -106,15 +106,6 @@ async function extractDetails(objString) {
             airdate: ''
         }]);
     }
-
-    // const transferData = url.split('|')[1];
-
-    // try {
-    //     var jsonData = JSON.parse(transferData);
-    // } catch(e) {
-    //     console.log('Error in details parsing data: ' + e.message);
-    //     console.log(transferData);
-    // }
     
     try {
         var anilistResult = await Anilist.lookup({ 'id': jsonData.anilistId });
@@ -150,10 +141,6 @@ async function extractEpisodes(objString) {
     const [url, jsonString] = decodeURIComponent(objString).split(encodedDelimiter);
     const jsonData = JSON.parse(jsonString || '{}');
 
-    // var transferData = url.split('|')[1];
-    // var jsonData = JSON.parse(transferData);
-    // var url = url.split('|')[0].slice(1);
-
     try {
         if (url.startsWith('#')) throw new Error('Host down but still attempted to get episodes');
 
@@ -184,12 +171,12 @@ async function extractEpisodes(objString) {
 
 /**
  * Extracts the stream URL from the given url, using a utility function on ac-api.ofchaos.com.
- * @param {string} url - The url to extract the stream URL from.
+ * @param {string} objString - The url to extract the stream URL from.
  * @returns {Promise<string|null>} A promise that resolves with the stream URL if successful, or null if an error occurs during the fetch operation.
  */
-async function extractStreamUrl(url) {
+async function extractStreamUrl(objString) {
     try {
-        const data = JSON.parse(url);
+        const data = JSON.parse(objString);
         return JSON.stringify({ stream: data.stream, subtitles: data.subtitles.find(sub => sub.type === 'vtt' && sub.label === 'English')?.src });
 
     } catch(e) {
