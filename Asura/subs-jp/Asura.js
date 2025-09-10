@@ -45,8 +45,7 @@ async function searchResults(keyword) {
                 mergedResults = mergedResults.concat(result.value);
             }
         }
-        
-
+    
         return JSON.stringify(mergedResults);
     });
 }
@@ -57,17 +56,21 @@ async function searchResults(keyword) {
  * @returns {Promise<string>} A promise that resolves with a JSON string containing the details in the format: `[{"description": "Description", "aliases": "Aliases", "airdate": "Airdate"}]`
  */
 async function extractDetails(objString) {
-    const encodedDelimiter = encodeURIComponent('|');
-    let json = {};
-    [json.url, json.origin, json.anilistId, json.detailsUrl, json.episodesUrl] = objString.split(encodedDelimiter);
+    const encodedDelimiter = '|';
+    const [url, jsonString] = decodeURIComponent(objString).split(encodedDelimiter);
+    try {
+        var json = JSON.parse(jsonString);
+    } catch(e) {
+        console.log('Error parsing transferdata in details: ' + e.message);
+    }
 
     try {
-        if(json?.detailsUrl == 'https://graphql.anilist.co') {
+        if(json?.source == 'AnimeParadise') {
             const result = await getDetailsFromAnilist(json.anilistId);
             return result;
         }
 
-        if(json?.origin == 'AniCrush') {
+        if(json?.source == 'AniCrush') {
             const result = await getDetailsFromAniCrush(json.detailsUrl);
             return result;
         }
@@ -89,20 +92,24 @@ async function extractDetails(objString) {
  * If an error occurs during the fetch operation, an empty array is returned in JSON format.
  */
 async function extractEpisodes(objString) {
-    const encodedDelimiter = encodeURIComponent('|');
-    let json = {};
-    [json.url, json.origin, json.anilistId, json.detailsUrl, json.episodesUrl] = objString.split(encodedDelimiter);
+    const encodedDelimiter = '|';
+    const [url, jsonString] = decodeURIComponent(objString).split(encodedDelimiter);
+    try {
+        var json = JSON.parse(jsonString);
+    } catch(e) {
+        console.log('Error parsing transferdata in details: ' + e.message);
+    }
 
     try {
-        if(json?.episodesUrl == null) {
+        if(json?.episodesUrl == null && (json?.episodeSlugs == null || json?.episodeSlugs?.length == 0)) {
             throw new Error('No episodes found');
         }
 
-        if(json?.origin == 'AnimeParadise') {
+        if(json?.source == 'AnimeParadise') {
             return await extractEpisodesFromAnimeParadise(json);
         }
 
-        if(json?.origin == 'AniCrush') {
+        if(json?.source == 'AniCrush') {
             return await extractEpisodesFromAniCrush(json);
         }
 
@@ -118,64 +125,30 @@ async function extractEpisodes(objString) {
  * @returns {Promise<string|null>} A promise that resolves with the stream URL if successful, or null if an error occurs during the fetch operation.
  */
 async function extractStreamUrl(objString) {
-    const delimiter = '|';
-    const [url, anilistId] = objString.split(delimiter);
+    const encodedDelimiter = '|';
+    const [url, jsonString] = decodeURIComponent(objString).split(encodedDelimiter);
+    try {
+        var json = JSON.parse(jsonString);
+        json.url = url;
+    } catch(e) {
+        console.log('Error parsing transferdata in details: ' + e.message);
+    }
 
     try {
-        if(url == null || anilistId == null) {
-            throw new Error('No data returned from Sora in extractStreamUrl');
+        if(json.source == 'AnimeParadise') {
+            return await extractStreamUrlFromAnimeParadise(json);
         }
 
-        if(url.startsWith('https://www.animeparadise.moe')) {
-            return await extractStreamUrlFromAnimeParadise(url, anilistId);
+        if(json.source == 'AniCrush') {
+            return await extractStreamUrlFromAniCrush(json);
         }
 
-        if(url.startsWith('https://api.anicrush.to')) {
-            return await extractStreamUrlFromAniCrush(url, anilistId);
-        }
-
-        throw new Error('Failed to extract stream URL from: ' + url);
+        throw new Error('Failed to extract stream from available sources');
 
     } catch(error) {
         console.log('[ASURA][extractStreamUrl] Stream URL error: ' + error?.message);
         return JSON.stringify({ stream: null, subtitles: null });
     }
-}
-
-/**
- * Extracts and parses the JSON data from the given HTML string from AnimeParadise.moe.
- * 
- * The function searches for the JSON data within the HTML content
- * that is wrapped between the '__NEXT_DATA__' and '</script>' tags,
- * trims the HTML to extract the JSON string, and then parses it into
- * an object.
- * 
- * @param {string} html - The HTML content containing the JSON data.
- * @returns {Object|null} The parsed JSON object if successful, or null if an error occurs during parsing.
- */
-function getNextData(html) {
-    const trimmedHtml = trimHtml(html, '__NEXT_DATA__', '</script>');
-    const jsonString = trimmedHtml.slice(39);
-
-    try {
-        return JSON.parse(jsonString);
-    } catch (e) {
-        console.log('[ASURA][getNextData] Error parsing NEXT_DATA json');
-        return null;
-    }
-}
-
-/**
- * Trims around the content, leaving only the area between the start and end string
- * @param {string} html The text to trim
- * @param {string} startString The string to start at (inclusive)
- * @param {string} endString The string to end at (exclusive)
- * @returns The trimmed text
- */
-function trimHtml(html, startString, endString) {
-    const startIndex = html.indexOf(startString);
-    const endIndex = html.indexOf(endString, startIndex);
-    return html.substring(startIndex, endIndex);
 }
 
 /**
@@ -190,7 +163,6 @@ function trimHtml(html, startString, endString) {
  * It expects a successful response with a non-null result array.
  * Any errors during the fetch or parsing are caught and logged, returning an empty array.
  */
-
 async function GetAnimes() {
     const baseUrl = 'https://asura.ofchaos.com/api/anime';
     const referer = 'SoraApp';
@@ -206,38 +178,6 @@ async function GetAnimes() {
 
     } catch(error) {
         console.log('[ASURA][GetAnimes] Error: ' + error?.message);
-        return [];
-    }
-}
-
-
-/**
- * Retrieves the episodes for the given Anilist ID
- * @param {number} anilistId - The Anilist ID of the anime to retrieve episodes for
- * @returns {Promise<Array<Object>>} A promise that resolves with an array of episode objects with the following properties:
- * - `number`: The episode number
- * - `href`: The URL to fetch the episode from
- */
-async function GetEpisodes(anilistId) {
-    if(anilistId == null || isNaN(parseInt(anilistId))) {
-        return [];
-    }
-
-    const baseUrl = 'https://asura.ofchaos.com/api/anime';
-    const referer = 'SoraApp';
-
-    try {
-        const response = await soraFetch(`${ baseUrl }/${ anilistId }`, { headers: { 'Referer': referer } });
-        const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
-
-        if(json == null)                 throw new Error('Error parsing Asura json');
-        if(json?.success !== true)       throw new Error(json?.error);
-        if(json?.result?.length == null) throw new Error('Error obtaining data from Asura API');
-
-        return json?.result;
-
-    } catch(error) {
-        console.log('[ASURA][GetEpisodes] Error: ' + error?.message);
         return [];
     }
 }
@@ -295,25 +235,30 @@ async function soraFetch(url, options = { headers: {}, method: 'GET', body: null
  * @returns {Promise<AnimeSearchResult[]>} A promise that resolves with a list of AnimeSearchResults
  */
 async function animeParadiseSearch(keyword, asuraList = []) {
-    const ANIME_URL = 'https://www.animeparadise.moe/anime/';
-    const SEARCH_URL = 'https://api.animeparadise.moe/search?q='
+    const BASE_URL = 'https://www.animeparadise.moe';
+    const SEARCH_URL = 'https://www.animeparadise.moe/search?q=';
     let shows = [];
 
-    try {
-        const response = await soraFetch(`${SEARCH_URL}${encodeURI(keyword)}`);
-        const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
+    const searchUrl = `${SEARCH_URL}${encodeURI(keyword)}`;
 
-        for(let entry of json?.data) {
-            if(!asuraList.includes(entry.mappings.anilist)) {
+    try {
+        const results = await getSearchResultsViaExtraction(searchUrl, keyword);
+        for (let result of results) {
+            if (!asuraList.includes(result?.mappings?.anilist)) {
                 continue;
             }
 
-            // Href value:
-            // [url, origin, anilistId, detatilsUrl, episodesUrl]
+            const transferData = JSON.stringify({
+                source: "AnimeParadise",
+                anilistId: result?.mappings?.anilist,
+                episodeSlugs: result?.ep,
+                origin: result?._id
+            });
+
             shows.push({
-                title: '[AP] ' + entry.title,
-                image: entry.posterImage.original,
-                href: `${ ANIME_URL }${ entry.link }|AnimeParadise|${ entry.mappings.anilist }|https://graphql.anilist.co|https://api.animeparadise.moe/anime/${ entry._id }/episode`
+                title: '[AP] ' + result?.title,
+                image: result?.posterImage?.large ?? result?.posterImage?.medium ?? result?.posterImage?.small ?? result?.posterImage?.original,
+                href: `${BASE_URL}/anime/${ result?.link }|${transferData}`,
             });
         }
 
@@ -357,12 +302,17 @@ async function aniCrushSearch(keyword, asuraList = []) {
 
             const href = `${ BASE_URL }/watch/${ entry.slug }.${ entry.id }`;
 
-            // Href value:
-            // [url, origin, anilistId, detatilsUrl, episodesUrl]
+            const transferData = JSON.stringify({
+                source: "AniCrush",
+                anilistId: entry.anilistId,
+                detailsUrl: `https://api.anicrush.to/shared/v2/movie/getById/${ entry.id }`,
+                episodesUrl: `https://api.anicrush.to/shared/v2/episode/list?_movieId=${ entry.id }`
+            });
+
             shows.push({
                 title: '[AC] ' + entry.name,
                 image: getAniCrushImage(entry.poster_path),
-                href: `${ href }|AniCrush|${ entry.anilistId }|https://api.anicrush.to/shared/v2/movie/getById/${ entry.id }|https://api.anicrush.to/shared/v2/episode/list?_movieId=${ entry.id }`
+                href: `${href}|${transferData}`
             });
         }
 
@@ -444,12 +394,12 @@ async function getDetailsFromAnilist(anilistId) {
                 "Content-Type": "application/json",
                 "Accept": "application/json"
             },
-            body: {
+            body: JSON.stringify({
                 query: query,
                 variables: {
                     "id": anilistId
                 }
-            }
+            })
         });
         const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
@@ -514,22 +464,26 @@ async function getDetailsFromAniCrush(detailsUrl) {
  * If an error occurs during the fetch operation, an empty array is returned in JSON format.
  */
 async function extractEpisodesFromAnimeParadise(json) {
-    const BASE_URL = 'https://www.animeparadise.moe/watch/';
-
     try {
-        const response = await soraFetch(json.episodesUrl);
-        const data = typeof response === 'object' ? await response.json() : await JSON.parse(response);
+        var episodes = [];
 
-        if(data?.data == null) {
-            throw new Error('Error retrieving AnimeParadise episodes json');
+        const streamsJson = await getStreamsViaExtraction(json.episodeSlugs[0], json.origin);
+        if (streamsJson == null) return null;
+
+        for (let stream of streamsJson.episodeList) {
+
+            const transferStream = JSON.stringify({
+                source: "AnimeParadise",
+                stream: stream.streamLink ?? stream?.streamLinkBackup,
+                anilistId: json.anilistId,
+                number: parseInt(stream.number)
+            });
+
+            episodes.push({
+                href: `https://animeparadise.moe/|${ transferStream }`,
+                number: parseInt(stream.number)
+            });
         }
-
-        const episodes = data?.data.map(ep => {
-            return {
-                href: `${ BASE_URL }${ ep.uid }?origin=${ ep.origin }|${ json.anilistId }`,
-                number: parseInt(ep.number)
-            }
-        });
 
         return JSON.stringify(episodes);
 
@@ -564,8 +518,14 @@ async function extractEpisodesFromAniCrush(json) {
 
         for(let episodeList in data.result) {
             for(let episode of data.result[episodeList]) {
+
+                const transferData = JSON.stringify({
+                    source: "AniCrush",
+                    anilistId: json.anilistId
+                });
+
                 episodes.push({
-                    href: `${ SOURCE_API_URL }/episode/sources?_movieId=${ movieId }&ep=${ episode.number }&sv=${ serverId }&sc=${ format }|${ json.anilistId }`,
+                    href: `${ SOURCE_API_URL }/episode/sources?_movieId=${ movieId }&ep=${ episode.number }&sv=${ serverId }&sc=${ format }|${ transferData }`,
                     number: parseInt(episode.number)
                 });
             }
@@ -585,18 +545,11 @@ async function extractEpisodesFromAniCrush(json) {
  * @param {number} anilistId - The Anilist ID of the anime.
  * @returns {Promise<string|null>} A promise that resolves with the stream URL if successful, or null if an error occurs during the fetch operation.
  */
-async function extractStreamUrlFromAnimeParadise(url, anilistId) {
+async function extractStreamUrlFromAnimeParadise(json) {
     try {
-        const response = await soraFetch(url);
-        const html = typeof response === 'object' ? await response.text() : await response;
+        const subtitles = GetSubtitles(json.anilistId, json.number);
 
-        const json = getNextData(html);
-        if (json == null) throw new Error('Error parsing NEXT_DATA json');
-
-        const streamUrl = json?.props?.pageProps?.episode?.streamLink;
-        const subtitles = GetSubtitles(json.props.pageProps?.animeData?.mappings?.anilist, json.props.pageProps.episode?.number);
-
-        return JSON.stringify({ stream: streamUrl, subtitles: subtitles });
+        return JSON.stringify({ stream: json.stream, subtitles: subtitles });
 
     } catch (error) {
         console.log('[ASURA][extractStreamUrlFromAnimeParadise] Error extracting stream url: ' + error?.message);
@@ -606,19 +559,23 @@ async function extractStreamUrlFromAnimeParadise(url, anilistId) {
 
 /**
  * Extracts the stream URL from the given url, using a utility function on ac-api.ofchaos.com.
- * @param {string} url - The url to extract the stream URL from.
- * @param {number} anilistId - The Anilist ID of the anime.
+ * @param {string} json.url - The url to extract the stream URL from.
+ * @param {number} json.anilistId - The Anilist ID of the anime.
  * @returns {Promise<string|null>} A promise that resolves with the stream URL if successful, or null if an error occurs during the fetch operation.
  */
-async function extractStreamUrlFromAniCrush(url, anilistId) {
+async function extractStreamUrlFromAniCrush(json) {
     const SOURCE_BASE_URL = "https://anicrush.to";
     const UTILITY_URL = "https://ac-api.ofchaos.com";
 
     try {
-        const epIndex = url.indexOf('ep=') + 3;
-        const ep = url.substring(epIndex, url.indexOf('&', epIndex));
+        if(json.url == null || json.anilistId == null) {
+            throw new Error('No data returned from Sora in extractStreamUrl');
+        }
 
-        const sourceResponse = await soraFetch(url, { headers: GetAniCrushHeaders() });
+        const epIndex = json.url.indexOf('ep=') + 3;
+        const ep = json.url.substring(epIndex, json.url.indexOf('&', epIndex));
+
+        const sourceResponse = await soraFetch(json.url, { headers: GetAniCrushHeaders() });
         const sourceData = typeof sourceResponse === 'object' ? await sourceResponse.json() : await JSON.parse(sourceResponse);
 
         if(
@@ -632,7 +589,7 @@ async function extractStreamUrlFromAniCrush(url, anilistId) {
 
         const source = sourceData.result.link;
 
-        const hlsUrl = `${ UTILITY_URL }/api/anime/embed/convert?embedUrl=${ encodeURIComponent(source) }&host=${ encodeURIComponent(SOURCE_BASE_URL) }`;
+        const hlsUrl = `${ UTILITY_URL }/api/anime/embed/convert/v2?embedUrl=${ encodeURIComponent(source) }&host=${ encodeURIComponent(SOURCE_BASE_URL) }`;
         const hlsResponse = await soraFetch(hlsUrl);
         const hlsData = typeof hlsResponse === 'object' ? await hlsResponse.json() : await JSON.parse(hlsResponse);
 
@@ -665,7 +622,7 @@ async function extractStreamUrlFromAniCrush(url, anilistId) {
         }
 
         const streamUrl = streamSource?.file;
-        const subtitles = GetSubtitles(anilistId, ep);
+        const subtitles = GetSubtitles(json.anilistId, ep);
 
         return JSON.stringify({ stream: streamUrl, subtitles: subtitles });
 
@@ -741,4 +698,86 @@ function aniListDateBuilder(startDate, endDate) {
 
 
     return `${ startDate.year }-${ startMonth }-${ startDay } - ${ endDate.year }-${ endMonth }-${ endDay }`;
+}
+
+async function getSearchResultsViaExtraction(url, keyword) {
+    const baseUrl = 'https://www.animeparadise.moe';
+
+    const searchPageResponse = await soraFetch(url, { method: 'POST' });
+    const searchPageHtml = await searchPageResponse.text();
+
+    const fuckYoSearchPageRegex = /src="(\/_next\/static\/chunks\/app\/search\/page-[^"]*.js)"/;
+    const searchPageSrc = searchPageHtml.match(fuckYoSearchPageRegex)?.[1];
+    if (searchPageSrc == null) return null;
+
+    const searchJsResponse = await soraFetch(`${baseUrl}${searchPageSrc}`);
+    const searchJs = await searchJsResponse.text();
+
+    const fuckYoNextActionBsRegex = /createServerReference\)\("([^"]*)"[^"]*"searchAnime"/;
+    const nextAction = searchJs.match(fuckYoNextActionBsRegex)?.[1];
+    if (nextAction == null) return null;
+
+    const response = await soraFetch(url, {
+        method: 'POST',
+        headers: {
+            "Accept": "text/x-component",
+            "Content-Type": "application/json",
+            "Next-Action": nextAction,
+            "Next-Router-State-Tree": "%5B%22%22%2C%7B%22children%22%3A%5B%22search%22%2C%7B%22children%22%3A%5B%22__PAGE__%22%2C%7B%7D%2Cnull%2Cnull%5D%7D%2Cnull%2Cnull%5D%7D%2Cnull%2Cnull%2Ctrue%5D"
+        },
+        body: JSON.stringify([keyword, { "genres": [], "year": null, "season": null, "page": 1 }])
+    });
+    const text = await response.text();
+    const jsonString = text.slice(text.indexOf('1:{') + 2);
+    const json = JSON.parse(jsonString);
+
+    if (json?.error == true) {
+        console.error('Error in search', json);
+        return null;
+    }
+
+    return json?.data?.searchData;
+}
+
+async function getStreamsViaExtraction(episodeId, origin) {
+    const baseUrl = 'https://www.animeparadise.moe';
+    const url = `${baseUrl}/watch/${episodeId}?origin=${origin}`;
+
+    const watchPageResponse = await soraFetch(url, { method: 'POST' });
+    const watchPageHtml = await watchPageResponse.text();
+
+    const fuckYoWatchPageRegex = /src="(\/_next\/static\/chunks\/app\/watch\/%5Bid%5D\/page-[^"]*.js)"/;
+    let watchPageSrc = watchPageHtml.match(fuckYoWatchPageRegex)?.[1];
+    if (watchPageSrc == null) return null;
+    // I don't even need this, why is the placeholder's only acceptable value the placeholder urlencoded, wtf am I looking at?
+    // watchPageSrc = watchPageSrc.replace('%5Bid%5D', episodeId);
+
+    const watchJsResponse = await soraFetch(`${baseUrl}${watchPageSrc}`);
+    const watchJs = await watchJsResponse.text();
+
+    const fuckYoNextActionBsRegex = /createServerReference\)\("([^"]*)"[^"]*"getEpisode"/;
+    const nextAction = watchJs.match(fuckYoNextActionBsRegex)?.[1];
+    if (nextAction == null) return null;
+
+    const response = await soraFetch(url, {
+        method: 'POST',
+        headers: {
+            "Accept": "text/x-component",
+            "Content-Type": "application/json",
+            "Next-Action": nextAction,
+            "Next-Router-State-Tree": "%5B%22%22%2C%7B%22children%22%3A%5B%22watch%22%2C%7B%22children%22%3A%5B%5B%22id%22%2C%228bf78dcf-e00b-433d-b17a-6d087f8d4bff%22%2C%22d%22%5D%2C%7B%22children%22%3A%5B%22__PAGE__%22%2C%7B%7D%2Cnull%2Cnull%5D%7D%2Cnull%2Cnull%5D%7D%2Cnull%2Cnull%5D%7D%2Cnull%2Cnull%2Ctrue%5D"
+        },
+        body: JSON.stringify([episodeId, origin])
+    });
+    const text = await response.text();
+
+    const jsonString = text.slice(text.indexOf('1:{') + 2);
+    const json = JSON.parse(jsonString);
+
+    if (json?.error == true) {
+        console.error('Error in search', json);
+        return null;
+    }
+
+    return json;
 }
