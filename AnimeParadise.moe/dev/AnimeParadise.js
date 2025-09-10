@@ -1,14 +1,14 @@
 //***** LOCAL TESTING
-// (async () => {
-// const results = await searchResults('Cowboy Bebop');
-// // console.log('RESULTS: ', results);
-// const details = await extractDetails(JSON.parse(results)[0].href);
-// // console.log('DETAILS: ', details);
-// const episodesa = await extractEpisodes(JSON.parse(results)[0].href);
-// // console.log('EPISODES: ', episodesa);
-// const streamUrl = await extractStreamUrl(JSON.parse(episodesa)[0].href);
-// console.log('STREAMURL: ', streamUrl);
-// })();
+(async () => {
+const results = await searchResults('Cowboy Bebop');
+// console.log('RESULTS: ', results);
+const details = await extractDetails(JSON.parse(results)[0].href);
+// console.log('DETAILS: ', details);
+const episodesa = await extractEpisodes(JSON.parse(results)[0].href);
+// console.log('EPISODES: ', episodesa);
+const streamUrl = await extractStreamUrl(JSON.parse(episodesa)[0].href);
+console.log('STREAMURL: ', streamUrl);
+})();
 //***** LOCAL TESTING
 
 async function areRequiredServersUp() {
@@ -94,7 +94,11 @@ async function searchResults(keyword) {
  * @param {string} url The id required to fetch the details
  * @returns {Promise<string>} A promise that resolves with a JSON string containing the details in the format: `[{"description": "Description", "aliases": "Aliases", "airdate": "Airdate"}]`
  */
-async function extractDetails(url) {
+async function extractDetails(objString) {
+    const encodedDelimiter = '|';
+    const [url, jsonString] = decodeURIComponent(objString).split(encodedDelimiter);
+    const jsonData = JSON.parse(jsonString || '{}');
+    
     if (url.startsWith('#')) {
         return JSON.stringify([{
             description: decodeURIComponent(url.slice(1)) + ' Please try again later.',
@@ -103,14 +107,14 @@ async function extractDetails(url) {
         }]);
     }
 
-    const transferData = url.split('|')[1];
+    // const transferData = url.split('|')[1];
 
-    try {
-        var jsonData = JSON.parse(transferData);
-    } catch(e) {
-        console.log('Error in details parsing data: ' + e.message);
-        console.log(transferData);
-    }
+    // try {
+    //     var jsonData = JSON.parse(transferData);
+    // } catch(e) {
+    //     console.log('Error in details parsing data: ' + e.message);
+    //     console.log(transferData);
+    // }
     
     try {
         var anilistResult = await Anilist.lookup({ 'id': jsonData.anilistId });
@@ -118,7 +122,6 @@ async function extractDetails(url) {
         console.log('Error in details getting anilist data: ' + e.message);
     }
     
-
     const data = anilistResult?.Page?.media?.[0];
 
     if (data == null) {
@@ -142,10 +145,14 @@ async function extractDetails(url) {
  * @returns {Promise<string>} A promise that resolves with a JSON string containing the episodes in the format: `[{ "href": "Episode URL", "number": Episode Number }, ...]`.
  * If an error occurs during the fetch operation, an empty array is returned in JSON format.
  */
-async function extractEpisodes(url) {
-    var transferData = url.split('|')[1];
-    var jsonData = JSON.parse(transferData);
-    var url = url.split('|')[0].slice(1);
+async function extractEpisodes(objString) {
+    const encodedDelimiter = '|';
+    const [url, jsonString] = decodeURIComponent(objString).split(encodedDelimiter);
+    const jsonData = JSON.parse(jsonString || '{}');
+
+    // var transferData = url.split('|')[1];
+    // var jsonData = JSON.parse(transferData);
+    // var url = url.split('|')[0].slice(1);
 
     try {
         if (url.startsWith('#')) throw new Error('Host down but still attempted to get episodes');
