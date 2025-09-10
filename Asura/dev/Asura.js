@@ -76,8 +76,10 @@ async function searchResults(keyword) {
  * @returns {Promise<string>} A promise that resolves with a JSON string containing the details in the format: `[{"description": "Description", "aliases": "Aliases", "airdate": "Airdate"}]`
  */
 async function extractDetails(objString) {
+    const encodedDelimiter = '|';
+    const [url, jsonString] = decodeURIComponent(objString).split(encodedDelimiter);
     try {
-        var json = JSON.parse(objString);
+        var json = JSON.parse(jsonString);
     } catch(e) {
         console.log('Error parsing transferdata in details: ' + e.message);
     }
@@ -110,8 +112,10 @@ async function extractDetails(objString) {
  * If an error occurs during the fetch operation, an empty array is returned in JSON format.
  */
 async function extractEpisodes(objString) {
+    const encodedDelimiter = '|';
+    const [url, jsonString] = decodeURIComponent(objString).split(encodedDelimiter);
     try {
-        var json = JSON.parse(objString);
+        var json = JSON.parse(jsonString);
     } catch(e) {
         console.log('Error parsing transferdata in details: ' + e.message);
     }
@@ -141,8 +145,11 @@ async function extractEpisodes(objString) {
  * @returns {Promise<string|null>} A promise that resolves with the stream URL if successful, or null if an error occurs during the fetch operation.
  */
 async function extractStreamUrl(objString) {
+    const encodedDelimiter = '|';
+    const [url, jsonString] = decodeURIComponent(objString).split(encodedDelimiter);
     try {
-        var json = JSON.parse(objString);
+        var json = JSON.parse(jsonString);
+        json.url = url;
     } catch(e) {
         console.log('Error parsing transferdata in details: ' + e.message);
     }
@@ -262,7 +269,6 @@ async function animeParadiseSearch(keyword, asuraList = []) {
             }
 
             const transferData = JSON.stringify({
-                url: BASE_URL + '/anime/' + result?.link,
                 source: "AnimeParadise",
                 anilistId: result?.mappings?.anilist,
                 episodeSlugs: result?.ep,
@@ -272,7 +278,7 @@ async function animeParadiseSearch(keyword, asuraList = []) {
             shows.push({
                 title: '[AP] ' + result?.title,
                 image: result?.posterImage?.large ?? result?.posterImage?.medium ?? result?.posterImage?.small ?? result?.posterImage?.original,
-                href: `${transferData}`,
+                href: `${BASE_URL}/anime/${ result?.link }|${transferData}`,
             });
         }
 
@@ -317,7 +323,6 @@ async function aniCrushSearch(keyword, asuraList = []) {
             const href = `${ BASE_URL }/watch/${ entry.slug }.${ entry.id }`;
 
             const transferData = JSON.stringify({
-                url: href,
                 source: "AniCrush",
                 anilistId: entry.anilistId,
                 detailsUrl: `https://api.anicrush.to/shared/v2/movie/getById/${ entry.id }`,
@@ -327,7 +332,7 @@ async function aniCrushSearch(keyword, asuraList = []) {
             shows.push({
                 title: '[AC] ' + entry.name,
                 image: getAniCrushImage(entry.poster_path),
-                href: `${transferData}`
+                href: `${href}|${transferData}`
             });
         }
 
@@ -495,7 +500,7 @@ async function extractEpisodesFromAnimeParadise(json) {
             });
 
             episodes.push({
-                href: transferStream,
+                href: `https://animeparadise.moe/|${ transferStream }`,
                 number: parseInt(stream.number)
             });
         }
@@ -536,12 +541,11 @@ async function extractEpisodesFromAniCrush(json) {
 
                 const transferData = JSON.stringify({
                     source: "AniCrush",
-                    url: `${ SOURCE_API_URL }/episode/sources?_movieId=${ movieId }&ep=${ episode.number }&sv=${ serverId }&sc=${ format }`,
                     anilistId: json.anilistId
                 });
 
                 episodes.push({
-                    href: `${transferData}`,
+                    href: `${ SOURCE_API_URL }/episode/sources?_movieId=${ movieId }&ep=${ episode.number }&sv=${ serverId }&sc=${ format }|${ transferData }`,
                     number: parseInt(episode.number)
                 });
             }
