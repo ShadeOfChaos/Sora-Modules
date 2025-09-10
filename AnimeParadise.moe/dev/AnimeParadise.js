@@ -168,10 +168,15 @@ async function extractEpisodes(objString) {
                 subtitles: stream?.subData
             });
 
+            let nr = stream?.number ?? 'Unknown';
+            console.log('========== Stream number ' + nr + '==========');
+
             episodes.push({
                 href: transferStream,
-                number: stream.number
+                number: parseInt(stream.number)
             });
+
+            debugger;
         }
 
         return JSON.stringify(episodes);
