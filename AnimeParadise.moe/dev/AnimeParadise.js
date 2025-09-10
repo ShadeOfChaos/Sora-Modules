@@ -168,15 +168,10 @@ async function extractEpisodes(objString) {
                 subtitles: stream?.subData
             });
 
-            let nr = stream?.number ?? 'Unknown';
-            console.log('========== Stream number ' + nr + '==========');
-
             episodes.push({
                 href: transferStream,
                 number: parseInt(stream.number)
             });
-
-            debugger;
         }
 
         return JSON.stringify(episodes);
@@ -195,7 +190,7 @@ async function extractEpisodes(objString) {
 async function extractStreamUrl(url) {
     try {
         const data = JSON.parse(url);
-        return JSON.stringify({ stream: data.stream, subtitles: data.subtitles.find(sub => sub.type === 'vtt' && sub.label === 'English') });
+        return JSON.stringify({ stream: data.stream, subtitles: data.subtitles.find(sub => sub.type === 'vtt' && sub.label === 'English')?.src });
 
     } catch(e) {
         console.log('Failed to parse streams json.');
