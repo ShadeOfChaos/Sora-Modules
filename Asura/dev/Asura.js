@@ -1,19 +1,19 @@
 // // //***** LOCAL TESTING
-// (async () => {
-//     const results = await searchResults('Cowboy Bebop');
-//     // console.log('RESULTS: ', results);
-//     const details = await extractDetails(JSON.parse(results)[2].href);
-//     // console.log('DETAILS: ', details);
-//     const eps = await extractEpisodes(JSON.parse(results)[2].href);
-//     // console.log('EPISODES: ', eps);
-//     const streamUrl = await extractStreamUrl(JSON.parse(eps)[0].href);
-//     console.log('STREAMURL: ', streamUrl);
+(async () => {
+    const results = await searchResults('Cowboy Bebop');
+    // console.log('RESULTS: ', results);
+    const details = await extractDetails(JSON.parse(results)[2].href);
+    // console.log('DETAILS: ', details);
+    const eps = await extractEpisodes(JSON.parse(results)[2].href);
+    // console.log('EPISODES: ', eps);
+    const streamUrl = await extractStreamUrl(JSON.parse(eps)[0].href);
+    console.log('STREAMURL: ', streamUrl);
 
-//     const eps2 = await extractEpisodes(JSON.parse(results)[0].href);
-//     // console.log('EPISODES: ', eps2);
-//     const streamUrl2 = await extractStreamUrl(JSON.parse(eps2)[0].href);
-//     console.log('STREAMURL2: ', streamUrl2);
-// })();
+    const eps2 = await extractEpisodes(JSON.parse(results)[0].href);
+    // console.log('EPISODES: ', eps2);
+    const streamUrl2 = await extractStreamUrl(JSON.parse(eps2)[0].href);
+    console.log('STREAMURL2: ', streamUrl2);
+})();
 //***** LOCAL TESTING
 
 
@@ -76,7 +76,7 @@ async function searchResults(keyword) {
  */
 async function extractDetails(objString) {
     try {
-        var json = JSON.parse(objString);
+        var json = JSON.parse(objString.slice(1));
     } catch(e) {
         console.log('Error parsing transferdata in details: ' + e.message);
     }
@@ -110,7 +110,7 @@ async function extractDetails(objString) {
  */
 async function extractEpisodes(objString) {
     try {
-        var json = JSON.parse(objString);
+        var json = JSON.parse(objString.slice(1));
     } catch(e) {
         console.log('Error parsing transferdata in details: ' + e.message);
     }
@@ -141,7 +141,7 @@ async function extractEpisodes(objString) {
  */
 async function extractStreamUrl(objString) {
     try {
-        var json = JSON.parse(objString);
+        var json = JSON.parse(objString.slice(1));
     } catch(e) {
         console.log('Error parsing transferdata in details: ' + e.message);
     }
@@ -271,7 +271,7 @@ async function animeParadiseSearch(keyword, asuraList = []) {
             shows.push({
                 title: '[AP] ' + result?.title,
                 image: result?.posterImage?.large ?? result?.posterImage?.medium ?? result?.posterImage?.small ?? result?.posterImage?.original,
-                href: transferData,
+                href: '+' + transferData,
             });
         }
 
@@ -326,7 +326,7 @@ async function aniCrushSearch(keyword, asuraList = []) {
             shows.push({
                 title: '[AC] ' + entry.name,
                 image: getAniCrushImage(entry.poster_path),
-                href: transferData
+                href: '+' + transferData
             });
         }
 
@@ -408,12 +408,12 @@ async function getDetailsFromAnilist(anilistId) {
                 "Content-Type": "application/json",
                 "Accept": "application/json"
             },
-            body: {
+            body: JSON.stringify({
                 query: query,
                 variables: {
                     "id": anilistId
                 }
-            }
+            })
         });
         const json = typeof response === 'object' ? await response.json() : await JSON.parse(response);
 
@@ -477,32 +477,6 @@ async function getDetailsFromAniCrush(detailsUrl) {
  * @returns {Promise<string>} A promise that resolves with a JSON string containing the episodes in the format: `[{ "href": "Episode URL", "number": Episode Number }, ...]`.
  * If an error occurs during the fetch operation, an empty array is returned in JSON format.
  */
-// async function extractEpisodesFromAnimeParadise(json) {
-//     const BASE_URL = 'https://www.animeparadise.moe/watch/';
-
-//     try {
-//         const response = await soraFetch(json.episodesUrl);
-//         const data = typeof response === 'object' ? await response.json() : await JSON.parse(response);
-
-//         if(data?.data == null) {
-//             throw new Error('Error retrieving AnimeParadise episodes json');
-//         }
-
-//         const episodes = data?.data.map(ep => {
-//             return {
-//                 href: `${ BASE_URL }${ ep.uid }?origin=${ ep.origin }|${ json.anilistId }`,
-//                 number: parseInt(ep.number)
-//             }
-//         });
-
-//         return JSON.stringify(episodes);
-
-//     } catch(error) {
-//         console.log('[ASURA][extractEpisodesFromAnimeParadise] Fetch error: ' + error?.message);
-//         return JSON.stringify([]);
-//     }
-// }
-
 async function extractEpisodesFromAnimeParadise(json) {
     try {
         var episodes = [];
@@ -520,7 +494,7 @@ async function extractEpisodesFromAnimeParadise(json) {
             });
 
             episodes.push({
-                href: transferStream,
+                href: '+' + transferStream,
                 number: parseInt(stream.number)
             });
         }
@@ -566,7 +540,7 @@ async function extractEpisodesFromAniCrush(json) {
                 });
 
                 episodes.push({
-                    href: transferData,
+                    href: '+' + transferData,
                     number: parseInt(episode.number)
                 });
             }
