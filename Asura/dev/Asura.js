@@ -272,7 +272,7 @@ async function animeParadiseSearch(keyword, asuraList = []) {
             shows.push({
                 title: '[AP] ' + result?.title,
                 image: result?.posterImage?.large ?? result?.posterImage?.medium ?? result?.posterImage?.small ?? result?.posterImage?.original,
-                href: JSON.stringify(transferData),
+                href: `${transferData}`,
             });
         }
 
@@ -327,7 +327,7 @@ async function aniCrushSearch(keyword, asuraList = []) {
             shows.push({
                 title: '[AC] ' + entry.name,
                 image: getAniCrushImage(entry.poster_path),
-                href: JSON.stringify(transferData)
+                href: `${transferData}`
             });
         }
 
@@ -541,7 +541,7 @@ async function extractEpisodesFromAniCrush(json) {
                 });
 
                 episodes.push({
-                    href: transferData,
+                    href: `${transferData}`,
                     number: parseInt(episode.number)
                 });
             }
