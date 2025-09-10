@@ -1,19 +1,19 @@
 // // //***** LOCAL TESTING
-(async () => {
-    const results = await searchResults('Cowboy Bebop');
-    // console.log('RESULTS: ', results);
-    const details = await extractDetails(JSON.parse(results)[2].href);
-    // console.log('DETAILS: ', details);
-    const eps = await extractEpisodes(JSON.parse(results)[2].href);
-    // console.log('EPISODES: ', eps);
-    const streamUrl = await extractStreamUrl(JSON.parse(eps)[0].href);
-    console.log('STREAMURL: ', streamUrl);
+// (async () => {
+//     const results = await searchResults('Cowboy Bebop');
+//     // console.log('RESULTS: ', results);
+//     const details = await extractDetails(JSON.parse(results)[2].href);
+//     // console.log('DETAILS: ', details);
+//     const eps = await extractEpisodes(JSON.parse(results)[2].href);
+//     // console.log('EPISODES: ', eps);
+//     const streamUrl = await extractStreamUrl(JSON.parse(eps)[0].href);
+//     console.log('STREAMURL: ', streamUrl);
 
-    const eps2 = await extractEpisodes(JSON.parse(results)[0].href);
-    // console.log('EPISODES: ', eps2);
-    const streamUrl2 = await extractStreamUrl(JSON.parse(eps2)[0].href);
-    console.log('STREAMURL2: ', streamUrl2);
-})();
+//     const eps2 = await extractEpisodes(JSON.parse(results)[0].href);
+//     // console.log('EPISODES: ', eps2);
+//     const streamUrl2 = await extractStreamUrl(JSON.parse(eps2)[0].href);
+//     console.log('STREAMURL2: ', streamUrl2);
+// })();
 //***** LOCAL TESTING
 
 
@@ -161,42 +161,6 @@ async function extractStreamUrl(objString) {
         console.log('[ASURA][extractStreamUrl] Stream URL error: ' + error?.message);
         return JSON.stringify({ stream: null, subtitles: null });
     }
-}
-
-/**
- * Extracts and parses the JSON data from the given HTML string from AnimeParadise.moe.
- * 
- * The function searches for the JSON data within the HTML content
- * that is wrapped between the '__NEXT_DATA__' and '</script>' tags,
- * trims the HTML to extract the JSON string, and then parses it into
- * an object.
- * 
- * @param {string} html - The HTML content containing the JSON data.
- * @returns {Object|null} The parsed JSON object if successful, or null if an error occurs during parsing.
- */
-function getNextData(html) {
-    const trimmedHtml = trimHtml(html, '__NEXT_DATA__', '</script>');
-    const jsonString = trimmedHtml.slice(39);
-
-    try {
-        return JSON.parse(jsonString);
-    } catch (e) {
-        console.log('[ASURA][getNextData] Error parsing NEXT_DATA json');
-        return null;
-    }
-}
-
-/**
- * Trims around the content, leaving only the area between the start and end string
- * @param {string} html The text to trim
- * @param {string} startString The string to start at (inclusive)
- * @param {string} endString The string to end at (exclusive)
- * @returns The trimmed text
- */
-function trimHtml(html, startString, endString) {
-    const startIndex = html.indexOf(startString);
-    const endIndex = html.indexOf(endString, startIndex);
-    return html.substring(startIndex, endIndex);
 }
 
 /**
